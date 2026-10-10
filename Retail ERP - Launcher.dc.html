@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Brn ERP — Retail ERP</title>
+<link rel="icon" type="image/svg+xml" href="./assets/brn-dot.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F5F7;color:#0E1116;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#010ECF;text-decoration:none}a:hover{color:#000A9E}
+</style>
+</helmet>
+<sc-if value="{{ isWeb }}" hint-placeholder-val="{{ false }}"><dc-import name="Retail ERP - Back office v3" on-switch-app="{{ back }}" hint-size="100%,100vh"></dc-import></sc-if>
+<sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}"><dc-import name="Retail ERP - Handheld v2" on-switch-app="{{ back }}" hint-size="100%,100vh"></dc-import></sc-if>
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;box-sizing:border-box;gap:36px">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+    <div style="width:52px;height:52px;border-radius:14px;background:#0E1116;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700">BE</div>
+    <h1 style="margin:0;font-size:30px;font-weight:700;letter-spacing:-.025em">Brn ERP</h1>
+    <div style="font-size:14.5px;color:#5B6270">Retail ERP · choose where you’re working</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:18px;width:100%;max-width:780px">
+    <div onClick="{{ open.web }}" style="cursor:pointer;display:flex;flex-direction:column;background:#fff;border:1px solid #E6E8EC;border-radius:18px;overflow:hidden;text-decoration:none;color:#0E1116;box-shadow:0 1px 2px rgba(14,17,22,.04)" style-hover="border-color:#010ECF;box-shadow:0 0 0 4px rgba(1,14,207,.08),0 18px 40px rgba(14,17,22,.08);text-decoration:none;color:#0E1116">
+      <div style="height:170px;background:#EEF0F6;display:flex;align-items:flex-end;justify-content:center;padding:22px 22px 0;box-sizing:border-box">
+        <div style="width:100%;max-width:270px;height:140px;background:#fff;border-radius:8px 8px 0 0;box-shadow:0 -2px 14px rgba(14,17,22,.08);display:flex;overflow:hidden">
+          <div style="width:52px;background:#FAFAFB;border-right:1px solid #ECEEF1;padding:10px 7px;display:flex;flex-direction:column;gap:6px;box-sizing:border-box">
+            <span style="height:6px;border-radius:3px;background:#010ECF;opacity:.7"></span><span style="height:6px;border-radius:3px;background:#DDE0E6"></span><span style="height:6px;border-radius:3px;background:#DDE0E6"></span><span style="height:6px;border-radius:3px;background:#DDE0E6"></span>
+          </div>
+          <div style="flex:1;padding:10px;display:flex;flex-direction:column;gap:7px">
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:6px"><span style="height:34px;border-radius:5px;background:#010ECF"></span><span style="height:34px;border-radius:5px;background:#F1F2F5"></span><span style="height:34px;border-radius:5px;background:#F1F2F5"></span></div>
+            <div style="flex:1;border-radius:5px;background:#F6F7F9;display:flex;align-items:flex-end;gap:5px;padding:8px">
+              <span style="flex:1;height:40%;background:#C9CEF7;border-radius:2px"></span><span style="flex:1;height:65%;background:#C9CEF7;border-radius:2px"></span><span style="flex:1;height:50%;background:#C9CEF7;border-radius:2px"></span><span style="flex:1;height:85%;background:#010ECF;border-radius:2px"></span><span style="flex:1;height:60%;background:#C9CEF7;border-radius:2px"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:22px 24px 24px;display:flex;flex-direction:column;gap:8px;flex:1">
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-size:19px;font-weight:700;letter-spacing:-.01em">Back office</span><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:#E6E8FB;color:#010ECF">Web app</span><sc-if value="{{ lastWeb }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto;font-size:11.5px;font-weight:600;color:#7A8191">Last used</span></sc-if></div>
+        <div style="font-size:13.5px;color:#5B6270;line-height:1.55">Inventory, purchasing, finance and reports for owners, managers and accountants. Best on a desktop or laptop.</div>
+        <div style="margin-top:auto;padding-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:13.5px;font-weight:650;color:#010ECF"><span>Open back office</span><span style="width:34px;height:34px;border-radius:17px;background:#010ECF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px">→</span></div>
+      </div>
+    </div>
+
+    <div onClick="{{ open.mobile }}" style="cursor:pointer;display:flex;flex-direction:column;background:#fff;border:1px solid #E6E8EC;border-radius:18px;overflow:hidden;text-decoration:none;color:#0E1116;box-shadow:0 1px 2px rgba(14,17,22,.04)" style-hover="border-color:#010ECF;box-shadow:0 0 0 4px rgba(1,14,207,.08),0 18px 40px rgba(14,17,22,.08);text-decoration:none;color:#0E1116">
+      <div style="height:170px;background:#0E1116;display:flex;align-items:flex-end;justify-content:center;padding-top:22px;box-sizing:border-box">
+        <div style="width:96px;height:148px;background:#1B1F27;border-radius:16px 16px 0 0;border:3px solid #2A2F39;border-bottom:none;padding:10px 8px 0;box-sizing:border-box;display:flex;flex-direction:column;gap:6px">
+          <span style="height:5px;width:40%;border-radius:3px;background:#3A404C"></span>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px"><span style="height:30px;border-radius:5px;background:#010ECF"></span><span style="height:30px;border-radius:5px;background:#2A2F39"></span><span style="height:30px;border-radius:5px;background:#2A2F39"></span><span style="height:30px;border-radius:5px;background:#2A2F39"></span><span style="height:30px;border-radius:5px;background:#2A2F39"></span><span style="height:30px;border-radius:5px;background:#2A2F39"></span></div>
+        </div>
+      </div>
+      <div style="padding:22px 24px 24px;display:flex;flex-direction:column;gap:8px;flex:1">
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-size:19px;font-weight:700;letter-spacing:-.01em">Handheld</span><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:#EEE8FD;color:#5B2FD1">Mobile app</span><sc-if value="{{ lastMobile }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto;font-size:11.5px;font-weight:600;color:#7A8191">Last used</span></sc-if></div>
+        <div style="font-size:13.5px;color:#5B6270;line-height:1.55">Scan to receive goods, transfer stock, count shelves, write off and pick online orders. Built for Zebra TC22 scanners.</div>
+        <div style="margin-top:auto;padding-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:13.5px;font-weight:650;color:#010ECF"><span>Open handheld</span><span style="width:34px;height:34px;border-radius:17px;background:#010ECF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px">→</span></div>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ suggest }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#4A5160;background:#fff;border:1px solid #E6E8EC;border-radius:10px;padding:10px 14px">{{ suggest }}</div></sc-if>
+
+  <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+    <span style="font-size:11px;color:#5B6270">Powered by</span>
+    <img src="./assets/brn-dynamics-logo.png" alt="brn dynamics" style="height:26px;display:block">
+  </div>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;webUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;./Retail ERP - Back office v3.dc.html&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Links&quot;},&quot;mobileUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;./Retail ERP - Handheld v2.dc.html&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Links&quot;}}">class Component extends DCLogic {
+  state = { last: null, mobile: false, app: null };
+  componentDidMount(){
+    let last=null; try{ last=localStorage.getItem('nv-erp-launcher-last'); }catch(e){}
+    const mobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||window.innerWidth<640;
+    this.setState({last,mobile});
+  }
+  pick(k){ try{ localStorage.setItem('nv-erp-launcher-last',k); }catch(e){} }
+  renderVals(){
+    const st=this.state;
+    return {
+      webHref:this.props.webUrl??'./Retail ERP - Back office v3.dc.html',
+      mobileHref:this.props.mobileUrl??'./Retail ERP - Handheld v2.dc.html',
+      open:{web:()=>{ this.pick('web'); this.setState({app:'web',last:'web'}); window.scrollTo(0,0); },mobile:()=>{ this.pick('mobile'); this.setState({app:'mobile',last:'mobile'}); window.scrollTo(0,0); }},
+      back:()=>this.setState({app:null}), isWeb:st.app==='web', isMobile:st.app==='mobile', isHome:!st.app,
+      lastWeb:st.last==='web', lastMobile:st.last==='mobile',
+      suggest:st.mobile?'You’re on a phone or scanner, so the Handheld app is the better fit.':''
+    };
+  }
+}</script>
+</body>
+</html>

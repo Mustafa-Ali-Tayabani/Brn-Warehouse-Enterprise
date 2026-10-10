@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Retail ERP — Back office</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="./erp-core.js"></script>
+<style>
+body{margin:0;background:#F4F5F7;color:#0E1116;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#010ECF;text-decoration:none}a:hover{color:#000A9E;text-decoration:underline}
+input,select,textarea,button{font-family:inherit;color:inherit}
+input:focus,select:focus,textarea:focus{outline:2px solid rgba(1,14,207,.35);outline-offset:0;border-color:#010ECF}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#D5D8DE;border-radius:10px;border:3px solid transparent;background-clip:content-box}
+</style>
+</helmet>
+<div style="display:flex;height:100vh;font-size:14px;font-variant-numeric:tabular-nums;min-width:1180px">
+  <aside style="width:236px;flex:none;background:#FAFAFB;border-right:1px solid #E6E8EC;display:flex;flex-direction:column;min-height:0">
+    <div style="height:56px;flex:none;display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid #ECEEF1">
+      <div style="width:30px;height:30px;border-radius:8px;background:#0E1116;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">NV</div>
+      <div style="min-width:0;line-height:1.3">
+        <div style="font-size:13.5px;font-weight:650">Najma Value Store</div>
+        <div style="font-size:11.5px;color:#7A8191">Kuwait City · Back office</div>
+      </div>
+    </div>
+    <nav style="flex:1;overflow:auto;padding:4px 0 16px">
+      <sc-for list="{{ nav }}" as="g" hint-placeholder-count="6">
+        <div style="padding:16px 22px 6px;font-size:10.5px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:#9AA0AC">{{ g.title }}</div>
+        <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="2">
+          <div onClick="{{ n.go }}" style="display:flex;align-items:center;gap:10px;height:32px;padding:0 10px 0 12px;margin:1px 10px;border-radius:6px;cursor:pointer;font-size:13.5px;background:{{ n.bg }};color:{{ n.fg }};font-weight:{{ n.fw }}">
+            <span style="width:6px;height:6px;border-radius:2px;background:{{ n.mark }}"></span>
+            <span style="flex:1">{{ n.label }}</span>
+            <sc-if value="{{ n.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:9px;background:{{ n.badgeBg }};color:{{ n.badgeFg }};font-size:11px;font-weight:650;display:flex;align-items:center;justify-content:center">{{ n.badge }}</span></sc-if>
+          </div>
+        </sc-for>
+      </sc-for>
+    </nav>
+    <div style="flex:none;padding:14px 22px;border-top:1px solid #ECEEF1;display:flex;align-items:center;gap:10px">
+      <span style="font-size:10.5px;color:#9AA0AC">Powered by</span>
+      <div style="line-height:.95">
+        <div style="font-size:16px;font-weight:800;letter-spacing:-.045em">brn<span style="color:#010ECF">.</span></div>
+        <div style="font-size:8.5px;font-weight:300;letter-spacing:.18em;color:#4A5160">dynamics</div>
+      </div>
+    </div>
+  </aside>
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column">
+    <header style="height:56px;flex:none;display:flex;align-items:center;gap:16px;padding:0 24px;background:#fff;border-bottom:1px solid #E6E8EC">
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;min-width:0">
+        <span style="color:#7A8191">{{ crumbA }}</span><span style="color:#C3C7CF">/</span><span style="font-weight:600;white-space:nowrap">{{ crumbB }}</span>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:2px;padding:3px;background:#F1F2F5;border-radius:8px">
+        <sc-for list="{{ locOpts }}" as="o" hint-placeholder-count="3">
+          <button onClick="{{ o.pick }}" style="height:28px;padding:0 12px;border:none;border-radius:6px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }}"><span style="width:7px;height:7px;border-radius:50%;background:{{ o.dot }}"></span>{{ o.label }}</button>
+        </sc-for>
+      </div>
+      <div style="font-size:12px;color:#7A8191;white-space:nowrap">Wed 07 Oct 2026 · 09:41 KWT</div>
+      <div style="position:relative">
+        <button onClick="{{ toggleMenu }}" style="display:flex;align-items:center;gap:8px;height:36px;padding:0 6px 0 4px;border:1px solid #E6E8EC;border-radius:18px;background:#fff;cursor:pointer">
+          <span style="width:28px;height:28px;border-radius:50%;background:#010ECF;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">NA</span>
+          <span style="font-size:12.5px;font-weight:600;padding-right:6px">Noura</span>
+        </button>
+        <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;right:0;top:44px;width:250px;background:#fff;border:1px solid #E6E8EC;border-radius:10px;box-shadow:0 16px 40px rgba(14,17,22,.14);z-index:40;overflow:hidden">
+            <div style="padding:14px 16px;border-bottom:1px solid #EEF0F3">
+              <div style="font-weight:600;font-size:13.5px">Noura Al-Saleh</div>
+              <div style="font-size:12px;color:#7A8191;margin-top:2px">Owner · Admin · noura@najmavalue.kw</div>
+            </div>
+            <div onClick="{{ goUsers }}" style="padding:10px 16px;font-size:13px;cursor:pointer" style-hover="background:#F6F7F9">Users and roles</div>
+            <div onClick="{{ reset }}" style="padding:10px 16px;font-size:13px;cursor:pointer;color:#B42318;border-top:1px solid #EEF0F3" style-hover="background:#FDF3F2">Reset demo data</div>
+          </div>
+        </sc-if>
+      </div>
+    </header>
+    <div onClick="{{ closeMenu }}" style="flex:1;overflow:auto">
+      <div style="max-width:1340px;margin:0 auto;padding:28px 32px 72px;box-sizing:border-box">
+
+<sc-if value="{{ is.dashboard }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:22px">
+    <div>
+      <h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Good morning, Noura</h1>
+      <div style="margin-top:6px;color:#5B6270;font-size:13.5px">Wednesday 07 Oct 2026 · showing {{ dashboard.scope }}</div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button onClick="{{ dashboard.newTrf }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#F6F7F9">New transfer</button>
+      <button onClick="{{ dashboard.newPO }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#000BB0">New purchase order</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1.55fr 1fr 1fr 1fr;gap:16px;margin-bottom:16px">
+    <div style="background:#010ECF;color:#fff;border-radius:12px;padding:20px 22px;position:relative;overflow:hidden">
+      <div style="position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.07)"></div>
+      <div style="font-size:12.5px;font-weight:500;opacity:.8">Stock value at average cost</div>
+      <div style="font-size:30px;font-weight:700;letter-spacing:-.02em;margin-top:6px">{{ dashboard.valTotal }}</div>
+      <div style="font-size:12.5px;opacity:.75;margin-top:2px">{{ dashboard.units }} units · {{ dashboard.skus }} active SKUs</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:18px">
+        <sc-for list="{{ dashboard.pools }}" as="p" hint-placeholder-count="2">
+          <div style="display:grid;grid-template-columns:120px 1fr 110px;align-items:center;gap:12px;font-size:12.5px">
+            <span style="display:flex;align-items:center;gap:7px;font-weight:600"><span style="width:8px;height:8px;border-radius:50%;background:{{ p.bar }}"></span>{{ p.name }}</span>
+            <span style="height:6px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden"><span style="display:block;height:100%;border-radius:3px;background:#fff;width:{{ p.pct }}"></span></span>
+            <span style="text-align:right;font-weight:600">{{ p.val }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:20px 22px">
+      <div style="font-size:12.5px;color:#5B6270;font-weight:500">Low stock</div>
+      <div style="font-size:30px;font-weight:700;letter-spacing:-.02em;margin-top:6px">{{ dashboard.lowCount }}</div>
+      <div style="font-size:12.5px;color:#7A8191;margin-top:2px">SKU-pool pairs below {{ dashboard.reorder }} units</div>
+      <div style="margin-top:18px;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:12px;background:#FDE7E5;color:#B42318;font-size:12px;font-weight:600">{{ dashboard.zeroCount }} out of stock in a pool</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:20px 22px">
+      <div style="font-size:12.5px;color:#5B6270;font-weight:500">Open purchase orders</div>
+      <div style="font-size:30px;font-weight:700;letter-spacing:-.02em;margin-top:6px">{{ dashboard.openCount }}</div>
+      <div style="font-size:12.5px;color:#7A8191;margin-top:2px">{{ dashboard.openVal }} on order</div>
+      <div onClick="{{ dashboard.goPOs }}" style="margin-top:18px;font-size:12.5px;font-weight:600;color:#010ECF;cursor:pointer">View purchase orders →</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:20px 22px">
+      <div style="font-size:12.5px;color:#5B6270;font-weight:500">Payables outstanding</div>
+      <div style="font-size:30px;font-weight:700;letter-spacing:-.02em;margin-top:6px">{{ dashboard.payTotal }}</div>
+      <div style="font-size:12.5px;color:#7A8191;margin-top:2px">{{ dashboard.payCount }} open supplier invoices</div>
+      <div style="margin-top:18px;display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:12px;background:#FDF1DC;color:#8A5A00;font-size:12px;font-weight:600">{{ dashboard.overdue }} overdue</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:16px;margin-bottom:16px">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+      <div style="display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid #EEF0F3"><div style="font-weight:600">Low stock by pool</div><div onClick="{{ dashboard.goItems }}" style="margin-left:auto;font-size:12.5px;font-weight:600;color:#010ECF;cursor:pointer">All items →</div></div>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 150px 70px;gap:12px;padding:0 18px;height:34px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Item</span><span>Pool</span><span style="text-align:right">On hand</span></div>
+      <sc-for list="{{ dashboard.low }}" as="r" hint-placeholder-count="6">
+        <div onClick="{{ r.open }}" style="display:grid;grid-template-columns:minmax(0,1fr) 150px 70px;gap:12px;padding:0 18px;min-height:44px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px;cursor:pointer" style-hover="background:#F7F8FB">
+          <div style="min-width:0"><div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7A8191">{{ r.sku }}</div></div>
+          <span><span style="display:inline-flex;align-items:center;gap:6px;height:20px;padding:0 8px;border-radius:4px;font-size:11px;font-weight:600;background:{{ r.pool.bg }};color:{{ r.pool.fg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ r.pool.dot }}"></span>{{ r.pool.name }}</span></span>
+          <span style="text-align:right;font-weight:650;color:{{ r.qFg }}">{{ r.q }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:16px 18px">
+        <div style="font-weight:600;margin-bottom:14px">Stock value by category</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ dashboard.cats }}" as="c" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:80px 1fr 100px;gap:12px;align-items:center;font-size:12.5px">
+              <span style="color:#353B47">{{ c.name }}</span>
+              <span style="height:8px;background:#F1F2F5;border-radius:4px;overflow:hidden"><span style="display:block;height:100%;background:#010ECF;border-radius:4px;width:{{ c.pct }}"></span></span>
+              <span style="text-align:right;font-weight:600">{{ c.val }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden;flex:1">
+        <div style="display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid #EEF0F3"><div style="font-weight:600">Payables</div><div onClick="{{ dashboard.goInv }}" style="margin-left:auto;font-size:12.5px;font-weight:600;color:#010ECF;cursor:pointer">Supplier invoices →</div></div>
+        <sc-for list="{{ dashboard.pay }}" as="r" hint-placeholder-count="3">
+          <div onClick="{{ r.open }}" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:10px 18px;border-bottom:1px solid #F2F3F5;align-items:center;cursor:pointer" style-hover="background:#F7F8FB">
+            <div style="min-width:0"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.vendor }}</div><div style="font-size:11.5px;color:#7A8191"><span style="font-family:'JetBrains Mono',monospace">{{ r.no }}</span> · due {{ r.due }}</div></div>
+            <div style="text-align:right"><div style="font-size:13px;font-weight:600">{{ r.k }}</div><span style="display:inline-flex;height:18px;padding:0 7px;border-radius:9px;align-items:center;font-size:10.5px;font-weight:600;background:{{ r.st.bg }};color:{{ r.st.fg }}">{{ r.st.text }}</span></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+      <div style="padding:14px 18px;border-bottom:1px solid #EEF0F3;font-weight:600">Open purchase orders</div>
+      <sc-for list="{{ dashboard.openPOs }}" as="r" hint-placeholder-count="3">
+        <div onClick="{{ r.open }}" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:11px 18px;border-bottom:1px solid #F2F3F5;align-items:center;cursor:pointer" style-hover="background:#F7F8FB">
+          <div style="min-width:0"><div style="display:flex;gap:8px;align-items:center"><span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500">{{ r.no }}</span><span style="display:inline-flex;height:20px;padding:0 8px;border-radius:10px;align-items:center;font-size:11px;font-weight:600;background:{{ r.st.bg }};color:{{ r.st.fg }}">{{ r.st.text }}</span></div><div style="font-size:12px;color:#7A8191;margin-top:2px">{{ r.vendor }} · to {{ r.pool.name }}</div></div>
+          <div style="text-align:right"><div style="font-size:13px;font-weight:600">{{ r.fx }}</div><div style="font-size:11.5px;color:#7A8191">{{ r.k }}</div></div>
+        </div>
+      </sc-for>
+      <sc-if value="{{ dashboard.openEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:24px 18px;color:#7A8191;font-size:13px">No open purchase orders for this location.</div></sc-if>
+    </div>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+      <div style="padding:14px 18px;border-bottom:1px solid #EEF0F3;font-weight:600">Recent stock movements</div>
+      <sc-for list="{{ dashboard.moves }}" as="m" hint-placeholder-count="5">
+        <div onClick="{{ m.open }}" style="display:grid;grid-template-columns:minmax(0,1fr) 84px 50px;gap:12px;padding:10px 18px;border-bottom:1px solid #F2F3F5;align-items:center;cursor:pointer" style-hover="background:#F7F8FB">
+          <div style="min-width:0"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</div><div style="font-size:11.5px;color:#7A8191">{{ m.type }} · <span style="font-family:'JetBrains Mono',monospace">{{ m.ref }}</span> · {{ m.date }}</div></div>
+          <span><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 7px;border-radius:4px;font-size:11px;font-weight:600;background:{{ m.pool.bg }};color:{{ m.pool.fg }}">{{ m.pool.label }}</span></span>
+          <span style="text-align:right;font-weight:650;color:{{ m.qtyFg }}">{{ m.qty }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.items }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Items</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">{{ items.count }} · Store and Online stock are separate pools</div></div>
+    <div style="margin-left:auto;display:flex;gap:8px"><button onClick="{{ items.goLabels }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Print barcode labels</button></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+    <div style="position:relative;width:320px"><input value="{{ items.q }}" onChange="{{ items.setQ }}" placeholder="Search SKU, name, barcode or Arabic…" style="width:100%;box-sizing:border-box;height:36px;padding:0 12px 0 34px;border:1px solid #D9DCE2;border-radius:6px;font-size:13px;background:#fff"><span style="position:absolute;left:12px;top:10px;width:11px;height:11px;border:2px solid #9AA0AC;border-radius:50%;box-sizing:border-box"></span></div>
+    <div style="display:flex;gap:6px">
+      <sc-for list="{{ items.cats }}" as="c" hint-placeholder-count="5"><button onClick="{{ c.pick }}" style="height:30px;padding:0 12px;border-radius:15px;font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }}">{{ c.label }}</button></sc-for>
+    </div>
+    <div onClick="{{ items.toggleInactive }}" style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12.5px;color:#353B47;cursor:pointer"><span style="width:30px;height:18px;border-radius:9px;padding:2px;box-sizing:border-box;display:flex;justify-content:{{ items.inactJ }};background:{{ items.inactBg }}"><span style="width:14px;height:14px;border-radius:50%;background:#fff"></span></span>Show inactive</div>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+    <div style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.6fr) 84px 84px 84px 84px 84px 56px;gap:14px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191">
+      <span>Item</span><span style="text-align:right">Arabic description</span><span>Category</span><span style="text-align:right">Cost KWD</span><span style="text-align:right">Price KWD</span>
+      <span style="text-align:right"><span style="display:inline-flex;height:20px;padding:0 7px;align-items:center;border-radius:4px;background:#E2F4F1;color:#0A6E65;letter-spacing:0;text-transform:none">Store</span></span>
+      <span style="text-align:right"><span style="display:inline-flex;height:20px;padding:0 7px;align-items:center;border-radius:4px;background:#EEE8FD;color:#5B2FD1;letter-spacing:0;text-transform:none">Online</span></span>
+      <span style="text-align:right">Active</span>
+    </div>
+    <sc-for list="{{ items.rows }}" as="r" hint-placeholder-count="10">
+      <div onClick="{{ r.open }}" style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.6fr) 84px 84px 84px 84px 84px 56px;gap:14px;padding:0 18px;min-height:52px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px;cursor:pointer;opacity:{{ r.op }}" style-hover="background:#F7F8FB">
+        <div style="min-width:0"><div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7A8191">{{ r.sku }} · {{ r.barcode }}</div></div>
+        <div dir="rtl" style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:12.5px;color:#4A5160;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.ar }}</div>
+        <span style="color:#4A5160">{{ r.cat }}</span>
+        <span style="text-align:right">{{ r.cost }}</span>
+        <span style="text-align:right">{{ r.price }}</span>
+        <span style="text-align:right;font-weight:650;color:{{ r.storeFg }}">{{ r.store }}</span>
+        <span style="text-align:right;font-weight:650;color:{{ r.onlineFg }}">{{ r.online }}</span>
+        <span style="display:flex;justify-content:flex-end"><span onClick="{{ r.toggle }}" style="width:30px;height:18px;border-radius:9px;padding:2px;box-sizing:border-box;display:flex;justify-content:{{ r.actJ }};background:{{ r.actBg }};cursor:pointer"><span style="width:14px;height:14px;border-radius:50%;background:#fff"></span></span></span>
+      </div>
+    </sc-for>
+    <sc-if value="{{ items.empty }}" hint-placeholder-val="{{ false }}"><div style="padding:40px;text-align:center;color:#7A8191;font-size:13px">No items match this search.</div></sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.item }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ item.back }}" style="font-size:12.5px;color:#010ECF;font-weight:600;cursor:pointer;margin-bottom:10px">← Items</div>
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px"><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">{{ item.product }}</h1><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ item.st.bg }};color:{{ item.st.fg }}">{{ item.st.text }}</span></div>
+      <div style="margin-top:6px;color:#5B6270;font-size:13.5px"><span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">{{ item.sku }}</span> · {{ item.variant }} · {{ item.cat }}</div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button onClick="{{ item.label }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Print labels</button>
+      <button onClick="{{ item.writeOff }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Write off</button>
+      <button onClick="{{ item.transfer }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">{{ item.transferLabel }}</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:16px;margin-bottom:16px">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:20px 22px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191">Name (English)</div>
+      <div style="font-size:17px;font-weight:600;margin-top:6px">{{ item.name }}</div>
+      <div style="height:1px;background:#EEF0F3;margin:18px 0"></div>
+      <div style="display:flex;align-items:center"><div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191">Description (Arabic)</div>
+        <sc-if value="{{ item.notEditing }}" hint-placeholder-val="{{ true }}"><button onClick="{{ item.startEdit }}" style="margin-left:auto;height:28px;padding:0 10px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:12px;font-weight:600;cursor:pointer">Edit</button></sc-if>
+      </div>
+      <sc-if value="{{ item.notEditing }}" hint-placeholder-val="{{ true }}"><div dir="rtl" style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:17px;line-height:1.7;text-align:right;margin-top:8px;color:#1F242C">{{ item.ar }}</div></sc-if>
+      <sc-if value="{{ item.editing }}" hint-placeholder-val="{{ false }}">
+        <textarea dir="rtl" value="{{ item.editVal }}" onChange="{{ item.setEdit }}" style="width:100%;box-sizing:border-box;margin-top:8px;min-height:84px;padding:10px 12px;border:1px solid #010ECF;border-radius:6px;font-family:'IBM Plex Sans Arabic',sans-serif;font-size:16px;line-height:1.7;text-align:right;resize:vertical"></textarea>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button onClick="{{ item.cancelEdit }}" style="height:32px;padding:0 12px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer">Cancel</button><button onClick="{{ item.saveEdit }}" style="height:32px;padding:0 14px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:12.5px;font-weight:600;cursor:pointer">Save description</button></div>
+      </sc-if>
+      <div style="height:1px;background:#EEF0F3;margin:18px 0"></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+        <div><div style="font-size:11.5px;color:#7A8191">Average cost</div><div style="font-size:16px;font-weight:650;margin-top:4px">{{ item.cost }}</div></div>
+        <div><div style="font-size:11.5px;color:#7A8191">Retail price</div><div style="font-size:16px;font-weight:650;margin-top:4px">{{ item.price }}</div></div>
+        <div><div style="font-size:11.5px;color:#7A8191">Gross margin</div><div style="font-size:16px;font-weight:650;margin-top:4px;color:#1B7A3A">{{ item.margin }}</div></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:16px 18px;border-top:3px solid #12A594">
+          <span style="display:inline-flex;height:20px;padding:0 7px;align-items:center;border-radius:4px;background:#E2F4F1;color:#0A6E65;font-size:11px;font-weight:600">Main Store</span>
+          <div style="font-size:30px;font-weight:700;margin-top:10px;color:{{ item.storeFg }}">{{ item.store }}</div>
+          <div style="font-size:12px;color:#7A8191">on hand · {{ item.storeVal }}</div>
+          <div style="font-size:11.5px;color:#5B6270;margin-top:8px">Sellable at POS only</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:16px 18px;border-top:3px solid #7C4DFF">
+          <span style="display:inline-flex;height:20px;padding:0 7px;align-items:center;border-radius:4px;background:#EEE8FD;color:#5B2FD1;font-size:11px;font-weight:600">Online Warehouse</span>
+          <div style="font-size:30px;font-weight:700;margin-top:10px;color:{{ item.onlineFg }}">{{ item.online }}</div>
+          <div style="font-size:12px;color:#7A8191">on hand · {{ item.res }} reserved · {{ item.onlineVal }}</div>
+          <div style="font-size:11.5px;color:#5B6270;margin-top:8px">Sellable on storefront only</div>
+        </div>
+      </div>
+      <sc-if value="{{ item.hint }}" hint-placeholder-val="{{ false }}"><div style="background:rgba(1,14,207,.06);border:1px solid rgba(1,14,207,.16);border-radius:10px;padding:12px 14px;font-size:12.5px;color:#1C2470;line-height:1.5">{{ item.hint }}</div></sc-if>
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:16px 18px;display:flex;gap:18px;align-items:center">
+        <div style="width:170px;flex:none"><div style="width:170px;height:60px;background:url({{ item.src }}) center/100% 100% no-repeat"></div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.18em;text-align:center;margin-top:4px">{{ item.barcode }}</div></div>
+        <div style="font-size:12.5px;color:#5B6270;line-height:1.5"><div style="font-weight:600;color:#0E1116">EAN-13</div>One barcode per variant. Scan at POS, goods receipt and transfers.</div>
+      </div>
+    </div>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+    <div style="display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid #EEF0F3"><div style="font-weight:600">Movement history</div><div style="margin-left:8px;font-size:12px;color:#7A8191">{{ item.moveCount }} entries</div></div>
+    <div style="display:grid;grid-template-columns:110px 190px 150px 130px minmax(0,1fr) 70px;gap:12px;padding:0 18px;height:34px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Date</span><span>Type</span><span>Reference</span><span>Pool</span><span>Note</span><span style="text-align:right">Qty</span></div>
+    <sc-for list="{{ item.moves }}" as="m" hint-placeholder-count="4">
+      <div style="display:grid;grid-template-columns:110px 190px 150px 130px minmax(0,1fr) 70px;gap:12px;padding:0 18px;min-height:40px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px">
+        <span style="color:#4A5160">{{ m.date }}</span><span>{{ m.type }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ m.ref }}</span>
+        <span><span style="display:inline-flex;align-items:center;gap:6px;height:20px;padding:0 8px;border-radius:4px;font-size:11px;font-weight:600;background:{{ m.pool.bg }};color:{{ m.pool.fg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ m.pool.dot }}"></span>{{ m.pool.label }}</span></span>
+        <span style="color:#5B6270;font-size:12.5px">{{ m.note }}</span>
+        <span style="text-align:right;font-weight:650;color:{{ m.qtyFg }}">{{ m.qty }}</span>
+      </div>
+    </sc-for>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.labels }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Barcode labels</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">EAN-13 shelf labels · 40 × 25 mm · {{ labels.total }} labels on {{ labels.sheets }}</div></div>
+    <div style="margin-left:auto;display:flex;gap:8px"><button onClick="{{ labels.clear }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Clear</button><button onClick="{{ labels.print }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Send to label printer</button></div>
+  </div>
+  <div style="display:grid;grid-template-columns:400px 1fr;gap:16px;align-items:start">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden;max-height:calc(100vh - 220px);overflow-y:auto">
+      <sc-for list="{{ labels.rows }}" as="r" hint-placeholder-count="8">
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #F2F3F5;background:{{ r.bg }}">
+          <span onClick="{{ r.toggle }}" style="width:16px;height:16px;flex:none;border-radius:4px;border:1.5px solid {{ r.cbBd }};background:{{ r.cbBg }};cursor:pointer;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;box-sizing:border-box">{{ r.tick }}</span>
+          <div onClick="{{ r.toggle }}" style="flex:1;min-width:0;cursor:pointer"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7A8191">{{ r.sku }}</div></div>
+          <div style="display:flex;align-items:center;border:1px solid #D9DCE2;border-radius:6px;overflow:hidden;opacity:{{ r.qOp }}"><button onClick="{{ r.dec }}" style="width:26px;height:26px;border:none;background:#fff;cursor:pointer;font-size:14px">−</button><span style="width:28px;text-align:center;font-size:12.5px;font-weight:600">{{ r.qty }}</span><button onClick="{{ r.inc }}" style="width:26px;height:26px;border:none;background:#fff;cursor:pointer;font-size:14px">+</button></div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#E9EBEF;border-radius:12px;padding:24px;display:flex;justify-content:center">
+      <div style="width:100%;max-width:640px;background:#fff;box-shadow:0 2px 10px rgba(14,17,22,.08);padding:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;min-height:300px;align-content:start">
+        <sc-for list="{{ labels.preview }}" as="l" hint-placeholder-count="8">
+          <div style="border:1px dashed #C9CDD4;border-radius:4px;padding:7px 8px 6px;display:flex;flex-direction:column;gap:2px">
+            <div style="font-size:9.5px;font-weight:600;line-height:1.2;height:23px;overflow:hidden">{{ l.name }}</div>
+            <div style="font-size:13px;font-weight:800">{{ l.price }}</div>
+            <div style="width:100%;height:30px;background:url({{ l.src }}) center/100% 100% no-repeat"></div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.12em;text-align:center">{{ l.code }}</div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ labels.empty }}" hint-placeholder-val="{{ false }}"><div style="grid-column:1/-1;padding:60px 0;text-align:center;color:#7A8191;font-size:13px">Select SKUs on the left to preview the label sheet.</div></sc-if>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.pos }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Purchase orders</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">Vendor currency with KWD equivalent at the latest sample rate · open POs revalue daily</div></div>
+    <div style="margin-left:auto"><button onClick="{{ pos.newPO }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">New purchase order</button></div>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+    <sc-for list="{{ pos.filters }}" as="f" hint-placeholder-count="6"><button onClick="{{ f.pick }}" style="height:30px;padding:0 12px;border-radius:15px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;border:1px solid {{ f.bd }};background:{{ f.bg }};color:{{ f.fg }}">{{ f.label }}<span style="opacity:.6">{{ f.n }}</span></button></sc-for>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+    <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 160px 110px 110px 150px 150px;gap:14px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>PO number</span><span>Vendor</span><span>Destination</span><span>Ordered</span><span>ETA</span><span style="text-align:right">Total</span><span>Status</span></div>
+    <sc-for list="{{ pos.rows }}" as="r" hint-placeholder-count="5">
+      <div onClick="{{ r.open }}" style="display:grid;grid-template-columns:150px minmax(0,1fr) 160px 110px 110px 150px 150px;gap:14px;padding:0 18px;min-height:54px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px;cursor:pointer" style-hover="background:#F7F8FB">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500">{{ r.no }}</span>
+        <div style="min-width:0"><div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.vendor }}</div><div style="font-size:11.5px;color:#7A8191">{{ r.lines }}</div></div>
+        <span><span style="display:inline-flex;align-items:center;gap:6px;height:20px;padding:0 8px;border-radius:4px;font-size:11px;font-weight:600;background:{{ r.pool.bg }};color:{{ r.pool.fg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ r.pool.dot }}"></span>{{ r.pool.name }}</span></span>
+        <span style="color:#4A5160">{{ r.date }}</span><span style="color:#4A5160">{{ r.eta }}</span>
+        <div style="text-align:right"><div style="font-weight:600">{{ r.fx }}</div><div style="font-size:11.5px;color:#7A8191">{{ r.k }}</div></div>
+        <span><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ r.st.bg }};color:{{ r.st.fg }}">{{ r.st.text }}</span></span>
+      </div>
+    </sc-for>
+    <sc-if value="{{ pos.empty }}" hint-placeholder-val="{{ false }}"><div style="padding:40px;text-align:center;color:#7A8191;font-size:13px">No purchase orders with this status.</div></sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.poNew }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ poNew.back }}" style="font-size:12.5px;color:#010ECF;font-weight:600;cursor:pointer;margin-bottom:10px">← Purchase orders</div>
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">New purchase order</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">Number assigned on save: <span style="font-family:'JetBrains Mono',monospace">{{ poNew.nextNo }}</span></div></div>
+    <div style="margin-left:auto;display:flex;gap:8px"><button onClick="{{ poNew.saveDraft }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Save as draft</button><button onClick="{{ poNew.saveSend }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Save and send</button></div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:18px 20px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:16px">
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160">Vendor{{ poNew.vendorSel }}</label>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160">Receive into
+          <div style="display:flex;gap:4px;padding:3px;background:#F1F2F5;border-radius:7px">
+            <sc-for list="{{ poNew.dests }}" as="d" hint-placeholder-count="2"><button onClick="{{ d.pick }}" style="flex:1;height:28px;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;background:{{ d.bg }};color:{{ d.fg }};box-shadow:{{ d.sh }}">{{ d.label }}</button></sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160">Currency<div style="height:34px;display:flex;align-items:center;padding:0 10px;border-radius:6px;background:#F6F7F9;border:1px solid #E6E8EC;font-size:13px;color:#0E1116">{{ poNew.ccy }}</div></div>
+        <div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:12.5px;color:#4A5160"><span style="display:inline-flex;height:20px;padding:0 7px;border-radius:4px;align-items:center;background:#FDF1DC;color:#8A5A00;font-size:11px;font-weight:600">Sample rate</span>{{ poNew.rateLine }}</div>
+      </div>
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 80px 110px 120px 130px 30px;gap:12px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Item</span><span style="text-align:right">Qty</span><span style="text-align:right">Unit {{ poNew.ccy }}</span><span style="text-align:right">Line total</span><span style="text-align:right">Landed / unit</span><span></span></div>
+        <sc-for list="{{ poNew.lines }}" as="l" hint-placeholder-count="3">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 80px 110px 120px 130px 30px;gap:12px;padding:10px 18px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px">
+            <div style="min-width:0">{{ l.picker }}</div>
+            <input value="{{ l.qty }}" onChange="{{ l.setQty }}" inputmode="numeric" style="height:34px;box-sizing:border-box;width:100%;border:1px solid #D9DCE2;border-radius:6px;padding:0 8px;text-align:right;font-size:13px">
+            <input value="{{ l.unit }}" onChange="{{ l.setUnit }}" inputmode="decimal" style="height:34px;box-sizing:border-box;width:100%;border:1px solid #D9DCE2;border-radius:6px;padding:0 8px;text-align:right;font-size:13px">
+            <span style="text-align:right;font-weight:600">{{ l.total }}</span>
+            <div style="text-align:right"><div style="font-weight:600">{{ l.landedV }}</div><div style="font-size:11.5px;color:#7A8191">{{ l.landedK }}</div></div>
+            <button onClick="{{ l.remove }}" style="width:28px;height:28px;border:none;background:transparent;border-radius:6px;color:#9AA0AC;cursor:pointer;font-size:16px" style-hover="background:#FDE7E5;color:#B42318">×</button>
+          </div>
+        </sc-for>
+        <div style="padding:12px 18px"><button onClick="{{ poNew.addLine }}" style="height:32px;padding:0 12px;border-radius:6px;border:1px dashed #B7BCC6;background:#fff;font-size:12.5px;font-weight:600;color:#010ECF;cursor:pointer">+ Add line</button></div>
+      </div>
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:18px 20px;display:grid;grid-template-columns:1fr 1fr 2fr;gap:16px;align-items:end">
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160">Freight ({{ poNew.ccy }})<input value="{{ poNew.freight }}" onChange="{{ poNew.setFreight }}" style="height:34px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:0 10px;text-align:right;font-size:13px"></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160">Customs duty ({{ poNew.ccy }})<input value="{{ poNew.duty }}" onChange="{{ poNew.setDuty }}" style="height:34px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:0 10px;text-align:right;font-size:13px"></label>
+        <div style="font-size:12.5px;color:#5B6270;line-height:1.5;padding-bottom:4px">Freight and duty are allocated to lines by value to give a landed cost per unit. Goods receipt uses landed cost to update average cost.</div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:18px 20px;position:sticky;top:0">
+      <div style="font-weight:600;margin-bottom:14px">Summary</div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px">
+        <div style="display:flex;justify-content:space-between"><span style="color:#5B6270">Goods</span><span>{{ poNew.goods }}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#5B6270">Freight</span><span>{{ poNew.freightF }}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#5B6270">Customs duty</span><span>{{ poNew.dutyF }}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#5B6270">Landed uplift</span><span>{{ poNew.uplift }}</span></div>
+      </div>
+      <div style="height:1px;background:#EEF0F3;margin:16px 0"></div>
+      <div style="font-size:12px;color:#5B6270">Total in vendor currency</div>
+      <div style="font-size:22px;font-weight:700;margin-top:2px">{{ poNew.totalV }}</div>
+      <div style="margin-top:12px;padding:12px 14px;border-radius:8px;background:rgba(1,14,207,.06)">
+        <div style="font-size:12px;color:#1C2470">KWD equivalent</div>
+        <div style="font-size:22px;font-weight:700;color:#010ECF;margin-top:2px">{{ poNew.totalK }}</div>
+      </div>
+      <div style="font-size:12px;color:#7A8191;margin-top:12px">{{ poNew.unitsLine }}</div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.po }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ po.back }}" style="font-size:12.5px;color:#010ECF;font-weight:600;cursor:pointer;margin-bottom:10px">← Purchase orders</div>
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px"><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em;font-family:'JetBrains Mono',monospace;letter-spacing:-.04em">{{ po.no }}</h1><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ po.st.bg }};color:{{ po.st.fg }}">{{ po.st.text }}</span></div>
+      <div style="margin-top:6px;color:#5B6270;font-size:13.5px">{{ po.vendor }} · {{ po.country }} · ordered {{ po.date }} · ETA {{ po.eta }}</div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <sc-if value="{{ po.canSend }}" hint-placeholder-val="{{ false }}"><button onClick="{{ po.send }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Send to vendor</button></sc-if>
+      <sc-if value="{{ po.canReceive }}" hint-placeholder-val="{{ false }}"><button onClick="{{ po.receive }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Receive goods</button></sc-if>
+      <sc-if value="{{ po.canClose }}" hint-placeholder-val="{{ false }}"><button onClick="{{ po.close }}" style="height:36px;padding:0 16px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Close PO</button></sc-if>
+    </div>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:20px 24px;margin-bottom:16px;display:flex;align-items:flex-start">
+    <sc-for list="{{ po.steps }}" as="s" hint-placeholder-count="5">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;position:relative;text-align:center">
+        <span style="position:absolute;top:13px;left:-50%;width:100%;height:2px;background:{{ s.line }};display:{{ s.lineShow }}"></span>
+        <span style="position:relative;width:28px;height:28px;border-radius:50%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:{{ s.bg }};color:{{ s.fg }};border:2px solid {{ s.bd }}">{{ s.mark }}</span>
+        <span style="font-size:12.5px;font-weight:600;margin-top:8px;color:{{ s.lab }}">{{ s.label }}</span>
+        <span style="font-size:11.5px;color:#7A8191;margin-top:2px">{{ s.date }}</span>
+      </div>
+    </sc-for>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+        <div style="display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid #EEF0F3;gap:10px"><div style="font-weight:600">Lines</div><span style="display:inline-flex;align-items:center;gap:6px;height:20px;padding:0 8px;border-radius:4px;font-size:11px;font-weight:600;background:{{ po.pool.bg }};color:{{ po.pool.fg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ po.pool.dot }}"></span>Receiving into {{ po.pool.name }}</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 70px 80px 90px 100px 130px;gap:12px;padding:0 18px;height:34px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Item</span><span style="text-align:right">Ordered</span><span style="text-align:right">Received</span><span style="text-align:right">Unit</span><span style="text-align:right">Landed</span><span style="text-align:right">Landed KWD</span></div>
+        <sc-for list="{{ po.lines }}" as="l" hint-placeholder-count="3">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 70px 80px 90px 100px 130px;gap:12px;padding:10px 18px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px">
+            <div style="min-width:0"><div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ l.name }}</div><div style="display:flex;align-items:center;gap:8px;margin-top:4px"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7A8191">{{ l.sku }}</span><span style="width:80px;height:4px;border-radius:2px;background:#EEF0F3;overflow:hidden"><span style="display:block;height:100%;background:#1B9A4A;width:{{ l.pct }}"></span></span></div></div>
+            <span style="text-align:right">{{ l.qty }}</span><span style="text-align:right;font-weight:600;color:{{ l.recFg }}">{{ l.rec }}</span>
+            <span style="text-align:right">{{ l.unit }}</span><span style="text-align:right">{{ l.landedV }}</span><span style="text-align:right;font-weight:600">{{ l.landedK }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+          <div style="padding:12px 18px;border-bottom:1px solid #EEF0F3;font-weight:600;font-size:13.5px">Goods receipts</div>
+          <sc-for list="{{ po.grns }}" as="g" hint-placeholder-count="1"><div style="display:flex;justify-content:space-between;padding:10px 18px;border-bottom:1px solid #F2F3F5;font-size:13px"><span style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ g.no }}</span><span style="color:#5B6270">{{ g.units }} · {{ g.date }}</span></div></sc-for>
+          <sc-if value="{{ po.noGrns }}" hint-placeholder-val="{{ false }}"><div style="padding:14px 18px;font-size:12.5px;color:#7A8191">Nothing received yet.</div></sc-if>
+        </div>
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+          <div style="padding:12px 18px;border-bottom:1px solid #EEF0F3;font-weight:600;font-size:13.5px">Supplier invoices</div>
+          <sc-for list="{{ po.invs }}" as="v" hint-placeholder-count="1"><div onClick="{{ v.open }}" style="display:flex;justify-content:space-between;align-items:center;padding:10px 18px;border-bottom:1px solid #F2F3F5;font-size:13px;cursor:pointer" style-hover="background:#F7F8FB"><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#010ECF">{{ v.no }}</span><span style="display:inline-flex;height:20px;padding:0 8px;border-radius:10px;align-items:center;font-size:11px;font-weight:600;background:{{ v.st.bg }};color:{{ v.st.fg }}">{{ v.st.text }}</span></div></sc-for>
+          <sc-if value="{{ po.noInvs }}" hint-placeholder-val="{{ false }}"><div style="padding:14px 18px;font-size:12.5px;color:#7A8191">Created automatically on goods receipt.</div></sc-if>
+        </div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:600;margin-bottom:14px">Landed cost</div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px">
+        <div style="display:flex;justify-content:space-between"><span style="color:#5B6270">Goods</span><span>{{ po.goods }}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#5B6270">Freight</span><span>{{ po.freight }}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#5B6270">Customs duty</span><span>{{ po.duty }}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#5B6270">Uplift on goods</span><span>{{ po.uplift }}</span></div>
+      </div>
+      <div style="height:1px;background:#EEF0F3;margin:16px 0"></div>
+      <div style="font-size:12px;color:#5B6270">Total</div>
+      <div style="font-size:22px;font-weight:700;margin-top:2px">{{ po.totalV }}</div>
+      <div style="margin-top:12px;padding:12px 14px;border-radius:8px;background:rgba(1,14,207,.06)">
+        <div style="font-size:12px;color:#1C2470">KWD equivalent</div>
+        <div style="font-size:22px;font-weight:700;color:#010ECF;margin-top:2px">{{ po.totalK }}</div>
+        <div style="font-size:11.5px;color:#1C2470;margin-top:4px">{{ po.rateLine }}</div>
+      </div>
+      <sc-if value="{{ po.reval }}" hint-placeholder-val="{{ false }}"><div style="margin-top:12px;font-size:12px;color:#8A5A00;background:#FDF1DC;border-radius:8px;padding:10px 12px;line-height:1.45">{{ po.reval }}</div></sc-if>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.grn }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Goods receipt</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">{{ grn.sub }}</div></div>
+    <sc-if value="{{ grn.hasPO }}" hint-placeholder-val="{{ false }}"><div style="margin-left:auto;display:flex;gap:8px"><button onClick="{{ grn.cancel }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Change PO</button><button onClick="{{ grn.post }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer;opacity:{{ grn.postOp }}">Post receipt</button></div></sc-if>
+  </div>
+  <sc-if value="{{ grn.noPO }}" hint-placeholder-val="{{ false }}">
+    <div style="font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191;margin-bottom:10px">Choose a purchase order to receive against</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:28px">
+      <sc-for list="{{ grn.pick }}" as="p" hint-placeholder-count="2">
+        <div onClick="{{ p.choose }}" style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:16px 18px;cursor:pointer" style-hover="border-color:#010ECF;box-shadow:0 0 0 3px rgba(1,14,207,.08)">
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500">{{ p.no }}</span><span style="display:inline-flex;height:20px;padding:0 8px;border-radius:10px;align-items:center;font-size:11px;font-weight:600;background:{{ p.st.bg }};color:{{ p.st.fg }}">{{ p.st.text }}</span></div>
+          <div style="font-size:13px;font-weight:500;margin-top:8px">{{ p.vendor }}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:#5B6270"><span style="display:inline-flex;align-items:center;gap:6px;height:20px;padding:0 8px;border-radius:4px;font-size:11px;font-weight:600;background:{{ p.pool.bg }};color:{{ p.pool.fg }}">{{ p.pool.name }}</span>{{ p.outstanding }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{ grn.pickEmpty }}" hint-placeholder-val="{{ false }}"><div style="background:#fff;border:1px dashed #C9CDD4;border-radius:12px;padding:28px;text-align:center;color:#5B6270;font-size:13px;margin-bottom:28px">No sent POs awaiting receipt. Send a PO first.</div></sc-if>
+  </sc-if>
+  <sc-if value="{{ grn.hasPO }}" hint-placeholder-val="{{ false }}">
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start;margin-bottom:28px">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:16px 18px;display:flex;gap:12px;align-items:center">
+          <div style="position:relative;flex:1"><input value="{{ scanInput }}" onChange="{{ setScan }}" onKeyDown="{{ grn.scanKey }}" placeholder="Scan or type barcode / SKU and press Enter" style="width:100%;box-sizing:border-box;height:44px;padding:0 14px 0 44px;border:1.5px solid #010ECF;border-radius:8px;font-size:14px;font-family:'JetBrains Mono',monospace"><span style="position:absolute;left:14px;top:14px;width:18px;height:16px;background:repeating-linear-gradient(90deg,#010ECF 0 2px,transparent 2px 4px,#010ECF 4px 5px,transparent 5px 7px)"></span></div>
+          <button onClick="{{ grn.simulate }}" style="height:44px;padding:0 16px;border-radius:8px;border:none;background:#0E1116;color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">Simulate scan</button>
+        </div>
+        <sc-if value="{{ lastScan }}" hint-placeholder-val="{{ false }}"><div style="margin-top:-6px;font-size:12.5px;color:#1B7A3A;font-weight:500">{{ lastScan }}</div></sc-if>
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 70px 80px 150px 90px 56px;gap:12px;padding:0 18px;height:34px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Item</span><span style="text-align:right">Ordered</span><span style="text-align:right">Prev. rec.</span><span style="text-align:center">This receipt</span><span style="text-align:right">Outstanding</span><span></span></div>
+          <sc-for list="{{ grn.lines }}" as="l" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 70px 80px 150px 90px 56px;gap:12px;padding:10px 18px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px;background:{{ l.bg }}">
+              <div style="min-width:0"><div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ l.name }}</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7A8191">{{ l.barcode }}</div><div style="height:4px;border-radius:2px;background:#EEF0F3;overflow:hidden;margin-top:6px;max-width:220px"><span style="display:block;height:100%;background:#1B9A4A;width:{{ l.pct }}"></span></div></div>
+              <span style="text-align:right">{{ l.qty }}</span><span style="text-align:right;color:#5B6270">{{ l.rec }}</span>
+              <div style="display:flex;align-items:center;justify-content:center;border:1px solid #D9DCE2;border-radius:6px;overflow:hidden;background:#fff"><button onClick="{{ l.dec }}" style="width:32px;height:32px;border:none;background:#fff;cursor:pointer;font-size:15px">−</button><input value="{{ l.now }}" onChange="{{ l.setNow }}" style="width:60px;height:32px;border:none;border-left:1px solid #EEF0F3;border-right:1px solid #EEF0F3;text-align:center;font-size:13px;font-weight:650;outline:none"><button onClick="{{ l.inc }}" style="width:32px;height:32px;border:none;background:#fff;cursor:pointer;font-size:15px">+</button></div>
+              <span style="text-align:right;font-weight:600;color:{{ l.outFg }}">{{ l.out }}</span>
+              <button onClick="{{ l.fill }}" style="height:28px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:11.5px;font-weight:600;cursor:pointer">All</button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:16px 18px">
+          <div style="font-size:12px;font-weight:600;color:#4A5160;margin-bottom:8px">Receive into</div>
+          <div style="display:flex;gap:4px;padding:3px;background:#F1F2F5;border-radius:7px">
+            <sc-for list="{{ grn.locs }}" as="d" hint-placeholder-count="2"><button onClick="{{ d.pick }}" style="flex:1;height:30px;border:none;border-radius:5px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;background:{{ d.bg }};color:{{ d.fg }};box-shadow:{{ d.sh }}"><span style="width:7px;height:7px;border-radius:50%;background:{{ d.dot }}"></span>{{ d.label }}</button></sc-for>
+          </div>
+          <div style="font-size:12px;color:#5B6270;margin-top:10px;line-height:1.5">{{ grn.locNote }}</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:16px 18px">
+          <div style="font-size:12px;color:#5B6270">This receipt</div>
+          <div style="font-size:26px;font-weight:700;margin-top:2px">{{ grn.units }} units</div>
+          <div style="font-size:13px;color:#4A5160;margin-top:4px">{{ grn.valV }} · <span style="font-weight:600;color:#010ECF">{{ grn.valK }}</span></div>
+          <div style="font-size:11.5px;color:#7A8191;margin-top:10px;line-height:1.5">Posting raises {{ grn.poolName }} stock, recalculates average cost, posts Dr Inventory / Cr Accounts payable and creates a supplier invoice.</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <div style="font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191;margin-bottom:10px">Recent goods receipts</div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+    <sc-for list="{{ grn.recent }}" as="r" hint-placeholder-count="3">
+      <div onClick="{{ r.open }}" style="display:grid;grid-template-columns:150px 150px 170px minmax(0,1fr) 110px;gap:14px;padding:0 18px;min-height:44px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px;cursor:pointer" style-hover="background:#F7F8FB">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500">{{ r.no }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5B6270">{{ r.po }}</span>
+        <span><span style="display:inline-flex;align-items:center;gap:6px;height:20px;padding:0 8px;border-radius:4px;font-size:11px;font-weight:600;background:{{ r.pool.bg }};color:{{ r.pool.fg }}">{{ r.pool.name }}</span></span>
+        <span style="color:#5B6270">{{ r.units }} units · {{ r.lines }}</span><span style="color:#5B6270;text-align:right">{{ r.date }}</span>
+      </div>
+    </sc-for>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.vendors }}" hint-placeholder-val="{{ false }}">
+  <div style="margin-bottom:20px"><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Vendors</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">Balances in vendor currency with KWD at the latest sample rate</div></div>
+  <div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:start">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+      <sc-for list="{{ vendors.rows }}" as="v" hint-placeholder-count="4">
+        <div onClick="{{ v.open }}" style="display:grid;grid-template-columns:44px minmax(0,1fr) 150px;gap:14px;padding:14px 18px;border-bottom:1px solid #F2F3F5;align-items:center;cursor:pointer;background:{{ v.bg }};box-shadow:{{ v.sh }}" style-hover="background:#F7F8FB">
+          <span style="width:40px;height:40px;border-radius:10px;background:#F1F2F5;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#353B47">{{ v.ccy }}</span>
+          <div style="min-width:0"><div style="font-weight:600;font-size:13.5px">{{ v.name }}</div><div style="font-size:12px;color:#7A8191;margin-top:2px">{{ v.id }} · {{ v.country }} · {{ v.openPOs }}</div></div>
+          <div style="text-align:right"><div style="font-weight:600;font-size:13px">{{ v.bal }}</div><div style="font-size:11.5px;color:#7A8191">{{ v.balK }}</div></div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+      <div style="padding:18px 20px;border-bottom:1px solid #EEF0F3">
+        <div style="font-size:17px;font-weight:650">{{ vendors.d.name }}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;font-size:12.5px"><div><span style="color:#7A8191">Contact</span><div style="font-weight:500">{{ vendors.d.contact }}</div></div><div><span style="color:#7A8191">Phone</span><div style="font-weight:500">{{ vendors.d.phone }}</div></div><div><span style="color:#7A8191">Currency</span><div style="font-weight:500">{{ vendors.d.ccy }}</div></div><div><span style="color:#7A8191">Terms</span><div style="font-weight:500">{{ vendors.d.terms }}</div></div></div>
+      </div>
+      <div style="padding:12px 20px 6px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191">Purchase orders</div>
+      <sc-for list="{{ vendors.d.pos }}" as="p" hint-placeholder-count="2"><div onClick="{{ p.open }}" style="display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;cursor:pointer" style-hover="background:#F7F8FB"><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#010ECF">{{ p.no }}</span><span style="display:inline-flex;height:20px;padding:0 8px;border-radius:10px;align-items:center;font-size:11px;font-weight:600;background:{{ p.st.bg }};color:{{ p.st.fg }}">{{ p.st.text }}</span><span style="margin-left:auto;font-weight:500">{{ p.fx }}</span></div></sc-for>
+      <sc-if value="{{ vendors.d.noPos }}" hint-placeholder-val="{{ false }}"><div style="padding:6px 20px;font-size:12.5px;color:#7A8191">No purchase orders.</div></sc-if>
+      <div style="padding:14px 20px 6px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191">Supplier invoices</div>
+      <sc-for list="{{ vendors.d.invs }}" as="p" hint-placeholder-count="2"><div onClick="{{ p.open }}" style="display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;cursor:pointer" style-hover="background:#F7F8FB"><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#010ECF">{{ p.no }}</span><span style="display:inline-flex;height:20px;padding:0 8px;border-radius:10px;align-items:center;font-size:11px;font-weight:600;background:{{ p.st.bg }};color:{{ p.st.fg }}">{{ p.st.text }}</span><span style="margin-left:auto;font-weight:500">{{ p.fx }}</span></div></sc-for>
+      <sc-if value="{{ vendors.d.noInvs }}" hint-placeholder-val="{{ false }}"><div style="padding:6px 20px;font-size:12.5px;color:#7A8191">No invoices.</div></sc-if>
+      <div style="height:14px"></div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ pending }}" hint-placeholder-val="{{ false }}">
+  <div style="background:#fff;border:1px dashed #C9CDD4;border-radius:12px;padding:48px;text-align:center"><div style="font-size:20px;font-weight:650">{{ crumbB }}</div><div style="margin-top:8px;color:#5B6270;font-size:13.5px">This screen is in the next build pass.</div></div>
+</sc-if>
+<sc-if value="{{ is.transfers }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:16px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Transfers</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">Move stock between Main Store and Online Warehouse</div></div>
+    <div style="margin-left:auto"><button onClick="{{ transfers.newTrf }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">New transfer</button></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:14px 18px;margin-bottom:16px">
+    <span style="display:inline-flex;height:24px;padding:0 9px;align-items:center;border-radius:4px;background:#E2F4F1;color:#0A6E65;font-size:12px;font-weight:600">Main Store · POS only</span>
+    <span style="font-size:16px;color:#9AA0AC">⇄</span>
+    <span style="display:inline-flex;height:24px;padding:0 9px;align-items:center;border-radius:4px;background:#EEE8FD;color:#5B2FD1;font-size:12px;font-weight:600">Online Warehouse · storefront only</span>
+    <span style="font-size:12.5px;color:#4A5160;margin-left:6px">The two pools are isolated. A transfer is the only way stock crosses between them.</span>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+    <div style="display:grid;grid-template-columns:150px 300px minmax(0,1fr) 70px 110px 120px 110px;gap:14px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Transfer</span><span>Route</span><span>Items</span><span style="text-align:right">Units</span><span>Date</span><span>Status</span><span></span></div>
+    <sc-for list="{{ transfers.rows }}" as="r" hint-placeholder-count="3">
+      <div onClick="{{ r.open }}" style="display:grid;grid-template-columns:150px 300px minmax(0,1fr) 70px 110px 120px 110px;gap:14px;padding:0 18px;min-height:52px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px;cursor:pointer" style-hover="background:#F7F8FB">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500">{{ r.no }}</span>
+        <span style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;height:20px;padding:0 8px;align-items:center;border-radius:4px;font-size:11px;font-weight:600;background:{{ r.from.bg }};color:{{ r.from.fg }}">{{ r.from.name }}</span><span style="color:#9AA0AC">→</span><span style="display:inline-flex;height:20px;padding:0 8px;align-items:center;border-radius:4px;font-size:11px;font-weight:600;background:{{ r.to.bg }};color:{{ r.to.fg }}">{{ r.to.name }}</span></span>
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.items }}</span>
+        <span style="text-align:right;font-weight:600">{{ r.units }}</span>
+        <span style="color:#4A5160">{{ r.date }}</span>
+        <span><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ r.st.bg }};color:{{ r.st.fg }}">{{ r.st.text }}</span></span>
+        <span style="text-align:right"><sc-if value="{{ r.hasAct }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.act }}" style="height:30px;padding:0 12px;border-radius:6px;border:1px solid #010ECF;background:#fff;color:#010ECF;font-size:12px;font-weight:600;cursor:pointer">{{ r.actLabel }}</button></sc-if></span>
+      </div>
+    </sc-for>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.trf }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ trf.back }}" style="font-size:12.5px;color:#010ECF;font-weight:600;cursor:pointer;margin-bottom:10px">← Transfers</div>
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px"><h1 style="margin:0;font-size:28px;font-weight:650;font-family:'JetBrains Mono',monospace;letter-spacing:-.04em">{{ trf.no }}</h1><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ trf.st.bg }};color:{{ trf.st.fg }}">{{ trf.st.text }}</span></div>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-size:13px;color:#5B6270"><span style="display:inline-flex;height:20px;padding:0 8px;align-items:center;border-radius:4px;font-size:11px;font-weight:600;background:{{ trf.from.bg }};color:{{ trf.from.fg }}">{{ trf.from.name }}</span>→<span style="display:inline-flex;height:20px;padding:0 8px;align-items:center;border-radius:4px;font-size:11px;font-weight:600;background:{{ trf.to.bg }};color:{{ trf.to.fg }}">{{ trf.to.name }}</span>· {{ trf.dateLine }}</div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <sc-if value="{{ trf.canDispatch }}" hint-placeholder-val="{{ false }}"><button onClick="{{ trf.dispatch }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Dispatch</button></sc-if>
+      <sc-if value="{{ trf.canReceive }}" hint-placeholder-val="{{ false }}"><button onClick="{{ trf.post }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer;opacity:{{ trf.postOp }}">Post receipt at {{ trf.to.name }}</button></sc-if>
+    </div>
+  </div>
+  <sc-if value="{{ trf.canReceive }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:16px 18px;display:flex;gap:12px;align-items:center;margin-bottom:8px">
+      <div style="position:relative;flex:1"><input value="{{ scanInput }}" onChange="{{ setScan }}" onKeyDown="{{ trf.scanKey }}" placeholder="Scan at destination: barcode or SKU, then Enter" style="width:100%;box-sizing:border-box;height:44px;padding:0 14px 0 44px;border:1.5px solid #010ECF;border-radius:8px;font-size:14px;font-family:'JetBrains Mono',monospace"><span style="position:absolute;left:14px;top:14px;width:18px;height:16px;background:repeating-linear-gradient(90deg,#010ECF 0 2px,transparent 2px 4px,#010ECF 4px 5px,transparent 5px 7px)"></span></div>
+      <button onClick="{{ trf.simulate }}" style="height:44px;padding:0 16px;border-radius:8px;border:none;background:#0E1116;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Simulate scan</button>
+    </div>
+    <div style="font-size:12.5px;color:#1B7A3A;font-weight:500;margin-bottom:12px;min-height:18px">{{ lastScan }}</div>
+  </sc-if>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 90px 160px 80px;gap:14px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Item</span><span style="text-align:right">Expected</span><span>Scanned</span><span></span></div>
+    <sc-for list="{{ trf.lines }}" as="l" hint-placeholder-count="1">
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 90px 160px 80px;gap:14px;padding:12px 18px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px">
+        <div><div style="font-weight:500">{{ l.name }}</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7A8191">{{ l.sku }} · {{ l.barcode }}</div></div>
+        <span style="text-align:right;font-weight:600">{{ l.qty }}</span>
+        <div style="display:flex;align-items:center;gap:10px"><span style="flex:1;height:6px;border-radius:3px;background:#EEF0F3;overflow:hidden"><span style="display:block;height:100%;background:#1B9A4A;width:{{ l.pct }}"></span></span><span style="font-weight:600;color:{{ l.fg }}">{{ l.scanned }}</span></div>
+        <sc-if value="{{ l.canFill }}" hint-placeholder-val="{{ false }}"><button onClick="{{ l.fill }}" style="height:28px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:11.5px;font-weight:600;cursor:pointer">Scan all</button></sc-if>
+      </div>
+    </sc-for>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.counts }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Stock counts</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">{{ counts.sub }}</div></div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <sc-if value="{{ counts.noDraft }}" hint-placeholder-val="{{ true }}"><div style="display:flex;gap:8px"><button onClick="{{ counts.startStore }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#12A594"></span>Count Main Store</button><button onClick="{{ counts.startOnline }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#7C4DFF"></span>Count Online Warehouse</button></div></sc-if>
+      <sc-if value="{{ counts.hasDraft }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px"><button onClick="{{ counts.cancel }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Discard</button><button onClick="{{ counts.post }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Post adjustment</button></div></sc-if>
+    </div>
+  </div>
+  <sc-if value="{{ counts.hasDraft }}" hint-placeholder-val="{{ false }}">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px">
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:14px 16px"><div style="font-size:12px;color:#5B6270">Count sheet</div><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;margin-top:4px">{{ counts.d.no }}</div><span style="display:inline-flex;margin-top:6px;height:20px;padding:0 8px;align-items:center;border-radius:4px;font-size:11px;font-weight:600;background:{{ counts.d.pool.bg }};color:{{ counts.d.pool.fg }}">{{ counts.d.pool.name }}</span></div>
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:14px 16px"><div style="font-size:12px;color:#5B6270">Counted</div><div style="font-size:22px;font-weight:700;margin-top:4px">{{ counts.d.progress }}</div></div>
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:14px 16px"><div style="font-size:12px;color:#5B6270">Lines with variance</div><div style="font-size:22px;font-weight:700;margin-top:4px">{{ counts.d.varLines }}</div></div>
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:14px 16px"><div style="font-size:12px;color:#5B6270">Net variance value</div><div style="font-size:22px;font-weight:700;margin-top:4px;color:{{ counts.d.netFg }}">{{ counts.d.net }}</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div onClick="{{ counts.toggleVar }}" style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#353B47;cursor:pointer"><span style="width:30px;height:18px;border-radius:9px;padding:2px;box-sizing:border-box;display:flex;justify-content:{{ counts.varJ }};background:{{ counts.varBg }}"><span style="width:14px;height:14px;border-radius:50%;background:#fff"></span></span>Only lines with variance</div>
+      <span style="margin-left:auto;font-size:12px;color:#7A8191">Blank counted = not counted, no adjustment</span>
+    </div>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden;margin-bottom:28px">
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 90px 120px 90px 130px;gap:14px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Item</span><span style="text-align:right">System</span><span style="text-align:center">Counted</span><span style="text-align:right">Variance</span><span style="text-align:right">Value KWD</span></div>
+      <sc-for list="{{ counts.d.lines }}" as="l" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 90px 120px 90px 130px;gap:14px;padding:8px 18px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px;background:{{ l.bg }}">
+          <div style="min-width:0"><div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ l.name }}</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7A8191">{{ l.sku }}</div></div>
+          <span style="text-align:right">{{ l.sys }}</span>
+          <input value="{{ l.counted }}" onChange="{{ l.set }}" placeholder="—" style="height:32px;box-sizing:border-box;width:100%;border:1px solid #D9DCE2;border-radius:6px;text-align:center;font-size:13px;font-weight:600">
+          <span style="text-align:right;font-weight:650;color:{{ l.fg }}">{{ l.variance }}</span>
+          <span style="text-align:right;color:{{ l.fg }}">{{ l.value }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+  <div style="font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191;margin-bottom:10px">Count history</div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+    <sc-for list="{{ counts.rows }}" as="r" hint-placeholder-count="2">
+      <div style="display:grid;grid-template-columns:150px 170px minmax(0,1fr) 140px 110px 100px;gap:14px;padding:0 18px;min-height:48px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500">{{ r.no }}</span>
+        <span><span style="display:inline-flex;height:20px;padding:0 8px;align-items:center;border-radius:4px;font-size:11px;font-weight:600;background:{{ r.pool.bg }};color:{{ r.pool.fg }}">{{ r.pool.name }}</span></span>
+        <span style="color:#5B6270">{{ r.summary }}</span>
+        <span style="text-align:right;font-weight:600;color:#B42318">{{ r.value }}</span>
+        <span style="color:#4A5160">{{ r.date }}</span>
+        <span><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ r.st.bg }};color:{{ r.st.fg }}">{{ r.st.text }}</span></span>
+      </div>
+    </sc-for>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.writeoffs }}" hint-placeholder-val="{{ false }}">
+  <div style="margin-bottom:20px"><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Write-offs</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">Log damaged, opened-pack and stolen stock. Each entry lowers stock and posts to shrinkage.</div></div>
+  <div style="display:grid;grid-template-columns:360px minmax(0,1fr);gap:16px;align-items:start">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:14px">
+      <div style="font-weight:600">New write-off</div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160">Location
+        <div style="display:flex;gap:4px;padding:3px;background:#F1F2F5;border-radius:7px">
+          <sc-for list="{{ writeoffs.locs }}" as="d" hint-placeholder-count="2"><button onClick="{{ d.pick }}" style="flex:1;height:28px;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;background:{{ d.bg }};color:{{ d.fg }};box-shadow:{{ d.sh }}">{{ d.label }}</button></sc-for>
+        </div>
+      </div>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160">Item{{ writeoffs.picker }}<span style="font-weight:500;color:#7A8191">{{ writeoffs.onHand }}</span></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160">Quantity<input value="{{ writeoffs.qty }}" onChange="{{ writeoffs.setQty }}" style="height:34px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:0 10px;font-size:13px"></label>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160">Reason
+        <div style="display:flex;gap:6px">
+          <sc-for list="{{ writeoffs.reasons }}" as="r" hint-placeholder-count="3"><button onClick="{{ r.pick }}" style="flex:1;height:32px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid {{ r.bd }};background:{{ r.bg }};color:{{ r.fg }}">{{ r.label }}</button></sc-for>
+        </div>
+      </div>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160">Note<textarea value="{{ writeoffs.note }}" onChange="{{ writeoffs.setNote }}" placeholder="What happened?" style="min-height:64px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:8px 10px;font-size:13px;resize:vertical"></textarea></label>
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#5B6270"><span>Value at average cost</span><span style="font-weight:650;color:#B42318">{{ writeoffs.value }}</span></div>
+      <button onClick="{{ writeoffs.log }}" style="height:38px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Log write-off</button>
+    </div>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:130px 100px 80px minmax(0,1fr) 50px 110px 100px;gap:12px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Number</span><span>Date</span><span>Pool</span><span>Item</span><span style="text-align:right">Qty</span><span>Reason</span><span style="text-align:right">KWD</span></div>
+      <sc-for list="{{ writeoffs.rows }}" as="r" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:130px 100px 80px minmax(0,1fr) 50px 110px 100px;gap:12px;padding:8px 18px;min-height:40px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500">{{ r.no }}</span><span style="color:#4A5160">{{ r.date }}</span>
+          <span><span style="display:inline-flex;height:20px;padding:0 7px;align-items:center;border-radius:4px;font-size:11px;font-weight:600;background:{{ r.pool.bg }};color:{{ r.pool.fg }}">{{ r.pool.label }}</span></span>
+          <div style="min-width:0"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500">{{ r.name }}</div><div style="font-size:11.5px;color:#7A8191;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.note }}</div></div>
+          <span style="text-align:right;font-weight:600">{{ r.qty }}</span>
+          <span><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ r.st.bg }};color:{{ r.st.fg }}">{{ r.st.text }}</span></span>
+          <span style="text-align:right;font-weight:600">{{ r.value }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.shrinkage }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Shrinkage report</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">Loss by reason and location at average cost · {{ shrinkage.rangeLine }}</div></div>
+    <div style="margin-left:auto;display:flex;gap:2px;padding:3px;background:#F1F2F5;border-radius:8px">
+      <sc-for list="{{ shrinkage.ranges }}" as="r" hint-placeholder-count="4"><button onClick="{{ r.pick }}" style="height:28px;padding:0 12px;border:none;border-radius:6px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ r.bg }};color:{{ r.fg }};box-shadow:{{ r.sh }}">{{ r.label }}</button></sc-for>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px">
+    <div style="background:#0E1116;color:#fff;border-radius:12px;padding:18px 20px"><div style="font-size:12.5px;opacity:.7">Total shrinkage</div><div style="font-size:28px;font-weight:700;margin-top:4px">{{ shrinkage.total }}</div><div style="font-size:12px;opacity:.6;margin-top:2px">{{ shrinkage.units }} units · {{ shrinkage.events }} events</div></div>
+    <sc-for list="{{ shrinkage.pools }}" as="p" hint-placeholder-count="2">
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:18px 20px"><span style="display:inline-flex;height:20px;padding:0 8px;align-items:center;border-radius:4px;font-size:11px;font-weight:600;background:{{ p.bg }};color:{{ p.fg }}">{{ p.name }}</span><div style="font-size:24px;font-weight:700;margin-top:8px">{{ p.val }}</div><div style="font-size:12px;color:#7A8191">{{ p.units }} units</div></div>
+    </sc-for>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:18px 20px"><div style="font-size:12.5px;color:#5B6270">Shrinkage vs stock value</div><div style="font-size:24px;font-weight:700;margin-top:8px">{{ shrinkage.rate }}</div><div style="font-size:12px;color:#7A8191">of current inventory at cost</div></div>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden;margin-bottom:16px">
+    <div style="display:grid;grid-template-columns:160px minmax(0,1fr) 130px 130px 130px;gap:14px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Reason</span><span>Share</span><span style="text-align:right">Main Store</span><span style="text-align:right">Online</span><span style="text-align:right">Total</span></div>
+    <sc-for list="{{ shrinkage.matrix }}" as="m" hint-placeholder-count="4">
+      <div style="display:grid;grid-template-columns:160px minmax(0,1fr) 130px 130px 130px;gap:14px;padding:0 18px;min-height:48px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px">
+        <span><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ m.st.bg }};color:{{ m.st.fg }}">{{ m.st.text }}</span></span>
+        <span style="height:8px;background:#F1F2F5;border-radius:4px;overflow:hidden"><span style="display:block;height:100%;border-radius:4px;background:{{ m.st.fg }};width:{{ m.pct }}"></span></span>
+        <span style="text-align:right">{{ m.store }}</span><span style="text-align:right">{{ m.online }}</span><span style="text-align:right;font-weight:650">{{ m.total }}</span>
+      </div>
+    </sc-for>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+    <div style="padding:14px 18px;border-bottom:1px solid #EEF0F3;font-weight:600">Events</div>
+    <sc-for list="{{ shrinkage.list }}" as="r" hint-placeholder-count="5">
+      <div style="display:grid;grid-template-columns:110px 140px 80px minmax(0,1fr) 120px 50px 100px;gap:12px;padding:0 18px;min-height:42px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px">
+        <span style="color:#4A5160">{{ r.date }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ r.ref }}</span>
+        <span><span style="display:inline-flex;height:20px;padding:0 7px;align-items:center;border-radius:4px;font-size:11px;font-weight:600;background:{{ r.pool.bg }};color:{{ r.pool.fg }}">{{ r.pool.label }}</span></span>
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</span>
+        <span><span style="display:inline-flex;height:20px;padding:0 8px;border-radius:10px;align-items:center;font-size:11px;font-weight:600;background:{{ r.st.bg }};color:{{ r.st.fg }}">{{ r.st.text }}</span></span>
+        <span style="text-align:right">{{ r.qty }}</span><span style="text-align:right;font-weight:600">{{ r.value }}</span>
+      </div>
+    </sc-for>
+    <sc-if value="{{ shrinkage.empty }}" hint-placeholder-val="{{ false }}"><div style="padding:30px;text-align:center;color:#7A8191;font-size:13px">No shrinkage in this period.</div></sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.rates }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Exchange rates</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px;display:flex;align-items:center;gap:8px"><span style="display:inline-flex;height:20px;padding:0 7px;border-radius:4px;align-items:center;background:#FDF1DC;color:#8A5A00;font-size:11px;font-weight:600">Sample rates</span>Illustrative values to KWD, not a live feed · latest {{ rates.latest }}</div></div>
+    <div style="margin-left:auto"><button onClick="{{ rates.simulate }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Simulate daily update</button></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px">
+    <sc-for list="{{ rates.cards }}" as="c" hint-placeholder-count="3">
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:18px 20px">
+        <div style="display:flex;align-items:center;gap:10px"><span style="width:36px;height:36px;border-radius:9px;background:#F1F2F5;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700">{{ c.code }}</span><div><div style="font-weight:600;font-size:13.5px">{{ c.name }}</div><div style="font-size:11.5px;color:#7A8191">{{ c.vendor }}</div></div><span style="margin-left:auto;font-size:12px;font-weight:600;color:{{ c.fg }}">{{ c.delta }}</span></div>
+        <div style="font-size:26px;font-weight:700;margin-top:14px">{{ c.rate }}</div>
+        <div style="font-size:12px;color:#7A8191">KWD per 1 {{ c.code }} · 1 KWD = {{ c.inv }}</div>
+        <div style="display:flex;align-items:flex-end;gap:3px;height:36px;margin-top:12px">
+          <sc-for list="{{ c.spark }}" as="b" hint-placeholder-count="7"><span style="flex:1;border-radius:2px;background:{{ b.bg }};height:{{ b.h }}"></span></sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <sc-if value="{{ rates.hasReval }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden;margin-bottom:16px">
+      <div style="padding:14px 18px;border-bottom:1px solid #EEF0F3;font-weight:600">Open POs revalued at {{ rates.revalDate }}</div>
+      <sc-for list="{{ rates.reval }}" as="r" hint-placeholder-count="2">
+        <div onClick="{{ r.open }}" style="display:grid;grid-template-columns:150px 150px 1fr 1fr 120px;gap:14px;padding:0 18px;min-height:42px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px;cursor:pointer" style-hover="background:#F7F8FB">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#010ECF">{{ r.no }}</span><span>{{ r.totalV }}</span><span style="color:#7A8191">was {{ r.old }}</span><span style="font-weight:600">now {{ r.now }}</span><span style="text-align:right;font-weight:600;color:{{ r.fg }}">{{ r.delta }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+    <div style="display:grid;grid-template-columns:160px 1fr 1fr 1fr;gap:14px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Date</span><span style="text-align:right">USD → KWD</span><span style="text-align:right">CNY → KWD</span><span style="text-align:right">AED → KWD</span></div>
+    <sc-for list="{{ rates.rows }}" as="r" hint-placeholder-count="7">
+      <div style="display:grid;grid-template-columns:160px 1fr 1fr 1fr;gap:14px;padding:0 18px;min-height:40px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px;background:{{ r.bg }}">
+        <span style="font-weight:{{ r.fw }}">{{ r.date }}</span><span style="text-align:right">{{ r.USD }}</span><span style="text-align:right">{{ r.CNY }}</span><span style="text-align:right">{{ r.AED }}</span>
+      </div>
+    </sc-for>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.invoices }}" hint-placeholder-val="{{ false }}">
+  <div style="margin-bottom:20px"><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Supplier invoices</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">{{ invoices.sub }}</div></div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+    <div style="display:grid;grid-template-columns:140px minmax(0,1fr) 130px 110px 150px 150px 130px;gap:14px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Invoice</span><span>Vendor</span><span>PO</span><span>Due</span><span style="text-align:right">Amount</span><span style="text-align:right">Balance</span><span>Status</span></div>
+    <sc-for list="{{ invoices.rows }}" as="r" hint-placeholder-count="5">
+      <div onClick="{{ r.open }}" style="display:grid;grid-template-columns:140px minmax(0,1fr) 130px 110px 150px 150px 130px;gap:14px;padding:0 18px;min-height:54px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px;cursor:pointer" style-hover="background:#F7F8FB">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500">{{ r.no }}</span>
+        <span style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.vendor }}</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5B6270">{{ r.po }}</span>
+        <span style="color:{{ r.dueFg }}">{{ r.due }}</span>
+        <div style="text-align:right"><div style="font-weight:600">{{ r.amount }}</div><div style="font-size:11.5px;color:#7A8191">{{ r.amountK }}</div></div>
+        <div style="text-align:right"><div style="font-weight:600">{{ r.bal }}</div><div style="font-size:11.5px;color:#7A8191">{{ r.balK }}</div></div>
+        <span><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ r.st.bg }};color:{{ r.st.fg }}">{{ r.st.text }}</span></span>
+      </div>
+    </sc-for>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.invoice }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ invoice.back }}" style="font-size:12.5px;color:#010ECF;font-weight:600;cursor:pointer;margin-bottom:10px">← Supplier invoices</div>
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px"><h1 style="margin:0;font-size:28px;font-weight:650;font-family:'JetBrains Mono',monospace;letter-spacing:-.04em">{{ invoice.no }}</h1><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ invoice.st.bg }};color:{{ invoice.st.fg }}">{{ invoice.st.text }}</span></div>
+      <div style="margin-top:6px;color:#5B6270;font-size:13.5px">{{ invoice.vendor }} · issued {{ invoice.date }} · due {{ invoice.due }}</div>
+    </div>
+    <div style="margin-left:auto"><sc-if value="{{ invoice.canPay }}" hint-placeholder-val="{{ false }}"><button onClick="{{ invoice.pay }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Record payment</button></sc-if></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:18px 20px"><div style="font-size:12px;color:#5B6270">Invoice amount</div><div style="font-size:24px;font-weight:700;margin-top:4px">{{ invoice.amount }}</div><div style="font-size:12px;color:#7A8191">{{ invoice.amountK }}</div></div>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:18px 20px"><div style="font-size:12px;color:#5B6270">Paid</div><div style="font-size:24px;font-weight:700;margin-top:4px;color:#1B7A3A">{{ invoice.paid }}</div><div style="height:6px;border-radius:3px;background:#EEF0F3;overflow:hidden;margin-top:10px"><span style="display:block;height:100%;background:#1B9A4A;width:{{ invoice.pct }}"></span></div></div>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:18px 20px"><div style="font-size:12px;color:#5B6270">Balance</div><div style="font-size:24px;font-weight:700;margin-top:4px">{{ invoice.bal }}</div><div style="font-size:12px;color:#7A8191">{{ invoice.balK }} at sample rate</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+      <div style="padding:14px 18px;border-bottom:1px solid #EEF0F3;font-weight:600">Three-way match</div>
+      <sc-for list="{{ invoice.match }}" as="m" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid #F2F3F5;font-size:13px">
+          <span style="width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:{{ m.bg }};color:{{ m.fg }}">{{ m.mark }}</span>
+          <div style="flex:1"><div style="font-weight:500">{{ m.label }}</div><div style="font-size:11.5px;color:#7A8191;font-family:'JetBrains Mono',monospace">{{ m.ref }}</div></div>
+          <span style="font-weight:600">{{ m.val }}</span>
+        </div>
+      </sc-for>
+      <div style="padding:12px 18px;font-size:12.5px;font-weight:600;color:{{ invoice.matchFg }}">{{ invoice.matchText }}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+        <div style="padding:14px 18px;border-bottom:1px solid #EEF0F3;font-weight:600">Payments</div>
+        <sc-for list="{{ invoice.payments }}" as="p" hint-placeholder-count="1"><div style="display:grid;grid-template-columns:110px 1fr auto;gap:12px;padding:10px 18px;border-bottom:1px solid #F2F3F5;font-size:13px;align-items:center"><span style="color:#4A5160">{{ p.date }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ p.ref }} · bank transfer</span><div style="text-align:right"><div style="font-weight:600">{{ p.amount }}</div><div style="font-size:11.5px;color:#7A8191">{{ p.k }}</div></div></div></sc-for>
+        <sc-if value="{{ invoice.noPayments }}" hint-placeholder-val="{{ false }}"><div style="padding:14px 18px;font-size:12.5px;color:#7A8191">No payments recorded.</div></sc-if>
+      </div>
+      <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+        <div style="padding:14px 18px;border-bottom:1px solid #EEF0F3;font-weight:600">Ledger entries</div>
+        <sc-for list="{{ invoice.ledger }}" as="e" hint-placeholder-count="2"><div style="display:grid;grid-template-columns:100px minmax(0,1fr) 90px 90px;gap:10px;padding:9px 18px;border-bottom:1px solid #F2F3F5;font-size:12.5px;align-items:center"><span style="color:#4A5160">{{ e.date }}</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ e.acct }}</span><span style="text-align:right">{{ e.dr }}</span><span style="text-align:right">{{ e.cr }}</span></div></sc-for>
+        <div onClick="{{ invoice.goLedger }}" style="padding:10px 18px;font-size:12.5px;font-weight:600;color:#010ECF;cursor:pointer">Open general ledger →</div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.ledger }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:16px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">General ledger</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">All amounts in KWD · entries post automatically from receipts, payments, counts and write-offs</div></div>
+    <div style="margin-left:auto;display:flex;gap:2px;padding:3px;background:#F1F2F5;border-radius:8px">
+      <sc-for list="{{ ledger.tabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.pick }}" style="height:28px;padding:0 14px;border:none;border-radius:6px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ t.bg }};color:{{ t.fg }};box-shadow:{{ t.sh }}">{{ t.label }}</button></sc-for>
+    </div>
+  </div>
+  <sc-if value="{{ ledger.isJournal }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="width:320px">{{ ledger.acctSel }}</div><span style="font-size:12.5px;color:#7A8191">{{ ledger.count }}</span></div>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:100px 140px 230px minmax(0,1fr) 110px 110px;gap:12px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Date</span><span>Reference</span><span>Account</span><span>Memo</span><span style="text-align:right">Debit</span><span style="text-align:right">Credit</span></div>
+      <sc-for list="{{ ledger.rows }}" as="e" hint-placeholder-count="10">
+        <div style="display:grid;grid-template-columns:100px 140px 230px minmax(0,1fr) 110px 110px;gap:12px;padding:0 18px;min-height:38px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px;background:{{ e.bg }}">
+          <span style="color:#4A5160">{{ e.date }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ e.ref }}</span>
+          <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:#7A8191;font-family:'JetBrains Mono',monospace;font-size:12px">{{ e.code }}</span> {{ e.acct }}</span>
+          <span style="color:#5B6270;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ e.memo }}</span>
+          <span style="text-align:right">{{ e.dr }}</span><span style="text-align:right">{{ e.cr }}</span>
+        </div>
+      </sc-for>
+      <div style="display:grid;grid-template-columns:100px 140px 230px minmax(0,1fr) 110px 110px;gap:12px;padding:0 18px;height:42px;align-items:center;background:#FAFBFC;font-size:13px;font-weight:650"><span></span><span></span><span>Total</span><span></span><span style="text-align:right">{{ ledger.totDr }}</span><span style="text-align:right">{{ ledger.totCr }}</span></div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ ledger.isCoa }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:90px minmax(0,1fr) 120px 80px 150px;gap:14px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Code</span><span>Account</span><span>Type</span><span style="text-align:right">Entries</span><span style="text-align:right">Balance</span></div>
+      <sc-for list="{{ ledger.coa }}" as="a" hint-placeholder-count="10">
+        <div onClick="{{ a.open }}" style="display:grid;grid-template-columns:90px minmax(0,1fr) 120px 80px 150px;gap:14px;padding:0 18px;min-height:42px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px;cursor:pointer" style-hover="background:#F7F8FB">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">{{ a.code }}</span><span style="font-weight:500">{{ a.name }}</span><span style="color:#5B6270">{{ a.type }}</span><span style="text-align:right;color:#5B6270">{{ a.n }}</span><span style="text-align:right;font-weight:600">{{ a.bal }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+  <sc-if value="{{ ledger.isTb }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:90px minmax(0,1fr) 150px 150px;gap:14px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Code</span><span>Account</span><span style="text-align:right">Debit</span><span style="text-align:right">Credit</span></div>
+      <sc-for list="{{ ledger.tb }}" as="a" hint-placeholder-count="10">
+        <div style="display:grid;grid-template-columns:90px minmax(0,1fr) 150px 150px;gap:14px;padding:0 18px;min-height:40px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">{{ a.code }}</span><span>{{ a.name }}</span><span style="text-align:right">{{ a.dr }}</span><span style="text-align:right">{{ a.cr }}</span>
+        </div>
+      </sc-for>
+      <div style="display:grid;grid-template-columns:90px minmax(0,1fr) 150px 150px;gap:14px;padding:0 18px;height:46px;align-items:center;background:#FAFBFC;font-size:13px;font-weight:700"><span></span><span style="display:flex;align-items:center;gap:8px">Total <span style="display:inline-flex;height:20px;padding:0 8px;border-radius:10px;align-items:center;font-size:11px;font-weight:600;background:{{ ledger.balBg }};color:{{ ledger.balFg }}">{{ ledger.balText }}</span></span><span style="text-align:right">{{ ledger.totDr }}</span><span style="text-align:right">{{ ledger.totCr }}</span></div>
+    </div>
+  </sc-if>
+</sc-if>
+
+<sc-if value="{{ is.users }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Users and roles</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">Growth plan · role-based access per location</div></div>
+    <div style="margin-left:auto"><button onClick="{{ users.invite }}" style="height:36px;padding:0 16px;border-radius:6px;border:1px solid #D9DCE2;background:#F6F7F9;color:#9AA0AC;font-size:13px;font-weight:600;cursor:not-allowed">Invite user</button></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:16px;margin-bottom:16px">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:18px 20px">
+      <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:30px;font-weight:700">10</span><span style="font-size:14px;color:#5B6270">of 10 seats used</span></div>
+      <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:14px">
+        <sc-for list="{{ users.seats }}" as="s" hint-placeholder-count="10"><span style="height:10px;border-radius:3px;background:{{ s.bg }}"></span></sc-for>
+      </div>
+      <div style="font-size:12px;color:#B42318;font-weight:600;margin-top:12px">Seat limit reached · new invites are blocked</div>
+    </div>
+    <div style="background:linear-gradient(135deg,#010ECF,#0A1AE8);color:#fff;border-radius:12px;padding:18px 22px;display:flex;align-items:center;gap:20px">
+      <div style="flex:1"><div style="font-size:12px;opacity:.75;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Upgrade</div><div style="font-size:18px;font-weight:650;margin-top:4px">Business plan · 25 seats</div><div style="font-size:12.5px;opacity:.8;margin-top:4px;line-height:1.5">Add more cashiers, pickers and a second store location.</div></div>
+      <button onClick="{{ users.upgrade }}" style="height:38px;padding:0 18px;border-radius:6px;border:none;background:#fff;color:#010ECF;font-size:13px;font-weight:700;cursor:pointer">See plans</button>
+    </div>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+    <div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) 170px 120px 100px;gap:14px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>User</span><span>Role</span><span>Location access</span><span>Last active</span><span>Status</span></div>
+    <sc-for list="{{ users.rows }}" as="u" hint-placeholder-count="10">
+      <div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) 170px 120px 100px;gap:14px;padding:0 18px;min-height:52px;align-items:center;border-bottom:1px solid #F2F3F5;font-size:13px">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0"><span style="width:30px;height:30px;flex:none;border-radius:50%;background:#EEF0F3;color:#353B47;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ u.ini }}</span><div style="min-width:0"><div style="font-weight:500">{{ u.name }}</div><div style="font-size:11.5px;color:#7A8191">{{ u.email }}</div></div></div>
+        <span>{{ u.role }}</span>
+        <span><span style="display:inline-flex;height:20px;padding:0 8px;align-items:center;border-radius:4px;font-size:11px;font-weight:600;background:{{ u.accBg }};color:{{ u.accFg }}">{{ u.access }}</span></span>
+        <span style="color:#5B6270">{{ u.last }}</span>
+        <span><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ u.st.bg }};color:{{ u.st.fg }}">{{ u.st.text }}</span></span>
+      </div>
+    </sc-for>
+  </div>
+</sc-if>
+
+<div data-slot="more"></div>
+
+      </div>
+    </div>
+  </main>
+</div>
+<sc-if value="{{ trfForm }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(14,17,22,.45);display:flex;align-items:center;justify-content:center;z-index:60">
+    <div style="width:620px;max-width:calc(100vw - 40px);background:#fff;border-radius:14px;box-shadow:0 24px 64px rgba(14,17,22,.3);overflow:hidden">
+      <div style="padding:18px 22px;border-bottom:1px solid #EEF0F3;display:flex;align-items:center"><div style="font-size:17px;font-weight:650">New transfer</div><button onClick="{{ tm.close }}" style="margin-left:auto;width:30px;height:30px;border:none;background:transparent;font-size:18px;color:#7A8191;cursor:pointer">×</button></div>
+      <div style="padding:18px 22px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="flex:1;border:1px solid #E6E8EC;border-radius:10px;padding:12px 14px"><div style="font-size:11px;color:#7A8191;font-weight:600;text-transform:uppercase;letter-spacing:.05em">From</div><span style="display:inline-flex;margin-top:6px;height:22px;padding:0 9px;align-items:center;border-radius:4px;font-size:12px;font-weight:600;background:{{ tm.from.bg }};color:{{ tm.from.fg }}">{{ tm.from.name }}</span></div>
+          <button onClick="{{ tm.swap }}" style="width:38px;height:38px;border-radius:50%;border:1px solid #D9DCE2;background:#fff;cursor:pointer;font-size:16px">⇄</button>
+          <div style="flex:1;border:1px solid #E6E8EC;border-radius:10px;padding:12px 14px"><div style="font-size:11px;color:#7A8191;font-weight:600;text-transform:uppercase;letter-spacing:.05em">To</div><span style="display:inline-flex;margin-top:6px;height:22px;padding:0 9px;align-items:center;border-radius:4px;font-size:12px;font-weight:600;background:{{ tm.to.bg }};color:{{ tm.to.fg }}">{{ tm.to.name }}</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ tm.lines }}" as="l" hint-placeholder-count="1">
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 80px 30px;gap:8px;align-items:center">
+              <div style="min-width:0">{{ l.picker }}<div style="font-size:11.5px;margin-top:3px;color:{{ l.fg }}">{{ l.avail }}</div></div>
+              <input value="{{ l.qty }}" onChange="{{ l.setQty }}" style="height:34px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;text-align:right;padding:0 8px;font-size:13px;align-self:start">
+              <button onClick="{{ l.remove }}" style="height:34px;border:none;background:transparent;color:#9AA0AC;font-size:16px;cursor:pointer;align-self:start">×</button>
+            </div>
+          </sc-for>
+          <button onClick="{{ tm.addLine }}" style="align-self:flex-start;height:30px;padding:0 12px;border-radius:6px;border:1px dashed #B7BCC6;background:#fff;font-size:12.5px;font-weight:600;color:#010ECF;cursor:pointer">+ Add line</button>
+        </div>
+      </div>
+      <div style="padding:14px 22px;border-top:1px solid #EEF0F3;display:flex;justify-content:flex-end;gap:8px;background:#FAFBFC"><button onClick="{{ tm.close }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Cancel</button><button onClick="{{ tm.next }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Continue</button></div>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ trfConfirm }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(14,17,22,.45);display:flex;align-items:center;justify-content:center;z-index:60">
+    <div style="width:520px;max-width:calc(100vw - 40px);background:#fff;border-radius:14px;box-shadow:0 24px 64px rgba(14,17,22,.3);overflow:hidden">
+      <div style="padding:22px 24px 6px">
+        <div style="width:44px;height:44px;border-radius:12px;background:#FDF1DC;color:#8A5A00;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700">!</div>
+        <div style="font-size:18px;font-weight:650;margin-top:14px">Move stock between isolated pools?</div>
+        <div style="font-size:13.5px;color:#4A5160;line-height:1.55;margin-top:8px">Main Store and Online Warehouse are separate stock pools. The POS sells only from Main Store; the storefront sells only from Online Warehouse. A transfer is the only way stock crosses between them.</div>
+      </div>
+      <div style="margin:14px 24px;border:1px solid #E6E8EC;border-radius:10px;overflow:hidden">
+        <sc-for list="{{ tm.effects }}" as="x" hint-placeholder-count="1">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid #F2F3F5;font-size:13px">
+            <span style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ x.name }}</span>
+            <span style="display:inline-flex;height:20px;padding:0 8px;align-items:center;border-radius:4px;font-size:11px;font-weight:600;background:{{ tm.from.bg }};color:{{ tm.from.fg }}">{{ tm.from.label }} −{{ x.qty }} now</span>
+            <span style="display:inline-flex;height:20px;padding:0 8px;align-items:center;border-radius:4px;font-size:11px;font-weight:600;background:{{ tm.to.bg }};color:{{ tm.to.fg }}">{{ tm.to.label }} +{{ x.qty }} on receipt</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="padding:14px 24px;border-top:1px solid #EEF0F3;display:flex;justify-content:flex-end;gap:8px;background:#FAFBFC"><button onClick="{{ tm.backStep }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Back</button><button onClick="{{ tm.confirm }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Confirm and dispatch</button></div>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ payOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(14,17,22,.45);display:flex;align-items:center;justify-content:center;z-index:60">
+    <div style="width:460px;max-width:calc(100vw - 40px);background:#fff;border-radius:14px;box-shadow:0 24px 64px rgba(14,17,22,.3);overflow:hidden">
+      <div style="padding:18px 22px;border-bottom:1px solid #EEF0F3"><div style="font-size:17px;font-weight:650">Record payment</div><div style="font-size:12.5px;color:#5B6270;margin-top:4px">{{ pm.no }} · {{ pm.vendor }} · balance {{ pm.bal }}</div></div>
+      <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160">Amount ({{ pm.ccy }})<input value="{{ pm.amount }}" onChange="{{ pm.setAmt }}" style="height:42px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:8px;padding:0 12px;font-size:18px;font-weight:650"></label>
+        <div style="display:flex;gap:6px"><button onClick="{{ pm.half }}" style="height:30px;padding:0 12px;border-radius:15px;border:1px solid #D9DCE2;background:#fff;font-size:12px;font-weight:600;cursor:pointer">50%</button><button onClick="{{ pm.full }}" style="height:30px;padding:0 12px;border-radius:15px;border:1px solid #D9DCE2;background:#fff;font-size:12px;font-weight:600;cursor:pointer">Full balance</button></div>
+        <div style="padding:12px 14px;border-radius:8px;background:rgba(1,14,207,.06);font-size:13px;color:#1C2470;display:flex;justify-content:space-between"><span>KWD equivalent (sample rate)</span><span style="font-weight:700;color:#010ECF">{{ pm.k }}</span></div>
+        <div style="font-size:12px;color:#7A8191">Bank transfer on 07 Oct 2026 · posts Dr 2100 Accounts payable / Cr 1110 Bank</div>
+      </div>
+      <div style="padding:14px 22px;border-top:1px solid #EEF0F3;display:flex;justify-content:flex-end;gap:8px;background:#FAFBFC"><button onClick="{{ pm.close }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Cancel</button><button onClick="{{ pm.confirm }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Record payment</button></div>
+    </div>
+  </div>
+</sc-if>
+<div style="position:fixed;right:24px;bottom:24px;display:flex;flex-direction:column;gap:8px;z-index:90;pointer-events:none">
+  <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="0">
+    <div style="background:#0E1116;color:#fff;font-size:13px;line-height:1.45;padding:12px 16px;border-radius:10px;box-shadow:0 12px 32px rgba(14,17,22,.28);max-width:440px;display:flex;gap:10px;align-items:flex-start"><span style="width:8px;height:8px;border-radius:50%;background:{{ t.dot }};margin-top:6px;flex:none"></span><span>{{ t.msg }}</span></div>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;reorderPoint&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:8,&quot;min&quot;:1,&quot;max&quot;:30,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;dashboard&quot;,&quot;options&quot;:[&quot;dashboard&quot;,&quot;items&quot;,&quot;pos&quot;,&quot;grn&quot;,&quot;transfers&quot;,&quot;counts&quot;,&quot;writeoffs&quot;,&quot;rates&quot;,&quot;invoices&quot;,&quot;ledger&quot;,&quot;users&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behaviour&quot;}}">
+class Component extends DCLogic {
+  state = { ready: false };
+  componentDidMount(){ const t=()=>{ if(window.ERP) this.setState(this.init()); else setTimeout(t,40); }; t(); }
+  init(){ return { ready:true, db:window.ERP.seed(), screen:this.props.startScreen||'dashboard', loc:'all', itemSku:'FA-TEE-BLK-L', poNo:null, invNo:null, trfNo:null, vendorId:'V-01', itemsQ:'', itemsCat:'All', showInactive:false, poFilter:'All', poDraft:null, grn:null, labelSel:{'FA-TEE-BLK-M':6,'BE-LIP-ROS':4,'GA-CBL-C1M':6}, trfModal:null, scanInput:'', lastScan:'', countDraft:null, countOnlyVar:false, wo:{loc:'store',sku:'BE-LIP-CRL',qty:'1',reason:'Damaged',note:''}, shrinkRange:'30', payModal:null, ledgerTab:'journal', ledgerAcct:'All', menuOpen:false, toasts:[], editAr:null, reval:null }; }
+  mut(fn){ const db=JSON.parse(JSON.stringify(this.state.db)); const extra=fn(db)||{}; this.setState({db,...extra}); }
+  toast(msg,bad){ const id=Math.random(); this.setState(s=>({toasts:[...s.toasts,{id,msg,dot:bad?'#FF6B5E':'#3DDC97'}]})); setTimeout(()=>this.setState(s=>({toasts:s.toasts.filter(t=>t.id!==id)})),4200); }
+  sel(value,opts,onChange,w){ return React.createElement('select',{value,onChange:e=>onChange(e.target.value),onClick:e=>e.stopPropagation(),style:{height:34,padding:'0 8px',border:'1px solid #D9DCE2',borderRadius:6,fontSize:13,background:'#fff',color:'#0E1116',width:w||'100%',minWidth:0,boxSizing:'border-box'}},opts.map(o=>React.createElement('option',{key:o[0],value:o[0]},o[1]))); }
+  go(screen,extra){ return ()=>this.setState({screen,menuOpen:false,scanInput:'',lastScan:'',...(extra||{})}); }
+  openTrf(pre){ const p=pre||{}; const from=p.from||'online'; this.setState({menuOpen:false,trfModal:{from,to:from==='online'?'store':'online',lines:[{sku:p.sku||'FA-TEE-BLK-L',qty:String(p.qty||6)}],step:'form'}}); }
+  newPO(){ this.setState({screen:'poNew',menuOpen:false,poDraft:{vendor:'V-01',dest:'online',freight:'300',duty:'90',lines:[{sku:'FA-TEE-BLK-L',qty:'60',unit:'8.50'},{sku:'HO-TWL-SND',qty:'40',unit:'11.00'},{sku:'GA-FAN-MIN',qty:'30',unit:'18.00'}]}}); }
+
+  renderVals(){
+    if(!this.state.ready||!window.ERP) return { ready:false, is:{} };
+    const E=window.ERP, st=this.state, db=st.db;
+    const REORDER=this.props.reorderPoint??8;
+    const I={}; db.items.forEach(i=>I[i.sku]=i);
+    const V={}; db.vendors.forEach(v=>V[v.id]=v);
+    const SCREENS=['dashboard','items','item','labels','pos','poNew','po','grn','vendors','transfers','trf','counts','writeoffs','shrinkage','rates','invoices','invoice','ledger','users'];
+    const is={}; SCREENS.forEach(k=>is[k]=st.screen===k);
+    const parent={item:'items',poNew:'pos',po:'pos',trf:'transfers',invoice:'invoices'}[st.screen]||st.screen;
+    const badges={pos:db.pos.filter(p=>p.status==='Sent'||p.status==='Partially received').length,transfers:db.transfers.filter(t=>t.status!=='Received').length,invoices:db.invoices.filter(i=>E.invStatus(i)==='Overdue').length};
+    const NAV=[['Overview',[['dashboard','Dashboard']]],['Items',[['items','Item list'],['labels','Barcode labels']]],['Purchasing',[['pos','Purchase orders'],['grn','Goods receipt'],['vendors','Vendors']]],['Warehouse',[['transfers','Transfers'],['counts','Stock counts'],['writeoffs','Write-offs'],['shrinkage','Shrinkage report']]],['Finance',[['rates','Exchange rates'],['invoices','Supplier invoices'],['ledger','General ledger']]],['Admin',[['users','Users and roles']]]];
+    const titles={}; NAV.forEach(([g,its])=>its.forEach(([id,l])=>titles[id]=[g,l]));
+    titles.item=['Items',st.itemSku]; titles.poNew=['Purchasing','New purchase order']; titles.po=['Purchasing',st.poNo]; titles.trf=['Warehouse',st.trfNo]; titles.invoice=['Finance',st.invNo];
+    const nav=NAV.map(([title,its])=>({title,items:its.map(([id,label])=>{ const a=parent===id; const bad=id==='invoices'; return {label,go:this.go(id),bg:a?'rgba(1,14,207,.08)':'transparent',fg:a?'#010ECF':'#353B47',fw:a?600:500,mark:a?'#010ECF':'#C9CDD4',badge:badges[id]||0,hasBadge:!!badges[id],badgeBg:bad?'#FDE7E5':'#E6E8FB',badgeFg:bad?'#B42318':'#010ECF'}; })}));
+    const locOpts=[['all','All locations','#7A8191'],['store','Main Store','#12A594'],['online','Online Warehouse','#7C4DFF']].map(([k,label,dot])=>({label,dot,pick:()=>this.setState({loc:k}),bg:st.loc===k?'#fff':'transparent',fg:st.loc===k?'#0E1116':'#5B6270',sh:st.loc===k?'0 1px 2px rgba(14,17,22,.12)':'none'}));
+    const go=(s,x)=>this.go(s,x);
+    const qFg=q=>q===0?'#B42318':q<REORDER?'#8A5A00':'#0E1116';
+    const sortedMoves=db.moves.map((m,i)=>({...m,i})).sort((a,b)=>b.date.localeCompare(a.date)||b.i-a.i);
+    const moveRow=m=>({date:E.fd(m.date),type:m.type,ref:m.ref,pool:E.POOL[m.loc],qty:(m.qty>=0?'+':'−')+Math.abs(m.qty),qtyFg:m.qty>=0?'#1B7A3A':'#B42318',name:I[m.sku].name,sku:m.sku,note:m.note||'',open:go('item',{itemSku:m.sku,editAr:null})});
+    const ctx={E,st,db,I,V,go,qFg,REORDER,sortedMoves,moveRow};
+    const out={ready:true,is,nav,locOpts,crumbA:(titles[st.screen]||['',''])[0],crumbB:(titles[st.screen]||['',''])[1],menuOpen:st.menuOpen,
+      toggleMenu:e=>{e.stopPropagation();this.setState(s=>({menuOpen:!s.menuOpen}));},closeMenu:()=>{ if(st.menuOpen) this.setState({menuOpen:false}); },
+      goUsers:go('users'),reset:()=>{ this.setState({...this.init(),screen:'dashboard'}); setTimeout(()=>this.toast('Demo data reset to seed'),0); },
+      toasts:st.toasts, scanInput:st.scanInput, lastScan:st.lastScan, setScan:e=>this.setState({scanInput:e.target.value})};
+    SCREENS.forEach(k=>{ if(is[k]&&this['v_'+k]) out[k]=this['v_'+k](ctx); });
+    out.pending=!this['v_'+st.screen];
+    if(this.v_modals) Object.assign(out,this.v_modals(ctx));
+    return out;
+  }
+
+  v_dashboard({E,st,db,V,go,REORDER,sortedMoves,moveRow}){
+    const locs=st.loc==='all'?['store','online']:[st.loc];
+    const val=l=>db.items.reduce((a,i)=>a+db.stock[i.sku][l]*i.cost,0);
+    const units=l=>db.items.reduce((a,i)=>a+db.stock[i.sku][l],0);
+    const vals={store:val('store'),online:val('online')}; const tot=locs.reduce((a,l)=>a+vals[l],0);
+    const low=[]; db.items.filter(i=>i.active).forEach(i=>locs.forEach(l=>{ const q=db.stock[i.sku][l]; if(q<REORDER) low.push({i,l,q}); }));
+    low.sort((a,b)=>a.q-b.q);
+    const openPO=db.pos.filter(p=>E.OPEN.includes(p.status)&&locs.includes(p.dest));
+    const poDest=no=>{ const p=db.pos.find(x=>x.no===no); return p?p.dest:null; };
+    const pay=db.invoices.filter(v=>E.invStatus(v)!=='Paid'&&(st.loc==='all'||poDest(v.po)===st.loc));
+    const cv=E.CATS.map(c=>({c,v:db.items.filter(i=>i.cat===c).reduce((a,i)=>a+locs.reduce((b,l)=>b+db.stock[i.sku][l],0)*i.cost,0)}));
+    const maxC=Math.max(...cv.map(x=>x.v),0.001);
+    return {
+      scope:st.loc==='all'?'all locations':E.POOL[st.loc].name, reorder:REORDER,
+      valTotal:E.k3(tot), units:E.nf(locs.reduce((a,l)=>a+units(l),0),0), skus:db.items.filter(i=>i.active).length,
+      pools:locs.map(l=>({name:E.POOL[l].name,bar:l==='store'?'#5EEAD4':'#C4B5FD',val:E.k3(vals[l]),pct:(tot?vals[l]/tot*100:0).toFixed(1)+'%'})),
+      lowCount:low.length, zeroCount:low.filter(x=>x.q===0).length,
+      low:low.slice(0,8).map(x=>({sku:x.i.sku,name:x.i.name,pool:E.POOL[x.l],q:x.q,qFg:x.q===0?'#B42318':'#8A5A00',open:go('item',{itemSku:x.i.sku,editAr:null})})),
+      openCount:openPO.length, openVal:E.k3(openPO.reduce((a,p)=>a+E.poCalc(p,db).totalK,0)),
+      openPOs:openPO.map(p=>{ const c=E.poCalc(p,db); return {no:p.no,vendor:V[p.vendor].name,st:E.chip(p.status),fx:E.mny(c.totalV,p.ccy),k:E.k3(c.totalK),pool:E.POOL[p.dest],open:go('po',{poNo:p.no})}; }),
+      openEmpty:!openPO.length,
+      payTotal:E.k3(pay.reduce((a,v)=>a+(v.amount-v.paid)*E.rate(db,v.ccy),0)), payCount:pay.length, overdue:pay.filter(v=>E.invStatus(v)==='Overdue').length,
+      pay:pay.slice(0,4).map(v=>({no:v.no,vendor:V[v.vendor].name,due:E.fd(v.due),k:E.k3((v.amount-v.paid)*E.rate(db,v.ccy)),st:E.chip(E.invStatus(v)),open:go('invoice',{invNo:v.no})})),
+      cats:cv.map(x=>({name:x.c,val:E.k3(x.v),pct:(x.v/maxC*100).toFixed(1)+'%'})),
+      moves:sortedMoves.filter(m=>locs.includes(m.loc)&&m.ref!=='OPEN').slice(0,7).map(moveRow),
+      newPO:()=>this.newPO(), newTrf:()=>this.openTrf(), goPOs:go('pos'), goItems:go('items'), goInv:go('invoices')
+    };
+  }
+
+  v_items({E,st,db,go,qFg}){
+    const q=st.itemsQ.trim().toLowerCase();
+    const rows=db.items.filter(i=>(st.showInactive||i.active)&&(st.itemsCat==='All'||i.cat===st.itemsCat)&&(!q||(i.sku+' '+i.name+' '+i.barcode).toLowerCase().includes(q)||i.ar.includes(st.itemsQ.trim())));
+    return {
+      q:st.itemsQ, setQ:e=>this.setState({itemsQ:e.target.value}), goLabels:go('labels'),
+      cats:['All',...E.CATS].map(c=>{ const a=st.itemsCat===c; return {label:c,pick:()=>this.setState({itemsCat:c}),bg:a?'#0E1116':'#fff',fg:a?'#fff':'#353B47',bd:a?'#0E1116':'#D9DCE2'}; }),
+      inactBg:st.showInactive?'#010ECF':'#D3D6DC', inactJ:st.showInactive?'flex-end':'flex-start', toggleInactive:()=>this.setState(s=>({showInactive:!s.showInactive})),
+      count:rows.length+' of '+db.items.length+' SKUs',
+      rows:rows.map(i=>{ const s=db.stock[i.sku]; return {sku:i.sku,name:i.name,ar:i.ar,cat:i.cat,barcode:i.barcode,cost:E.nf(i.cost,3),price:E.nf(i.price,3),store:s.store,online:s.online,storeFg:qFg(s.store),onlineFg:qFg(s.online),op:i.active?1:.5,actBg:i.active?'#010ECF':'#D3D6DC',actJ:i.active?'flex-end':'flex-start',
+        toggle:e=>{ e.stopPropagation(); this.mut(d=>{ const x=d.items.find(y=>y.sku===i.sku); x.active=!x.active; }); this.toast(i.sku+(i.active?' set inactive':' set active')); },
+        open:go('item',{itemSku:i.sku,editAr:null})}; }),
+      empty:!rows.length
+    };
+  }
+
+  v_item({E,st,db,go,qFg,sortedMoves,moveRow}){
+    const i=db.items.find(x=>x.sku===st.itemSku)||db.items[0]; const s=db.stock[i.sku];
+    const toStore=s.store===0||s.store<=s.online;
+    const mv=sortedMoves.filter(m=>m.sku===i.sku);
+    return {
+      sku:i.sku,name:i.name,product:i.product,variant:[i.colour,i.size].filter(Boolean).join(' · ')||'Standard',cat:i.cat,ar:i.ar,barcode:i.barcode,src:E.eanSvg(i.barcode),
+      cost:E.k3(i.cost),price:E.k3(i.price),margin:((i.price-i.cost)/i.price*100).toFixed(1)+'%',st:E.chip(i.active?'Active':'Inactive'),
+      store:s.store,online:s.online,res:s.res,storeFg:qFg(s.store),onlineFg:qFg(s.online),storeVal:E.k3(s.store*i.cost),onlineVal:E.k3(s.online*i.cost),
+      hint:s.store===0?'Zero store stock: this variant cannot be sold at the POS, even though the Online Warehouse holds '+s.online+'. Transfer stock to put it on the shelf.':s.online===0?'Zero online stock: shoppers see this variant as sold out, even though Main Store holds '+s.store+'. Transfer stock to sell it online.':'',
+      editing:st.editAr!==null, notEditing:st.editAr===null, editVal:st.editAr||'',
+      startEdit:()=>this.setState({editAr:i.ar}), setEdit:e=>this.setState({editAr:e.target.value}), cancelEdit:()=>this.setState({editAr:null}),
+      saveEdit:()=>{ const v=(st.editAr||'').trim(); if(!v){ this.toast('Arabic description cannot be empty',true); return; } this.mut(d=>{ d.items.find(x=>x.sku===i.sku).ar=v; return {editAr:null}; }); this.toast('Arabic description saved for '+i.sku); },
+      moves:mv.map(moveRow), moveCount:mv.length,
+      transferLabel:toStore?'Transfer to Main Store':'Transfer to Online',
+      transfer:()=>this.openTrf({from:toStore?'online':'store',sku:i.sku,qty:Math.max(1,Math.min(6,toStore?s.online:s.store))}),
+      writeOff:go('writeoffs',{wo:{loc:s.store>0?'store':'online',sku:i.sku,qty:'1',reason:'Damaged',note:''}}),
+      label:go('labels',{labelSel:{[i.sku]:6}}), back:go('items')
+    };
+  }
+
+  v_labels({E,st,db}){
+    const sel=st.labelSel; const setSel=fn=>this.setState(s=>{ const n={...s.labelSel}; fn(n); return {labelSel:n}; });
+    const preview=[]; db.items.forEach(i=>{ const n=sel[i.sku]||0; for(let k=0;k<n;k++) preview.push({name:i.name,price:E.k3(i.price),src:E.eanSvg(i.barcode),code:i.barcode}); });
+    const total=preview.length;
+    return {
+      rows:db.items.filter(i=>i.active).map(i=>{ const on=!!sel[i.sku]; return {sku:i.sku,name:i.name,qty:sel[i.sku]||0,bg:on?'rgba(1,14,207,.04)':'#fff',cbBg:on?'#010ECF':'#fff',cbBd:on?'#010ECF':'#C3C7CF',tick:on?'✓':'',qOp:on?1:.4,
+        toggle:()=>setSel(n=>{ if(n[i.sku]) delete n[i.sku]; else n[i.sku]=4; }), inc:()=>setSel(n=>{ n[i.sku]=Math.min(48,(n[i.sku]||0)+1); }), dec:()=>setSel(n=>{ const v=(n[i.sku]||0)-1; if(v<=0) delete n[i.sku]; else n[i.sku]=v; })}; }),
+      preview:preview.slice(0,40), total, sheets:Math.max(1,Math.ceil(total/40))+(Math.ceil(total/40)>1?' sheets':' sheet'), empty:!total,
+      clear:()=>this.setState({labelSel:{}}), print:()=>{ if(!total){ this.toast('Select at least one SKU',true); return; } this.toast(total+' labels sent to label printer (simulated)'); }
+    };
+  }
+  v_pos({E,st,db,V,go}){
+    const F=['All','Draft','Sent','Partially received','Received','Closed'];
+    const rows=db.pos.filter(p=>st.poFilter==='All'||p.status===st.poFilter);
+    return {
+      newPO:()=>this.newPO(),
+      filters:F.map(f=>{ const a=st.poFilter===f; return {label:f,n:f==='All'?db.pos.length:db.pos.filter(p=>p.status===f).length,pick:()=>this.setState({poFilter:f}),bg:a?'#0E1116':'#fff',fg:a?'#fff':'#353B47',bd:a?'#0E1116':'#D9DCE2'}; }),
+      rows:rows.map(p=>{ const c=E.poCalc(p,db); return {no:p.no,vendor:V[p.vendor].name,lines:p.lines.length+' lines · '+E.nf(p.lines.reduce((a,l)=>a+(+l.qty),0),0)+' units',pool:E.POOL[p.dest],date:E.fd(p.date),eta:E.fd(p.eta),fx:E.mny(c.totalV,p.ccy),k:E.k3(c.totalK),st:E.chip(p.status),open:go('po',{poNo:p.no})}; }),
+      empty:!rows.length
+    };
+  }
+
+  v_poNew({E,st,db,I,V,go}){
+    const d=st.poDraft; if(!d) return {};
+    const ccy=V[d.vendor].ccy; const c=E.poCalc({...d,ccy,rate:null},db);
+    const upd=fn=>this.setState(s=>{ const n=JSON.parse(JSON.stringify(s.poDraft)); fn(n); return {poDraft:n}; });
+    const lr=db.rates[db.rates.length-1];
+    const save=send=>{
+      const lines=d.lines.map(l=>({sku:l.sku,qty:Math.round(+l.qty||0),unit:+l.unit||0,rec:0})).filter(l=>l.qty>0&&l.unit>0);
+      if(!lines.length){ this.toast('Add at least one line with quantity and unit price',true); return; }
+      let no;
+      this.mut(db=>{ no='PO-2026-'+E.pad(db.seq.PO++); db.pos.unshift({no,vendor:d.vendor,ccy,date:E.TODAY,eta:E.addDays(E.TODAY,21),dest:d.dest,status:send?'Sent':'Draft',freight:+d.freight||0,duty:+d.duty||0,rate:null,log:send?[['Draft',E.TODAY],['Sent',E.TODAY]]:[['Draft',E.TODAY]],lines}); return {screen:'po',poNo:no,poDraft:null}; });
+      this.toast(no+(send?' saved and sent to '+V[d.vendor].name+' (simulated email)':' saved as draft'));
+    };
+    return {
+      nextNo:'PO-2026-'+E.pad(db.seq.PO), ccy, back:go('pos'),
+      vendorSel:this.sel(d.vendor,db.vendors.map(v=>[v.id,v.name+' · '+v.ccy]),v=>upd(n=>{n.vendor=v;})),
+      dests:['online','store'].map(k=>{ const a=d.dest===k; return {label:E.POOL[k].name,pick:()=>upd(n=>{n.dest=k;}),bg:a?'#fff':'transparent',fg:a?E.POOL[k].fg:'#5B6270',sh:a?'0 1px 2px rgba(14,17,22,.12)':'none'}; }),
+      rateLine:ccy==='KWD'?'Vendor invoices in KWD, no conversion needed':'1 '+ccy+' = KWD '+E.nf(lr[ccy],5)+' on '+E.fd(lr.date)+' · KWD shown to three decimals',
+      lines:c.lines.map((l,idx)=>({
+        picker:this.sel(l.sku,db.items.map(i=>[i.sku,i.sku+' · '+i.name]),v=>upd(n=>{n.lines[idx].sku=v;})),
+        qty:d.lines[idx].qty, unit:d.lines[idx].unit,
+        setQty:e=>{ const v=e.target.value; upd(n=>{n.lines[idx].qty=v;}); }, setUnit:e=>{ const v=e.target.value; upd(n=>{n.lines[idx].unit=v;}); },
+        total:E.mny(l.value,ccy), landedV:E.mny(l.landedV,ccy), landedK:E.k3(l.landedK),
+        remove:()=>upd(n=>{n.lines.splice(idx,1);})
+      })),
+      addLine:()=>upd(n=>{n.lines.push({sku:db.items[0].sku,qty:'10',unit:'1.00'});}),
+      freight:d.freight, duty:d.duty, setFreight:e=>{ const v=e.target.value; upd(n=>{n.freight=v;}); }, setDuty:e=>{ const v=e.target.value; upd(n=>{n.duty=v;}); },
+      goods:E.mny(c.goods,ccy), freightF:E.mny(+d.freight||0,ccy), dutyF:E.mny(+d.duty||0,ccy), uplift:'+'+(c.f*100).toFixed(1)+'%',
+      totalV:E.mny(c.totalV,ccy), totalK:E.k3(c.totalK), unitsLine:c.lines.length+' lines · '+E.nf(c.lines.reduce((a,l)=>a+l.qty,0),0)+' units',
+      saveDraft:()=>save(false), saveSend:()=>save(true)
+    };
+  }
+
+  v_po({E,st,db,I,V,go}){
+    const p=db.pos.find(x=>x.no===st.poNo); if(!p) return {};
+    const c=E.poCalc(p,db);
+    const S=['Draft','Sent','Partially received','Received','Closed']; const idx=S.indexOf(p.status);
+    const logD={}; (p.log||[]).forEach(([s,d])=>logD[s]=d);
+    const setStatus=(s,msg)=>{ this.mut(db=>{ const x=db.pos.find(y=>y.no===p.no); x.status=s; x.log=[...(x.log||[]),[s,E.TODAY]]; if(s==='Closed'&&x.rate==null) x.rate=E.rate(db,x.ccy); }); this.toast(msg); };
+    const grns=db.grns.filter(g=>g.po===p.no), invs=db.invoices.filter(v=>v.po===p.no);
+    const open=E.OPEN.includes(p.status);
+    return {
+      no:p.no,vendor:V[p.vendor].name,country:V[p.vendor].country,date:E.fd(p.date),eta:E.fd(p.eta),st:E.chip(p.status),pool:E.POOL[p.dest],back:go('pos'),
+      canSend:p.status==='Draft',canReceive:p.status==='Sent'||p.status==='Partially received',canClose:p.status==='Received',
+      send:()=>setStatus('Sent',p.no+' sent to '+V[p.vendor].name+' (simulated email)'),
+      close:()=>setStatus('Closed',p.no+' closed'),
+      receive:go('grn',{grn:{po:p.no,loc:p.dest,counts:{}}}),
+      steps:S.map((s,i)=>{ const done=i<idx||(i===idx&&s==='Closed'), cur=i===idx&&!done; return {label:s,date:logD[s]?E.fd(logD[s]):'',mark:done?'✓':String(i+1),bg:done?'#010ECF':'#fff',fg:done?'#fff':cur?'#010ECF':'#9AA0AC',bd:done||cur?'#010ECF':'#D9DCE2',lab:done||cur?'#0E1116':'#9AA0AC',line:i<=idx?'#010ECF':'#E2E4E9',lineShow:i===0?'none':'block'}; }),
+      lines:c.lines.map(l=>({name:I[l.sku].name,sku:l.sku,qty:E.nf(l.qty,0),rec:E.nf(l.rec,0),recFg:l.rec>=l.qty?'#1B7A3A':l.rec>0?'#8A5A00':'#9AA0AC',pct:Math.min(100,l.rec/l.qty*100).toFixed(0)+'%',unit:E.mny(l.unit,p.ccy),landedV:E.mny(l.landedV,p.ccy),landedK:E.k3(l.landedK)})),
+      goods:E.mny(c.goods,p.ccy),freight:E.mny(p.freight,p.ccy),duty:E.mny(p.duty,p.ccy),uplift:'+'+(c.f*100).toFixed(1)+'%',totalV:E.mny(c.totalV,p.ccy),totalK:E.k3(c.totalK),
+      rateLine:p.ccy==='KWD'?'No conversion':(open?'Sample rate '+E.fd(db.rates[db.rates.length-1].date)+' · 1 '+p.ccy+' = KWD '+E.nf(c.r,5):'Locked at receipt · 1 '+p.ccy+' = KWD '+E.nf(c.r,5)),
+      reval:open&&p.revalFrom&&p.ccy!=='KWD'?'Revalued on daily update: was '+E.k3(c.totalV*p.revalFrom)+' at '+E.nf(p.revalFrom,5)+', now '+E.k3(c.totalK)+'.':'',
+      grns:grns.map(g=>({no:g.no,date:E.fd(g.date),units:E.nf(g.lines.reduce((a,l)=>a+l.qty,0),0)+' units'})),noGrns:!grns.length,
+      invs:invs.map(v=>({no:v.no,st:E.chip(E.invStatus(v)),open:go('invoice',{invNo:v.no})})),noInvs:!invs.length
+    };
+  }
+
+  v_grn({E,st,db,I,V,go}){
+    const g=st.grn&&st.grn.po?st.grn:null;
+    const receivable=db.pos.filter(p=>p.status==='Sent'||p.status==='Partially received');
+    const out={hasPO:!!g,noPO:!g,
+      pick:receivable.map(p=>({no:p.no,vendor:V[p.vendor].name,st:E.chip(p.status),pool:E.POOL[p.dest],outstanding:E.nf(p.lines.reduce((a,l)=>a+l.qty-l.rec,0),0)+' units outstanding',choose:()=>this.setState({grn:{po:p.no,loc:p.dest,counts:{}},scanInput:'',lastScan:''})})),
+      pickEmpty:!receivable.length,
+      recent:db.grns.slice(0,6).map(r=>({no:r.no,po:r.po,date:E.fd(r.date),pool:E.POOL[r.loc],units:E.nf(r.lines.reduce((a,l)=>a+l.qty,0),0),lines:r.lines.length+' lines',open:go('po',{poNo:r.po})})),
+      sub:'Scan items against a purchase order into a chosen stock pool'};
+    if(!g) return out;
+    const p=db.pos.find(x=>x.no===g.po); const c=E.poCalc(p,db);
+    const setCount=(sku,fn)=>this.setState(s=>{ const counts={...s.grn.counts}; const l=c.lines.find(x=>x.sku===sku); counts[sku]=Math.max(0,Math.min(l.qty-l.rec,fn(+counts[sku]||0))); return {grn:{...s.grn,counts}}; });
+    const scanSku=(sku,code)=>{ const l=c.lines.find(x=>x.sku===sku); const now=+g.counts[sku]||0; if(now>=l.qty-l.rec){ this.toast(I[sku].name+' is already fully received',true); return; } setCount(sku,v=>v+1); this.setState({scanInput:'',lastScan:'✓ Scanned '+code+' · '+I[sku].name+' · '+(now+1)+' of '+(l.qty-l.rec)}); };
+    let units=0,valV=0,valK=0; c.lines.forEach(l=>{ const n=+g.counts[l.sku]||0; units+=n; valV+=n*l.landedV; valK+=n*l.landedK; });
+    Object.assign(out,{
+      sub:p.no+' · '+V[p.vendor].name+' · '+p.ccy,
+      cancel:()=>this.setState({grn:null,lastScan:''}),
+      scanKey:e=>{ if(e.key!=='Enter') return; const code=st.scanInput.trim().toUpperCase(); if(!code) return; const l=c.lines.find(x=>I[x.sku].barcode===code||x.sku===code); if(!l){ this.toast('Barcode '+code+' is not on '+p.no,true); this.setState({scanInput:''}); return; } scanSku(l.sku,code); },
+      simulate:()=>{ const l=c.lines.find(x=>(+g.counts[x.sku]||0)<x.qty-x.rec); if(!l){ this.toast('All lines fully scanned',true); return; } scanSku(l.sku,I[l.sku].barcode); },
+      locs:['online','store'].map(k=>{ const a=g.loc===k; return {label:E.POOL[k].name,dot:E.POOL[k].dot,pick:()=>this.setState(s=>({grn:{...s.grn,loc:k}})),bg:a?'#fff':'transparent',fg:a?E.POOL[k].fg:'#5B6270',sh:a?'0 1px 2px rgba(14,17,22,.12)':'none'}; }),
+      locNote:g.loc==='store'?'Stock received here is sellable at the POS only.':'Stock received here is sellable on the storefront only.',
+      poolName:E.POOL[g.loc].name,
+      lines:c.lines.map(l=>{ const n=+g.counts[l.sku]||0; const rem=l.qty-l.rec-n; return {name:I[l.sku].name,barcode:I[l.sku].barcode,qty:E.nf(l.qty,0),rec:E.nf(l.rec,0),now:String(n),out:E.nf(rem,0),outFg:rem===0?'#1B7A3A':'#0E1116',pct:Math.min(100,(l.rec+n)/l.qty*100).toFixed(0)+'%',bg:n>0?'rgba(27,154,74,.04)':'#fff',
+        inc:()=>setCount(l.sku,v=>v+1),dec:()=>setCount(l.sku,v=>v-1),fill:()=>setCount(l.sku,()=>1e9),setNow:e=>{ const v=parseInt(e.target.value,10)||0; setCount(l.sku,()=>v); }}; }),
+      units:E.nf(units,0), valV:E.mny(valV,p.ccy), valK:E.k3(valK), postOp:units?1:.45,
+      post:()=>this.postGRN()
+    });
+    return out;
+  }
+
+  postGRN(){
+    const E=window.ERP, g=this.state.grn;
+    const total=Object.values(g.counts).reduce((a,b)=>a+(+b||0),0);
+    if(!total){ this.toast('Scan at least one item before posting',true); return; }
+    let msg='';
+    this.mut(db=>{
+      const po=db.pos.find(p=>p.no===g.po); const c=E.poCalc(po,db);
+      const no='GRN-2026-'+E.pad(db.seq.GRN++); let valK=0,valV=0; const lines=[];
+      c.lines.forEach((ln,idx)=>{ const q=Math.min(+g.counts[ln.sku]||0,ln.qty-ln.rec); if(q<=0) return;
+        const item=db.items.find(i=>i.sku===ln.sku); const s=db.stock[ln.sku]; const S=s.store+s.online; const old=item.cost;
+        item.cost=Math.round(((S*old+q*ln.landedK)/(S+q))*1000)/1000;
+        s[g.loc]+=q; po.lines[idx].rec+=q; valK+=q*ln.landedK; valV+=q*ln.landedV; lines.push({sku:ln.sku,qty:q});
+        db.moves.push({date:E.TODAY,sku:ln.sku,loc:g.loc,qty:q,type:'Goods receipt',ref:no,note:'Avg cost '+E.nf(old,3)+' → '+E.nf(item.cost,3)+' KWD'});
+      });
+      const full=po.lines.every(l=>l.rec>=l.qty); const ns=full?'Received':'Partially received';
+      if(po.status!==ns){ po.status=ns; po.log=[...(po.log||[]),[ns,E.TODAY]]; }
+      if(full) po.rate=E.rate(db,po.ccy);
+      db.grns.unshift({no,po:po.no,loc:g.loc,date:E.TODAY,lines});
+      const inv='INV-2026-'+E.pad(db.seq.INV++);
+      db.invoices.unshift({no:inv,vendor:po.vendor,po:po.no,grn:no,ccy:po.ccy,amount:Math.round(valV*(po.ccy==='KWD'?1000:100))/(po.ccy==='KWD'?1000:100),date:E.TODAY,due:E.addDays(E.TODAY,30),paid:0,payments:[]});
+      E.post(db,E.TODAY,no,'Goods received on '+po.no,[[E.INVACCT[g.loc],valK,0],['2100',0,valK]]);
+      msg=no+' posted: '+total+' units into '+E.POOL[g.loc].name+' · PO now '+ns+' · '+inv+' created';
+      return {screen:'po',poNo:po.no,grn:null,lastScan:''};
+    });
+    this.toast(msg);
+  }
+
+  v_vendors({E,st,db,go}){
+    const bal=v=>db.invoices.filter(i=>i.vendor===v.id).reduce((a,i)=>a+i.amount-i.paid,0);
+    const d=db.vendors.find(v=>v.id===st.vendorId)||db.vendors[0];
+    const pos=db.pos.filter(p=>p.vendor===d.id), invs=db.invoices.filter(i=>i.vendor===d.id);
+    return {
+      rows:db.vendors.map(v=>{ const a=v.id===d.id; const n=db.pos.filter(p=>p.vendor===v.id&&E.OPEN.includes(p.status)).length; return {id:v.id,name:v.name,country:v.country,ccy:v.ccy,openPOs:n+' open PO'+(n===1?'':'s'),bal:E.mny(bal(v),v.ccy),balK:E.k3(bal(v)*E.rate(db,v.ccy)),open:()=>this.setState({vendorId:v.id}),bg:a?'rgba(1,14,207,.05)':'#fff',sh:a?'inset 3px 0 0 #010ECF':'none'}; }),
+      d:{name:d.name,contact:d.contact,phone:d.phone,ccy:d.ccy,terms:d.terms,
+        pos:pos.map(p=>({no:p.no,st:E.chip(p.status),fx:E.mny(E.poCalc(p,db).totalV,p.ccy),open:go('po',{poNo:p.no})})),noPos:!pos.length,
+        invs:invs.map(i=>({no:i.no,st:E.chip(E.invStatus(i)),fx:E.mny(i.amount,i.ccy),open:go('invoice',{invNo:i.no})})),noInvs:!invs.length}
+    };
+  }
+  v_transfers({E,db,I,go}){
+    return { newTrf:()=>this.openTrf(),
+      rows:db.transfers.map(t=>{ const act=t.status==='Draft'?['Dispatch',()=>this.dispatchTrf(t.no)]:t.status==='In transit'?['Receive',()=>this.setState({screen:'trf',trfNo:t.no,scanInput:'',lastScan:''})]:null;
+        return {no:t.no,from:E.POOL[t.from],to:E.POOL[t.to],items:t.lines.map(l=>I[l.sku].name).join(', '),units:t.lines.reduce((a,l)=>a+l.qty,0),date:E.fd(t.date),st:E.chip(t.status),hasAct:!!act,actLabel:act?act[0]:'',act:e=>{ e.stopPropagation(); act&&act[1](); },open:go('trf',{trfNo:t.no})}; }) };
+  }
+  dispatchTrf(no){
+    const E=window.ERP; const t=this.state.db.transfers.find(x=>x.no===no);
+    const short=t.lines.find(l=>this.state.db.stock[l.sku][t.from]<l.qty);
+    if(short){ this.toast('Not enough '+short.sku+' in '+E.POOL[t.from].name,true); return; }
+    this.mut(db=>{ const x=db.transfers.find(y=>y.no===no); x.status='In transit'; x.date=E.TODAY; x.lines.forEach(l=>{ db.stock[l.sku][x.from]-=l.qty; db.moves.push({date:E.TODAY,sku:l.sku,loc:x.from,qty:-l.qty,type:'Transfer out',ref:no}); }); });
+    this.toast(no+' dispatched · '+E.POOL[t.from].name+' stock reduced, in transit to '+E.POOL[t.to].name);
+  }
+  v_trf({E,st,db,I,go}){
+    const t=db.transfers.find(x=>x.no===st.trfNo); if(!t) return {};
+    const recv=t.status==='In transit'; const all=t.lines.every(l=>l.scanned>=l.qty);
+    const bump=(sku,n)=>{ this.mut(d=>{ const l=d.transfers.find(y=>y.no===t.no).lines.find(y=>y.sku===sku); l.scanned=Math.min(l.qty,n==null?l.qty:l.scanned+n); }); };
+    const scan=(l,code)=>{ if(l.scanned>=l.qty){ this.toast(I[l.sku].name+' already fully scanned',true); this.setState({scanInput:''}); return; } bump(l.sku,1); this.setState({scanInput:'',lastScan:'✓ Scanned '+code+' · '+I[l.sku].name+' · '+(l.scanned+1)+' of '+l.qty}); };
+    return {
+      no:t.no,st:E.chip(t.status),from:E.POOL[t.from],to:E.POOL[t.to],back:go('transfers'),
+      dateLine:t.status==='Received'?'received '+E.fd(t.received):t.status==='Draft'?'created '+E.fd(t.date):'dispatched '+E.fd(t.date),
+      canDispatch:t.status==='Draft',canReceive:recv,dispatch:()=>this.dispatchTrf(t.no),postOp:all?1:.45,
+      scanKey:e=>{ if(e.key!=='Enter') return; const code=st.scanInput.trim().toUpperCase(); const l=t.lines.find(x=>I[x.sku].barcode===code||x.sku===code); if(!l){ this.toast('Barcode '+code+' is not on '+t.no,true); this.setState({scanInput:''}); return; } scan(l,code); },
+      simulate:()=>{ const l=t.lines.find(x=>x.scanned<x.qty); if(!l){ this.toast('All lines scanned',true); return; } scan(l,I[l.sku].barcode); },
+      lines:t.lines.map(l=>({name:I[l.sku].name,sku:l.sku,barcode:I[l.sku].barcode,qty:l.qty,scanned:l.scanned+' / '+l.qty,pct:(l.scanned/l.qty*100).toFixed(0)+'%',fg:l.scanned>=l.qty?'#1B7A3A':'#0E1116',canFill:recv&&l.scanned<l.qty,fill:()=>bump(l.sku,null)})),
+      post:()=>{ if(!all){ this.toast('Scan every unit before posting the receipt',true); return; }
+        this.mut(db=>{ const x=db.transfers.find(y=>y.no===t.no); x.status='Received'; x.received=E.TODAY; x.lines.forEach(l=>{ db.stock[l.sku][x.to]+=l.qty; db.moves.push({date:E.TODAY,sku:l.sku,loc:x.to,qty:l.qty,type:'Transfer in',ref:x.no}); }); return {lastScan:''}; });
+        this.toast(t.no+' received · '+E.POOL[t.to].name+' stock increased'); }
+    };
+  }
+  v_modals({E,st,db,I}){
+    const m=st.trfModal, p=st.payModal, out={trfForm:!!m&&m.step==='form',trfConfirm:!!m&&m.step==='confirm',payOpen:!!p};
+    if(m){
+      const upd=fn=>this.setState(s=>{ const n=JSON.parse(JSON.stringify(s.trfModal)); fn(n); return {trfModal:n}; });
+      const lines=m.lines.map(l=>({...l,q:Math.round(+l.qty||0),avail:db.stock[l.sku][m.from]}));
+      out.tm={from:E.POOL[m.from],to:E.POOL[m.to],close:()=>this.setState({trfModal:null}),swap:()=>upd(n=>{ const f=n.from; n.from=n.to; n.to=f; }),
+        addLine:()=>upd(n=>{ n.lines.push({sku:db.items[0].sku,qty:'1'}); }),
+        lines:lines.map((l,i)=>({picker:this.sel(l.sku,db.items.map(it=>[it.sku,it.sku+' · '+it.name+' ('+db.stock[it.sku][m.from]+' in '+E.POOL[m.from].label+')']),v=>upd(n=>{ n.lines[i].sku=v; })),
+          qty:l.qty,setQty:e=>{ const v=e.target.value; upd(n=>{ n.lines[i].qty=v; }); },remove:()=>upd(n=>{ n.lines.splice(i,1); }),
+          avail:l.q>l.avail?'Only '+l.avail+' available in '+E.POOL[m.from].name:l.avail+' available in '+E.POOL[m.from].name,fg:l.q>l.avail?'#B42318':'#7A8191'})),
+        next:()=>{ if(!lines.length||lines.some(l=>l.q<=0)){ this.toast('Every line needs a quantity',true); return; } const bad=lines.find(l=>l.q>l.avail); if(bad){ this.toast('Not enough '+bad.sku+' in '+E.POOL[m.from].name,true); return; } upd(n=>{ n.step='confirm'; }); },
+        backStep:()=>upd(n=>{ n.step='form'; }),
+        effects:lines.map(l=>({name:I[l.sku].name,qty:l.q})),
+        confirm:()=>{ let no; this.mut(db=>{ no='TRF-2026-'+E.pad(db.seq.TRF++); const ls=lines.map(l=>({sku:l.sku,qty:l.q,scanned:0})); db.transfers.unshift({no,from:m.from,to:m.to,date:E.TODAY,status:'In transit',lines:ls}); ls.forEach(l=>{ db.stock[l.sku][m.from]-=l.qty; db.moves.push({date:E.TODAY,sku:l.sku,loc:m.from,qty:-l.qty,type:'Transfer out',ref:no}); }); return {trfModal:null,screen:'trf',trfNo:no,scanInput:'',lastScan:''}; }); this.toast(no+' dispatched · scan it in at '+E.POOL[m.to].name+' to complete'); }
+      };
+    }
+    if(p){
+      const v=db.invoices.find(x=>x.no===p.no); const bal=v.amount-v.paid; const dp=v.ccy==='KWD'?3:2; const r=E.rate(db,v.ccy); const amt=+p.amount||0;
+      out.pm={no:v.no,vendor:db.vendors.find(x=>x.id===v.vendor).name,ccy:v.ccy,bal:E.mny(bal,v.ccy),amount:p.amount,k:E.k3(amt*r),
+        setAmt:e=>this.setState({payModal:{...p,amount:e.target.value}}),half:()=>this.setState({payModal:{...p,amount:(bal/2).toFixed(dp)}}),full:()=>this.setState({payModal:{...p,amount:bal.toFixed(dp)}}),
+        close:()=>this.setState({payModal:null}),
+        confirm:()=>{ if(amt<=0||amt>bal+0.0005){ this.toast('Enter an amount between 0 and the balance',true); return; } let st2;
+          this.mut(db=>{ const x=db.invoices.find(y=>y.no===v.no); const ref='BT-'+db.seq.BT++; const k=Math.round(amt*r*1000)/1000; x.paid=Math.round((x.paid+amt)*1000)/1000; x.payments.push({date:E.TODAY,amount:amt,k,ref}); E.post(db,E.TODAY,x.no,'Payment '+ref+' to '+db.vendors.find(y=>y.id===x.vendor).name,[['2100',k,0],['1110',0,k]]); st2=E.invStatus(x); return {payModal:null}; });
+          this.toast('Payment of '+E.mny(amt,v.ccy)+' recorded · '+v.no+' now '+st2+' · ledger entry posted'); }};
+    }
+    return out;
+  }
+  v_counts({E,st,db,I}){
+    const d=st.countDraft;
+    const start=loc=>this.setState({countDraft:{loc,no:'CNT-2026-'+E.pad(db.seq.CNT),counted:{}}});
+    const val=c=>c.lines.reduce((a,l)=>a+(l.counted-l.sys)*l.cost,0);
+    const out={noDraft:!d,hasDraft:!!d,startStore:()=>start('store'),startOnline:()=>start('online'),
+      sub:d?'Enter counted quantities for '+E.POOL[d.loc].name+'. Posting sets stock to the counted figure.':'Count sheet per location · variances post to shrinkage',
+      rows:db.counts.map(c=>{ const vl=c.lines.filter(l=>l.counted!==l.sys).length; return {no:c.no,pool:E.POOL[c.loc],summary:c.lines.length+' lines counted · '+vl+' with variance',value:E.k3(val(c)),date:E.fd(c.date),st:E.chip(c.status)}; })};
+    if(!d) return out;
+    const items=db.items.filter(i=>i.active);
+    const lines=items.map(i=>{ const sys=db.stock[i.sku][d.loc]; const raw=d.counted[i.sku]; const has=raw!==undefined&&raw!==''; const c=has?Math.max(0,parseInt(raw,10)||0):null; const v=has?c-sys:0; return {i,sys,raw:has?raw:'',has,c,v}; });
+    const shown=st.countOnlyVar?lines.filter(l=>l.v!==0):lines;
+    const net=lines.reduce((a,l)=>a+l.v*l.i.cost,0);
+    Object.assign(out,{
+      cancel:()=>this.setState({countDraft:null}), toggleVar:()=>this.setState(s=>({countOnlyVar:!s.countOnlyVar})), varBg:st.countOnlyVar?'#010ECF':'#D3D6DC', varJ:st.countOnlyVar?'flex-end':'flex-start',
+      d:{no:d.no,pool:E.POOL[d.loc],progress:lines.filter(l=>l.has).length+' / '+lines.length,varLines:lines.filter(l=>l.v!==0).length,net:E.k3(net),netFg:net<0?'#B42318':net>0?'#1B7A3A':'#0E1116',
+        lines:shown.map(l=>({name:l.i.name,sku:l.i.sku,sys:l.sys,counted:l.raw,variance:l.has?(l.v>0?'+':l.v<0?'−':'')+Math.abs(l.v):'—',value:l.has&&l.v?E.nf(l.v*l.i.cost,3):'—',fg:l.v<0?'#B42318':l.v>0?'#1B7A3A':'#5B6270',bg:l.v!==0?(l.v<0?'#FFF8F7':'#F6FBF8'):'#fff',
+          set:e=>{ const v=e.target.value.replace(/[^0-9]/g,''); this.setState(s=>({countDraft:{...s.countDraft,counted:{...s.countDraft.counted,[l.i.sku]:v}}})); }}))},
+      post:()=>{ const counted=lines.filter(l=>l.has); if(!counted.length){ this.toast('Enter at least one counted quantity',true); return; }
+        let no; this.mut(db=>{ no='CNT-2026-'+E.pad(db.seq.CNT++); const cl=counted.map(l=>({sku:l.i.sku,sys:l.sys,counted:l.c,cost:l.i.cost}));
+          cl.forEach(l=>{ if(l.counted!==l.sys){ db.stock[l.sku][d.loc]=l.counted; db.moves.push({date:E.TODAY,sku:l.sku,loc:d.loc,qty:l.counted-l.sys,type:'Count adjustment',ref:no}); } });
+          db.counts.unshift({no,loc:d.loc,date:E.TODAY,status:'Posted',lines:cl});
+          const loss=cl.reduce((a,l)=>a+Math.max(0,l.sys-l.counted)*l.cost,0), gain=cl.reduce((a,l)=>a+Math.max(0,l.counted-l.sys)*l.cost,0);
+          if(loss) E.post(db,E.TODAY,no,'Count variance — '+E.POOL[d.loc].name,[['5400',loss,0],[E.INVACCT[d.loc],0,loss]]);
+          if(gain) E.post(db,E.TODAY,no,'Count surplus — '+E.POOL[d.loc].name,[[E.INVACCT[d.loc],gain,0],['5400',0,gain]]);
+          return {countDraft:null}; });
+        this.toast(no+' posted · '+counted.filter(l=>l.v!==0).length+' adjustments, net '+E.k3(net)); }
+    });
+    return out;
+  }
+  v_writeoffs({E,st,db,I}){
+    const w=st.wo; const setW=p=>this.setState(s=>({wo:{...s.wo,...p}}));
+    const avail=db.stock[w.sku]?db.stock[w.sku][w.loc]:0; const q=parseInt(w.qty,10)||0; const it=I[w.sku];
+    return {
+      locs:['store','online'].map(k=>{ const a=w.loc===k; return {label:E.POOL[k].name,pick:()=>setW({loc:k}),bg:a?'#fff':'transparent',fg:a?E.POOL[k].fg:'#5B6270',sh:a?'0 1px 2px rgba(14,17,22,.12)':'none'}; }),
+      picker:this.sel(w.sku,db.items.map(i=>[i.sku,i.sku+' · '+i.name]),v=>setW({sku:v})),
+      onHand:avail+' on hand in '+E.POOL[w.loc].name, qty:w.qty, setQty:e=>setW({qty:e.target.value.replace(/[^0-9]/g,'')}), note:w.note, setNote:e=>setW({note:e.target.value}),
+      reasons:E.REASONS.map(r=>{ const a=w.reason===r; const c=E.chip(r); return {label:r,pick:()=>setW({reason:r}),bg:a?c.bg:'#fff',fg:a?c.fg:'#353B47',bd:a?c.fg:'#D9DCE2'}; }),
+      value:E.k3(q*(it?it.cost:0)),
+      log:()=>{ if(q<=0){ this.toast('Enter a quantity',true); return; } if(q>avail){ this.toast('Only '+avail+' on hand in '+E.POOL[w.loc].name,true); return; }
+        let no; this.mut(db=>{ no='WO-2026-'+E.pad(db.seq.WO++); const value=q*it.cost; db.stock[w.sku][w.loc]-=q; db.writeoffs.unshift({no,date:E.TODAY,loc:w.loc,sku:w.sku,qty:q,reason:w.reason,note:w.note||'—',value}); db.moves.push({date:E.TODAY,sku:w.sku,loc:w.loc,qty:-q,type:'Write-off · '+w.reason,ref:no,note:w.note}); E.post(db,E.TODAY,no,'Write-off · '+w.reason,[['5400',value,0],[E.INVACCT[w.loc],0,value]]); return {wo:{...w,qty:'1',note:''}}; });
+        this.toast(no+' logged · '+E.POOL[w.loc].name+' −'+q+' · '+E.k3(q*it.cost)+' to shrinkage'); },
+      rows:db.writeoffs.map(r=>({no:r.no,date:E.fd(r.date),pool:E.POOL[r.loc],name:I[r.sku].name,note:r.note,qty:r.qty,st:E.chip(r.reason),value:E.nf(r.value,3)}))
+    };
+  }
+  v_shrinkage({E,st,db,I}){
+    const R=[['7','Last 7 days',E.addDays(E.TODAY,-7)],['30','Last 30 days',E.addDays(E.TODAY,-30)],['mtd','Month to date','2026-10-01'],['all','All time','2000-01-01']];
+    const cur=R.find(r=>r[0]===st.shrinkRange)||R[1];
+    const ev=[]; db.writeoffs.forEach(w=>ev.push({date:w.date,ref:w.no,loc:w.loc,sku:w.sku,qty:w.qty,reason:w.reason,value:w.value}));
+    db.counts.forEach(c=>c.lines.forEach(l=>{ if(l.counted<l.sys) ev.push({date:c.date,ref:c.no,loc:c.loc,sku:l.sku,qty:l.sys-l.counted,reason:'Count variance',value:(l.sys-l.counted)*l.cost}); }));
+    const f=ev.filter(e=>e.date>=cur[2]).sort((a,b)=>b.date.localeCompare(a.date));
+    const sum=(fn)=>f.filter(fn).reduce((a,e)=>a+e.value,0); const tot=sum(()=>true);
+    const stockVal=db.items.reduce((a,i)=>a+(db.stock[i.sku].store+db.stock[i.sku].online)*i.cost,0);
+    const reasons=[...E.REASONS,'Count variance']; const mx=Math.max(...reasons.map(r=>sum(e=>e.reason===r)),0.001);
+    return {
+      rangeLine:cur[1].toLowerCase(),
+      ranges:R.map(r=>{ const a=r[0]===cur[0]; return {label:r[1],pick:()=>this.setState({shrinkRange:r[0]}),bg:a?'#fff':'transparent',fg:a?'#0E1116':'#5B6270',sh:a?'0 1px 2px rgba(14,17,22,.12)':'none'}; }),
+      total:E.k3(tot),units:f.reduce((a,e)=>a+e.qty,0),events:f.length,rate:(tot/stockVal*100).toFixed(2)+'%',
+      pools:['store','online'].map(l=>({...E.POOL[l],val:E.k3(sum(e=>e.loc===l)),units:f.filter(e=>e.loc===l).reduce((a,e)=>a+e.qty,0)})),
+      matrix:reasons.map(r=>({st:E.chip(r),store:E.nf(sum(e=>e.reason===r&&e.loc==='store'),3),online:E.nf(sum(e=>e.reason===r&&e.loc==='online'),3),total:E.k3(sum(e=>e.reason===r)),pct:(sum(e=>e.reason===r)/mx*100).toFixed(1)+'%'})),
+      list:f.map(e=>({date:E.fd(e.date),ref:e.ref,pool:E.POOL[e.loc],name:I[e.sku].name,st:E.chip(e.reason),qty:e.qty,value:E.nf(e.value,3)})),empty:!f.length
+    };
+  }
+  v_rates({E,st,db,V,go}){
+    const R=db.rates, last=R[R.length-1], prev=R[R.length-2];
+    const names={USD:'US dollar',CNY:'Chinese yuan',AED:'UAE dirham'};
+    const rv=st.reval;
+    return {
+      latest:E.fd(last.date),
+      simulate:()=>{ const rows=[]; let date; this.mut(db=>{ const l=db.rates[db.rates.length-1]; date=E.addDays(l.date,1); const dr=()=>1+(Math.random()-.4)*0.004; const nr={date,USD:+(l.USD*dr()).toFixed(5),CNY:+(l.CNY*dr()).toFixed(5),AED:+(l.AED*dr()).toFixed(5)};
+          const open=db.pos.filter(p=>E.OPEN.includes(p.status)&&p.ccy!=='KWD'); open.forEach(p=>{ rows.push({no:p.no,old:E.poCalc(p,db).totalK}); p.revalFrom=l[p.ccy]; });
+          db.rates.push(nr); rows.forEach(r=>{ const p=db.pos.find(x=>x.no===r.no); const c=E.poCalc(p,db); r.now=c.totalK; r.totalV=E.mny(c.totalV,p.ccy); });
+          return {reval:{date,rows}}; });
+        this.toast('Sample rates for '+E.fd(date)+' added · '+rows.length+' open POs revalued'); },
+      cards:['USD','CNY','AED'].map(c=>{ const d=(last[c]-prev[c])/prev[c]*100; const vals=R.slice(-7).map(r=>r[c]); const mn=Math.min(...vals),mx=Math.max(...vals);
+        return {code:c,name:names[c],vendor:db.vendors.filter(v=>v.ccy===c).map(v=>v.name).join(', '),rate:E.nf(last[c],5),inv:E.nf(1/last[c],3)+' '+c,delta:(d>=0?'▲ ':'▼ ')+Math.abs(d).toFixed(2)+'%',fg:d>=0?'#B42318':'#1B7A3A',
+          spark:vals.map((v,i)=>({h:(20+(mx>mn?(v-mn)/(mx-mn)*80:50)).toFixed(0)+'%',bg:i===vals.length-1?'#010ECF':'#C9CEF5'}))}; }),
+      hasReval:!!(rv&&rv.rows.length), revalDate:rv?E.fd(rv.date):'',
+      reval:rv?rv.rows.map(r=>{ const d=r.now-r.old; return {no:r.no,totalV:r.totalV,old:E.k3(r.old),now:E.k3(r.now),delta:(d>=0?'+':'−')+E.nf(Math.abs(d),3),fg:d>0?'#B42318':'#1B7A3A',open:go('po',{poNo:r.no})}; }):[],
+      rows:R.slice().reverse().map((r,i)=>({date:E.fd(r.date),USD:E.nf(r.USD,5),CNY:E.nf(r.CNY,5),AED:E.nf(r.AED,5),bg:i===0?'rgba(1,14,207,.04)':'#fff',fw:i===0?650:400}))
+    };
+  }
+  v_invoices({E,db,V,go}){
+    const open=db.invoices.filter(v=>E.invStatus(v)!=='Paid');
+    return { sub:open.length+' open · '+E.k3(open.reduce((a,v)=>a+(v.amount-v.paid)*E.rate(db,v.ccy),0))+' outstanding at sample rates',
+      rows:db.invoices.map(v=>{ const s=E.invStatus(v); const r=E.rate(db,v.ccy); return {no:v.no,vendor:V[v.vendor].name,po:v.po,due:E.fd(v.due),dueFg:s==='Overdue'?'#B42318':'#4A5160',amount:E.mny(v.amount,v.ccy),amountK:E.k3(v.amount*r),bal:E.mny(v.amount-v.paid,v.ccy),balK:E.k3((v.amount-v.paid)*r),st:E.chip(s),open:go('invoice',{invNo:v.no})}; }) };
+  }
+  v_invoice({E,st,db,V,go}){
+    const v=db.invoices.find(x=>x.no===st.invNo); if(!v) return {};
+    const r=E.rate(db,v.ccy); const s=E.invStatus(v); const po=db.pos.find(p=>p.no===v.po);
+    let poVal=null,recVal=null,recRef='—';
+    if(po){ const c=E.poCalc(po,db); poVal=c.totalV; if(v.grn){ const g=db.grns.find(x=>x.no===v.grn); recRef=v.grn; recVal=g.lines.reduce((a,l)=>a+l.qty*c.lines.find(x=>x.sku===l.sku).landedV,0); } else { const gs=db.grns.filter(g=>g.po===po.no); recRef=gs.map(g=>g.no).join(', ')||'—'; recVal=c.lines.reduce((a,l)=>a+l.rec*l.landedV,0); } }
+    const ok=recVal!=null&&Math.abs(recVal-v.amount)<Math.max(0.05,v.amount*0.002);
+    const mk=(good,label,ref,val)=>({label,ref,val,mark:good?'✓':'–',bg:good?'#E3F3E8':'#EEF0F3',fg:good?'#1B7A3A':'#7A8191'});
+    const acct={}; window.ERP.ACCTS.forEach(a=>acct[a[0]]=a[1]);
+    const led=db.ledger.filter(e=>e.ref===v.no||(v.grn&&e.ref===v.grn));
+    return {
+      no:v.no,vendor:V[v.vendor].name,date:E.fd(v.date),due:E.fd(v.due),st:E.chip(s),back:go('invoices'),canPay:s!=='Paid',
+      pay:()=>this.setState({payModal:{no:v.no,amount:((v.amount-v.paid)/2).toFixed(v.ccy==='KWD'?3:2)}}),
+      amount:E.mny(v.amount,v.ccy),amountK:E.k3(v.amount*r),paid:E.mny(v.paid,v.ccy),pct:Math.min(100,v.paid/v.amount*100).toFixed(0)+'%',bal:E.mny(v.amount-v.paid,v.ccy),balK:E.k3((v.amount-v.paid)*r),
+      match:[mk(!!po,'Purchase order',v.po,po?E.mny(poVal,v.ccy):'Archived'),mk(recVal!=null,'Goods received (landed)',recRef,recVal!=null?E.mny(recVal,v.ccy):'—'),mk(ok,'Supplier invoice',v.no,E.mny(v.amount,v.ccy))],
+      matchText:po?(ok?'Invoice matches received goods':'Invoice differs from received value — review before paying'):'PO archived · matched at time of entry',matchFg:po&&!ok?'#8A5A00':'#1B7A3A',
+      payments:v.payments.map(p=>({date:E.fd(p.date),ref:p.ref,amount:E.mny(p.amount,v.ccy),k:E.k3(p.k)})),noPayments:!v.payments.length,
+      ledger:led.map(e=>({date:E.fd(e.date),acct:e.acct+' '+acct[e.acct],dr:e.dr?E.nf(e.dr,3):'',cr:e.cr?E.nf(e.cr,3):''})),
+      goLedger:go('ledger',{ledgerTab:'journal',ledgerAcct:'2100'})
+    };
+  }
+  v_ledger({E,st,db}){
+    const A=E.ACCTS; const name={}; A.forEach(a=>name[a[0]]=a[1]);
+    const tabs=[['journal','Journal'],['coa','Chart of accounts'],['tb','Trial balance']].map(([k,l])=>{ const a=st.ledgerTab===k; return {label:l,pick:()=>this.setState({ledgerTab:k}),bg:a?'#fff':'transparent',fg:a?'#0E1116':'#5B6270',sh:a?'0 1px 2px rgba(14,17,22,.12)':'none'}; });
+    const bal={}; const n={}; db.ledger.forEach(e=>{ bal[e.acct]=(bal[e.acct]||0)+e.dr-e.cr; n[e.acct]=(n[e.acct]||0)+1; });
+    const rows=db.ledger.filter(e=>st.ledgerAcct==='All'||e.acct===st.ledgerAcct).slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+    const tdr=db.ledger.reduce((a,e)=>a+e.dr,0), tcr=db.ledger.reduce((a,e)=>a+e.cr,0);
+    const tb=A.filter(a=>Math.abs(bal[a[0]]||0)>0.0005).map(a=>({code:a[0],name:a[1],dr:bal[a[0]]>0?E.nf(bal[a[0]],3):'',cr:bal[a[0]]<0?E.nf(-bal[a[0]],3):''}));
+    const tbDr=A.reduce((s,a)=>s+Math.max(0,bal[a[0]]||0),0), tbCr=A.reduce((s,a)=>s+Math.max(0,-(bal[a[0]]||0)),0);
+    const isTb=st.ledgerTab==='tb'; const balanced=Math.abs(tbDr-tbCr)<0.01;
+    return {tabs,isJournal:st.ledgerTab==='journal',isCoa:st.ledgerTab==='coa',isTb,
+      acctSel:this.sel(st.ledgerAcct,[['All','All accounts'],...A.map(a=>[a[0],a[0]+' · '+a[1]])],v=>this.setState({ledgerAcct:v})),
+      count:rows.length+' entries',
+      rows:rows.map(e=>({date:E.fd(e.date),ref:e.ref,code:e.acct,acct:name[e.acct],memo:e.memo,dr:e.dr?E.nf(e.dr,3):'',cr:e.cr?E.nf(e.cr,3):'',bg:e.date===E.TODAY?'rgba(1,14,207,.035)':'#fff'})),
+      totDr:E.nf(isTb?tbDr:rows.reduce((a,e)=>a+e.dr,0),3), totCr:E.nf(isTb?tbCr:rows.reduce((a,e)=>a+e.cr,0),3),
+      coa:A.map(a=>({code:a[0],name:a[1],type:a[2],n:n[a[0]]||0,bal:E.k3(Math.abs(bal[a[0]]||0))+((bal[a[0]]||0)<-0.0005?' Cr':(bal[a[0]]||0)>0.0005?' Dr':''),open:()=>this.setState({ledgerTab:'journal',ledgerAcct:a[0]})})),
+      tb, balText:balanced?'Balanced':'Out of balance', balBg:balanced?'#E3F3E8':'#FDE7E5', balFg:balanced?'#1B7A3A':'#B42318'
+    };
+  }
+  v_users({E}){
+    const acc={'All locations':['#E6E8FB','#010ECF'],'Main Store':['#E2F4F1','#0A6E65'],'Online Warehouse':['#EEE8FD','#5B2FD1']};
+    return {
+      invite:()=>this.toast('All 10 seats are in use. Upgrade to invite more users.',true),
+      upgrade:()=>this.toast('Plan upgrade opens billing (not part of this prototype)'),
+      seats:Array.from({length:10},(_,i)=>({bg:i<9?'#010ECF':'#7C86F0'})),
+      rows:E.USERS.map(u=>({name:u[0],email:u[1],role:u[2],access:u[3],last:u[4],st:E.chip(u[5]),ini:u[0].split(' ').map(x=>x[0]).join('').replace('-','').slice(0,2).toUpperCase(),accBg:acc[u[3]][0],accFg:acc[u[3]][1]}))
+    };
+  }
+  // @@METHODS
+}
+</script>
+</body>
+</html>

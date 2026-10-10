@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Retail ERP — Handheld</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="./erp-core.js"></script>
+<style>
+body{margin:0;background:#E4E6EA;color:#0E1116;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#010ECF;text-decoration:none}a:hover{color:#000A9E}
+input,button,textarea{font-family:inherit;color:inherit}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;gap:40px;padding:28px;box-sizing:border-box;flex-wrap:wrap;font-variant-numeric:tabular-nums">
+  <div style="width:384px;height:772px;flex:none;border-radius:44px;background:#1A1D23;padding:12px;box-sizing:border-box;box-shadow:0 30px 80px rgba(14,17,22,.35),inset 0 0 0 2px #2A2E36;position:relative">
+    <div onClick="{{ trigger }}" title="Hardware scan trigger" style="position:absolute;right:-7px;top:170px;width:7px;height:74px;border-radius:0 4px 4px 0;background:#F2B54A;cursor:pointer"></div>
+    <div onClick="{{ trigger }}" title="Hardware scan trigger" style="position:absolute;left:-7px;top:170px;width:7px;height:74px;border-radius:4px 0 0 4px;background:#F2B54A;cursor:pointer"></div>
+    <div style="width:360px;height:748px;border-radius:32px;overflow:hidden;background:#F4F5F7;position:relative;display:flex;flex-direction:column">
+      <div style="height:28px;flex:none;display:flex;align-items:center;padding:0 22px;font-size:12.5px;font-weight:600;background:#0E1116;color:#fff">
+        <span>09:41</span><span style="margin-left:auto;display:flex;gap:8px;align-items:center"><span style="display:inline-flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;background:currentColor;border-radius:1px"></span><span style="width:3px;height:7px;background:currentColor;border-radius:1px"></span><span style="width:3px;height:10px;background:currentColor;border-radius:1px;opacity:.5"></span></span><span style="display:inline-flex;width:22px;height:11px;border:1.5px solid currentColor;border-radius:3px;padding:1px;box-sizing:border-box"><span style="display:block;width:38%;background:currentColor;border-radius:1px"></span></span></span>
+      </div>
+
+      <sc-if value="{{ signedOut }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;display:flex;flex-direction:column;background:#0E1116;color:#fff;padding:18px 20px 16px">
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:38px;height:38px;border-radius:10px;background:#fff;color:#0E1116;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800">BE</div><div><div style="font-size:16px;font-weight:700">Brn ERP</div><div style="font-size:12px;color:#9AA0AC">Warehouse handheld 1 · Zebra TC22</div></div></div>
+          <div style="font-size:13px;color:#9AA0AC;margin-top:20px">Location</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+            <sc-for list="{{ locs }}" as="l" hint-placeholder-count="2"><button onClick="{{ l.pick }}" style="height:58px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:2px solid {{ l.bd }};background:{{ l.bg }};color:{{ l.fg }}">{{ l.label }}</button></sc-for>
+          </div>
+          <div style="font-size:13px;color:#9AA0AC;margin-top:20px;text-align:center">{{ pinHint }}</div>
+          <div style="display:flex;justify-content:center;gap:18px;margin:14px 0 16px"><sc-for list="{{ pinDots }}" as="d" hint-placeholder-count="4"><span style="width:16px;height:16px;border-radius:50%;border:2px solid {{ d.bd }};background:{{ d.bg }}"></span></sc-for></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+            <sc-for list="{{ pinKeys }}" as="k" hint-placeholder-count="12"><button onClick="{{ k.press }}" style="height:62px;border-radius:14px;border:none;font-size:24px;font-weight:600;cursor:pointer;background:{{ k.bg }};color:#fff">{{ k.label }}</button></sc-for>
+          </div>
+          <div style="margin-top:auto;display:flex;align-items:center;justify-content:center;gap:9px;font-size:10.5px;color:#9AA0AC;padding-top:10px"><span>Powered by</span><img src="./assets/brn-dynamics-logo-white.png" alt="brn dynamics" style="height:24px;display:block"></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:none;background:#0E1116;color:#fff;display:flex;align-items:center;gap:8px;padding:6px 12px 12px;min-height:60px;box-sizing:border-box">
+          <sc-if value="{{ hasBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ back }}" style="width:48px;height:48px;border-radius:12px;border:none;background:#22262E;color:#fff;font-size:26px;cursor:pointer;flex:none">‹</button></sc-if>
+          <div style="flex:1;min-width:0;padding-left:4px"><div style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ title }}</div><div style="font-size:12px;color:#9AA0AC;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ subtitle }}</div></div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex:none">
+            <span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:5px;font-size:12px;font-weight:700;background:{{ pool.bg }};color:{{ pool.fg }}"><span style="width:7px;height:7px;border-radius:50%;background:{{ pool.dot }}"></span><span>{{ pool.name }}</span></span>
+            <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:{{ net.fg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ net.dot }}"></span><span>{{ net.label }}</span></span>
+          </div>
+        </div>
+        <sc-if value="{{ offline }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:none;display:flex;align-items:center;gap:10px;padding:8px 12px;background:#FDF1DC;color:#6B4500;font-size:13.5px;font-weight:700"><span style="width:9px;height:9px;border-radius:50%;background:#E8833A;flex:none"></span><span style="flex:1">{{ offlineText }}</span><button onClick="{{ sync }}" style="height:40px;padding:0 14px;border-radius:10px;border:none;background:#6B4500;color:#fff;font-size:13px;font-weight:800;cursor:pointer">{{ syncLabel }}</button></div>
+        </sc-if>
+        <div style="flex:1;overflow:auto">
+
+<sc-if value="{{ is.home }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:14px 14px 18px">
+    <div style="font-size:14px;color:#4A5160">{{ home.hello }}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+      <sc-for list="{{ home.tiles }}" as="t" hint-placeholder-count="6">
+        <button onClick="{{ t.go }}" style="height:122px;border-radius:16px;border:1px solid {{ t.bd }};background:{{ t.bg }};color:{{ t.fg }};cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;padding:14px;box-sizing:border-box;position:relative;text-align:left">
+          <span style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:{{ t.iconBg }}"><span style="width:22px;height:22px;display:block;background:url({{ t.icon }}) center/contain no-repeat"></span></span>
+          <span><span style="display:block;font-size:18px;font-weight:800">{{ t.label }}</span><span style="display:block;font-size:12px;opacity:.72;margin-top:2px">{{ t.sub }}</span></span>
+          <sc-if value="{{ t.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;right:12px;top:12px;min-width:28px;height:28px;padding:0 8px;box-sizing:border-box;border-radius:14px;background:#D92D20;color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ t.badge }}</span></sc-if>
+        </button>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <button onClick="{{ home.goActivity }}" style="flex:1.4;height:56px;border-radius:14px;border:1px solid #E1E3E8;background:#fff;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;padding:0 14px;box-sizing:border-box;gap:8px"><span>Activity</span><span style="margin-left:auto;color:#5B6270;font-weight:600;font-size:13px">{{ home.actCount }}</span></button>
+      <button onClick="{{ home.goSettings }}" style="flex:1;height:56px;border-radius:14px;border:1px solid #E1E3E8;background:#fff;font-size:15px;font-weight:700;cursor:pointer">Settings</button>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.list }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13.5px;color:#4A5160;line-height:1.45">{{ list.intro }}</div>
+    <sc-for list="{{ list.rows }}" as="p" hint-placeholder-count="2">
+      <button onClick="{{ p.open }}" style="min-height:86px;border-radius:14px;border:1px solid #E1E3E8;background:#fff;cursor:pointer;padding:12px 14px;text-align:left;display:flex;flex-direction:column;gap:5px">
+        <span style="display:flex;align-items:center;gap:8px;width:100%"><span style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600">{{ p.no }}</span><span style="margin-left:auto;display:inline-flex;height:26px;padding:0 10px;border-radius:13px;align-items:center;font-size:12px;font-weight:700;background:{{ p.st.bg }};color:{{ p.st.fg }}">{{ p.st.text }}</span></span>
+        <span style="font-size:15px;font-weight:700">{{ p.title }}</span><span style="font-size:13px;color:#5B6270">{{ p.sub }}</span>
+      </button>
+    </sc-for>
+    <sc-if value="{{ list.empty }}" hint-placeholder-val="{{ false }}"><div style="padding:32px 14px;text-align:center;color:#4A5160;font-size:14.5px;background:#fff;border-radius:14px;border:2px dashed #C9CDD4;line-height:1.5">{{ list.emptyText }}</div></sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.lines }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:12px 14px 16px;display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;gap:8px">
+      <div style="flex:1;background:#fff;border-radius:12px;padding:10px 12px;border:1px solid #E1E3E8"><div style="font-size:12px;color:#5B6270">{{ lines.kA }}</div><div style="font-size:26px;font-weight:800">{{ lines.vA }}</div></div>
+      <div style="flex:1;background:#fff;border-radius:12px;padding:10px 12px;border:1px solid #E1E3E8"><div style="font-size:12px;color:#5B6270">{{ lines.kB }}</div><div style="font-size:26px;font-weight:800">{{ lines.vB }}</div></div>
+    </div>
+    <sc-if value="{{ lines.hasBlind }}" hint-placeholder-val="{{ false }}"><div onClick="{{ lines.flipBlind }}" style="display:flex;align-items:center;gap:12px;background:#fff;border-radius:12px;border:1px solid #E1E3E8;padding:0 14px;min-height:56px;cursor:pointer"><div style="flex:1"><div style="font-size:14.5px;font-weight:700">Blind count</div><div style="font-size:12px;color:#5B6270">{{ lines.blindSub }}</div></div><span style="width:46px;height:28px;border-radius:14px;padding:3px;box-sizing:border-box;display:flex;justify-content:{{ lines.blindJ }};background:{{ lines.blindBg }}"><span style="width:22px;height:22px;border-radius:50%;background:#fff"></span></span></div></sc-if>
+    <sc-if value="{{ lines.note }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#353B47;background:#E9EBF5;border-radius:10px;padding:9px 11px;line-height:1.45">{{ lines.note }}</div></sc-if>
+    <sc-for list="{{ lines.rows }}" as="l" hint-placeholder-count="3">
+      <div onClick="{{ l.edit }}" style="background:#fff;border-radius:14px;padding:12px 14px;border:2px solid {{ l.bd }};cursor:pointer;display:flex;gap:12px;align-items:center">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:700;line-height:1.25">{{ l.name }}</div>
+          <div dir="rtl" style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;color:#4A5160;text-align:right;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ l.ar }}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#7A8191;margin-top:3px">{{ l.code }}</div>
+          <sc-if value="{{ l.hasBar }}" hint-placeholder-val="{{ false }}"><div style="height:7px;border-radius:4px;background:#EEF0F3;overflow:hidden;margin-top:8px"><span style="display:block;height:100%;background:{{ l.barC }};width:{{ l.pct }}"></span></div></sc-if>
+          <sc-if value="{{ l.hasFlag }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;margin-top:7px;height:22px;padding:0 8px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:700;background:#FDF1DC;color:#8A5A00">{{ l.flag }}</span></sc-if>
+        </div>
+        <div style="text-align:right;flex:none"><div style="font-size:32px;font-weight:800;line-height:1;color:{{ l.fg }}">{{ l.big }}</div><div style="font-size:12px;color:#5B6270;margin-top:4px">{{ l.small }}</div></div>
+      </div>
+    </sc-for>
+    <sc-if value="{{ lines.empty }}" hint-placeholder-val="{{ false }}"><div style="padding:34px 16px;text-align:center;color:#4A5160;font-size:15px;background:#fff;border-radius:14px;border:2px dashed #C9CDD4;line-height:1.5">{{ lines.emptyText }}</div></sc-if>
+    <sc-if value="{{ lines.hasRecvExtra }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border-radius:14px;border:1px solid #E1E3E8;padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:14.5px;font-weight:700">Delivery issues</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"><sc-for list="{{ lines.issues }}" as="r" hint-placeholder-count="3"><button onClick="{{ r.pick }}" style="height:50px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid {{ r.bd }};background:{{ r.bg }};color:{{ r.fg }}">{{ r.label }}</button></sc-for></div>
+        <input value="{{ lines.issueNote }}" onChange="{{ lines.setIssueNote }}" placeholder="Note for the back office, e.g. 2 cartons missing" style="height:52px;border-radius:10px;border:1px solid #D9DCE2;padding:0 12px;font-size:14px">
+        <button onClick="{{ lines.photo }}" style="height:52px;border-radius:10px;border:1px dashed {{ lines.photoBd }};background:{{ lines.photoBg }};font-size:14px;font-weight:700;cursor:pointer;color:{{ lines.photoFg }}">{{ lines.photoLabel }}</button>
+        <div style="font-size:12px;color:#5B6270">Saved with the receipt and shown on the PO in the back office.</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ lines.hasSide }}" hint-placeholder-val="{{ false }}"><button onClick="{{ lines.side }}" style="height:56px;border-radius:14px;border:1px solid #D9DCE2;background:#fff;font-size:15px;font-weight:700;cursor:pointer">{{ lines.sideLabel }}</button></sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.trfChoose }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:16px 14px;display:flex;flex-direction:column;gap:12px">
+    <button onClick="{{ trfChoose.goOut }}" style="min-height:112px;border-radius:16px;border:none;background:#010ECF;color:#fff;cursor:pointer;text-align:left;padding:16px"><div style="font-size:21px;font-weight:800">Transfer out</div><div style="font-size:13.5px;opacity:.85;margin-top:4px">{{ trfChoose.outSub }}</div></button>
+    <button onClick="{{ trfChoose.goIn }}" style="min-height:112px;border-radius:16px;border:1px solid #E1E3E8;background:#fff;cursor:pointer;text-align:left;padding:16px"><div style="font-size:21px;font-weight:800">Transfer in</div><div style="font-size:13.5px;color:#5B6270;margin-top:4px">{{ trfChoose.inSub }}</div></button>
+    <div style="font-size:13px;color:#4A5160;line-height:1.5;background:#FDF1DC;border-radius:12px;padding:12px">Main Store and Online Warehouse are isolated pools. A transfer is the only way stock moves between them.</div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.countDone }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+    <div style="background:#fff;border-radius:14px;padding:14px;border:1px solid #E1E3E8"><div style="font-size:12.5px;color:#5B6270">{{ countDone.no }}</div><div style="font-size:28px;font-weight:800;color:{{ countDone.netFg }}">{{ countDone.net }}</div><div style="font-size:13px;color:#5B6270">{{ countDone.sub }}</div></div>
+    <sc-for list="{{ countDone.rows }}" as="r" hint-placeholder-count="3">
+      <div style="background:#fff;border-radius:12px;padding:12px 14px;border:1px solid #E1E3E8;display:flex;align-items:center;gap:10px"><div style="flex:1;min-width:0"><div style="font-size:14.5px;font-weight:700">{{ r.name }}</div><div style="font-size:12.5px;color:#5B6270">{{ r.sub }}</div></div><div style="font-size:26px;font-weight:800;color:{{ r.fg }}">{{ r.v }}</div></div>
+    </sc-for>
+    <button onClick="{{ countDone.home }}" style="height:60px;border-radius:14px;border:none;background:#010ECF;color:#fff;font-size:17px;font-weight:800;cursor:pointer;margin-top:6px">Done</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.wo }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+    <sc-if value="{{ wo.noItem }}" hint-placeholder-val="{{ true }}"><div style="padding:40px 16px;text-align:center;color:#4A5160;font-size:16px;font-weight:600;background:#fff;border-radius:14px;border:2px dashed #C9CDD4;line-height:1.5">Scan the damaged, opened or missing item</div></sc-if>
+    <sc-if value="{{ wo.hasItem }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border-radius:14px;padding:14px;border:1px solid #E1E3E8"><div style="font-size:16px;font-weight:800">{{ wo.name }}</div><div dir="rtl" style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13.5px;color:#4A5160;text-align:right;margin-top:4px">{{ wo.ar }}</div><div style="font-size:13px;color:#5B6270;margin-top:6px">{{ wo.onHand }}</div></div>
+      <div style="background:#fff;border-radius:14px;padding:10px 14px;border:1px solid #E1E3E8;display:flex;align-items:center"><span style="font-size:15px;font-weight:700">Quantity</span><div style="margin-left:auto;display:flex;align-items:center;gap:8px"><button onClick="{{ wo.dec }}" style="width:56px;height:56px;border-radius:12px;border:1px solid #D9DCE2;background:#fff;font-size:28px;cursor:pointer">−</button><span style="width:46px;text-align:center;font-size:30px;font-weight:800">{{ wo.qty }}</span><button onClick="{{ wo.inc }}" style="width:56px;height:56px;border-radius:12px;border:1px solid #D9DCE2;background:#fff;font-size:28px;cursor:pointer">+</button></div></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><sc-for list="{{ wo.reasons }}" as="r" hint-placeholder-count="3"><button onClick="{{ r.pick }}" style="height:58px;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;border:2px solid {{ r.bd }};background:{{ r.bg }};color:{{ r.fg }}">{{ r.label }}</button></sc-for></div>
+      <input value="{{ wo.note }}" onChange="{{ wo.setNote }}" placeholder="Note (optional)" style="height:56px;border-radius:12px;border:1px solid #D9DCE2;padding:0 14px;font-size:15px;background:#fff">
+      <button onClick="{{ wo.photo }}" style="height:56px;border-radius:12px;border:1px dashed {{ wo.photoBd }};background:{{ wo.photoBg }};font-size:14.5px;font-weight:700;cursor:pointer;color:{{ wo.photoFg }}">{{ wo.photoLabel }}</button>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.lookup }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+    <sc-if value="{{ lookup.noItem }}" hint-placeholder-val="{{ true }}"><div style="padding:40px 16px;text-align:center;color:#4A5160;font-size:16px;font-weight:600;background:#fff;border-radius:14px;border:2px dashed #C9CDD4;line-height:1.5">Scan any item to see stock in both pools</div></sc-if>
+    <sc-if value="{{ lookup.hasItem }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border-radius:14px;padding:14px;border:1px solid #E1E3E8">
+        <div style="font-size:17px;font-weight:800;line-height:1.25">{{ lookup.name }}</div>
+        <div dir="rtl" style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:14px;color:#4A5160;text-align:right;margin-top:6px;line-height:1.6">{{ lookup.ar }}</div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-top:10px"><span style="font-size:26px;font-weight:800">{{ lookup.price }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#7A8191">{{ lookup.code }}</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:#fff;border-radius:14px;padding:12px;border:1px solid #E1E3E8;border-top:4px solid #12A594"><span style="display:inline-flex;height:22px;padding:0 8px;align-items:center;border-radius:4px;background:#E2F4F1;color:#0A6E65;font-size:11.5px;font-weight:700">Store</span><div style="font-size:34px;font-weight:800;margin-top:6px;color:{{ lookup.sFg }}">{{ lookup.store }}</div><div style="font-size:12px;color:#5B6270">POS only</div></div>
+        <div style="background:#fff;border-radius:14px;padding:12px;border:1px solid #E1E3E8;border-top:4px solid #7C4DFF"><span style="display:inline-flex;height:22px;padding:0 8px;align-items:center;border-radius:4px;background:#EEE8FD;color:#5B2FD1;font-size:11.5px;font-weight:700">Online</span><div style="font-size:34px;font-weight:800;margin-top:6px;color:{{ lookup.oFg }}">{{ lookup.online }}</div><div style="font-size:12px;color:#5B6270">Storefront only</div></div>
+      </div>
+      <div style="background:#fff;border-radius:14px;border:1px solid #E1E3E8;overflow:hidden">
+        <div style="padding:10px 14px;font-size:12.5px;font-weight:700;color:#5B6270;border-bottom:1px solid #EEF0F3">Last movements</div>
+        <sc-for list="{{ lookup.moves }}" as="m" hint-placeholder-count="5"><div style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid #F2F3F5;font-size:13px"><span style="display:inline-flex;height:20px;padding:0 6px;align-items:center;border-radius:4px;font-size:10.5px;font-weight:700;background:{{ m.pool.bg }};color:{{ m.pool.fg }}">{{ m.pool.label }}</span><div style="flex:1;min-width:0"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600">{{ m.type }}</div><div style="font-size:11.5px;color:#7A8191">{{ m.sub }}</div></div><span style="font-weight:800;color:{{ m.fg }}">{{ m.qty }}</span></div></sc-for>
+      </div>
+      <button onClick="{{ lookup.print }}" style="height:56px;border-radius:14px;border:1px solid #D9DCE2;background:#fff;font-size:15px;font-weight:700;cursor:pointer">Print shelf label</button>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.activity }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+    <sc-for list="{{ activity.rows }}" as="a" hint-placeholder-count="4"><div style="background:#fff;border-radius:12px;padding:11px 14px;border:1px solid #E1E3E8;display:flex;gap:10px;align-items:center"><span style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ a.dot }}"></span><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">{{ a.text }}</div><div style="font-size:12px;color:#5B6270">{{ a.sub }}</div></div><span style="font-size:12px;color:#7A8191">{{ a.time }}</span></div></sc-for>
+    <sc-if value="{{ activity.empty }}" hint-placeholder-val="{{ false }}"><div style="padding:34px 16px;text-align:center;color:#4A5160;font-size:14.5px;background:#fff;border-radius:14px;border:2px dashed #C9CDD4">No scans yet today.</div></sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.settings }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+    <div style="background:#fff;border-radius:14px;border:1px solid #E1E3E8;overflow:hidden">
+      <sc-for list="{{ settings.info }}" as="r" hint-placeholder-count="4"><div style="display:flex;padding:12px 14px;border-bottom:1px solid #F2F3F5;font-size:14px"><span style="color:#5B6270">{{ r.k }}</span><span style="margin-left:auto;font-weight:700;color:{{ r.fg }}">{{ r.v }}</span></div></sc-for>
+    </div>
+    <div style="background:#fff;border-radius:14px;border:1px solid #E1E3E8;overflow:hidden">
+      <sc-for list="{{ settings.toggles }}" as="t" hint-placeholder-count="3"><div onClick="{{ t.flip }}" style="display:flex;align-items:center;min-height:58px;padding:0 14px;border-bottom:1px solid #F2F3F5;cursor:pointer"><div style="flex:1"><div style="font-size:14.5px;font-weight:700">{{ t.label }}</div><div style="font-size:12px;color:#5B6270">{{ t.sub }}</div></div><span style="width:46px;height:28px;border-radius:14px;padding:3px;box-sizing:border-box;display:flex;justify-content:{{ t.j }};background:{{ t.bg }}"><span style="width:22px;height:22px;border-radius:50%;background:#fff"></span></span></div></sc-for>
+    </div>
+    <div style="background:#fff;border-radius:14px;border:1px solid #E1E3E8;padding:12px 14px"><div style="font-size:14.5px;font-weight:700">Scanner test</div><div style="font-family:'JetBrains Mono',monospace;font-size:17px;margin-top:6px;word-break:break-all">{{ settings.testRaw }}</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px"><sc-for list="{{ settings.testMeta }}" as="m" hint-placeholder-count="3"><div><div style="font-size:11px;color:#7A8191">{{ m.k }}</div><div style="font-size:13px;font-weight:700">{{ m.v }}</div></div></sc-for></div>
+      <div style="display:flex;gap:8px;margin-top:10px"><button onClick="{{ settings.testGood }}" style="flex:1;height:52px;border-radius:12px;border:none;background:#0E1116;color:#fff;font-size:14px;font-weight:700;cursor:pointer">Test good scan</button><button onClick="{{ settings.testBad }}" style="flex:1;height:52px;border-radius:12px;border:1px solid #D9DCE2;background:#fff;font-size:14px;font-weight:700;cursor:pointer">Test unknown</button></div></div>
+    <div style="display:flex;gap:8px"><button onClick="{{ settings.lockNow }}" style="flex:1;height:56px;border-radius:12px;border:1px solid #D9DCE2;background:#fff;font-size:14.5px;font-weight:700;cursor:pointer">Lock now</button><button onClick="{{ settings.about }}" style="flex:1;height:56px;border-radius:12px;border:1px solid #D9DCE2;background:#fff;font-size:14.5px;font-weight:700;cursor:pointer">About</button></div>
+    <div style="display:flex;gap:8px"><button onClick="{{ settings.signOut }}" style="flex:1;height:56px;border-radius:12px;border:1px solid #D9DCE2;background:#fff;font-size:14.5px;font-weight:700;cursor:pointer">Sign out</button><button onClick="{{ settings.reset }}" style="flex:1;height:56px;border-radius:12px;border:1px solid #F3B2AB;background:#FDF3F2;color:#B42318;font-size:14.5px;font-weight:700;cursor:pointer">Reset demo data</button></div>
+    <a href="./Retail%20ERP%20-%20Launcher.dc.html" onClick="{{ goLauncher }}" style="cursor:pointer;height:56px;border-radius:12px;border:1px solid #D9DCE2;background:#fff;font-size:14.5px;font-weight:700;color:#0E1116;display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none" style-hover="text-decoration:none;color:#010ECF;border-color:#010ECF">Switch app · back to launcher</a>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:10.5px;color:#7A8191;padding:6px 0"><span>Powered by</span><img src="./assets/brn-dynamics-logo.png" alt="brn dynamics" style="height:22px;display:block"></div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.about }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:28px 18px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+    <img src="./assets/brn-dynamics-logo.png" alt="brn dynamics" style="height:52px;display:block;margin-top:10px">
+    <div style="font-size:18px;font-weight:800;margin-top:6px">Retail ERP Handheld</div>
+    <div style="font-size:13.5px;color:#5B6270">{{ about.version }}</div>
+    <div style="width:100%;background:#fff;border-radius:14px;border:1px solid #E1E3E8;overflow:hidden;text-align:left;margin-top:6px"><sc-for list="{{ about.rows }}" as="r" hint-placeholder-count="5"><div style="display:flex;padding:12px 14px;border-bottom:1px solid #F2F3F5;font-size:14px"><span style="color:#5B6270">{{ r.k }}</span><span style="margin-left:auto;font-weight:700">{{ r.v }}</span></div></sc-for></div>
+    <div style="font-size:12px;color:#7A8191;line-height:1.5">Licensed to Brn ERP, Kuwait City.<br>© 2026 brn dynamics. All rights reserved.</div>
+  </div>
+</sc-if>
+
+        </div>
+        <sc-if value="{{ bar.show }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:none;padding:10px 12px 14px;background:#fff;border-top:1px solid #E1E3E8;display:flex;gap:8px">
+            <button onClick="{{ bar.camera }}" title="Camera scan (fallback)" style="width:60px;height:62px;flex:none;border-radius:14px;border:1px solid #D9DCE2;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><span style="width:26px;height:20px;border:2.5px solid #0E1116;border-radius:5px;box-sizing:border-box;display:flex;align-items:center;justify-content:center"><span style="width:8px;height:8px;border:2.5px solid #0E1116;border-radius:50%;box-sizing:border-box"></span></span></button>
+            <button onClick="{{ bar.scan }}" style="flex:1;height:62px;border-radius:14px;border:none;background:#0E1116;color:#fff;font-size:18px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px"><span style="width:20px;height:16px;background:repeating-linear-gradient(90deg,#fff 0 2px,transparent 2px 4px,#fff 4px 5px,transparent 5px 7px)"></span><span>Scan</span></button>
+            <sc-if value="{{ bar.hasPrimary }}" hint-placeholder-val="{{ false }}"><button onClick="{{ bar.primary }}" style="flex:1.1;height:62px;border-radius:14px;border:none;background:#010ECF;color:#fff;font-size:16px;font-weight:800;cursor:pointer;opacity:{{ bar.op }}">{{ bar.label }}</button></sc-if>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ flash.show }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:0;right:0;top:28px;padding:18px 18px 20px;z-index:40;pointer-events:none;color:#fff;display:flex;align-items:center;gap:14px;background:{{ flash.bg }};box-shadow:0 10px 30px rgba(14,17,22,.25)">
+          <span style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;flex:none">{{ flash.mark }}</span>
+          <div style="min-width:0"><div style="font-size:18px;font-weight:800;line-height:1.25">{{ flash.text }}</div><div style="font-size:13px;opacity:.9;margin-top:2px;font-family:'JetBrains Mono',monospace">{{ flash.sub }}</div></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ pad.show }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:rgba(14,17,22,.5);z-index:50;display:flex;flex-direction:column;justify-content:flex-end">
+          <div style="background:#fff;border-radius:22px 22px 0 0;padding:16px 16px 18px">
+            <div style="font-size:14px;color:#5B6270">{{ pad.title }}</div><div style="font-size:15px;font-weight:800;margin-top:2px">{{ pad.name }}</div>
+            <div style="height:64px;border-radius:12px;background:#F4F5F7;margin:12px 0;display:flex;align-items:center;justify-content:flex-end;padding:0 16px;font-size:36px;font-weight:800">{{ pad.value }}</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><sc-for list="{{ pad.keys }}" as="k" hint-placeholder-count="12"><button onClick="{{ k.press }}" style="height:56px;border-radius:12px;border:1px solid #E1E3E8;background:{{ k.bg }};color:{{ k.fg }};font-size:22px;font-weight:700;cursor:pointer">{{ k.label }}</button></sc-for></div>
+            <div style="display:flex;gap:8px;margin-top:10px"><button onClick="{{ pad.cancel }}" style="flex:1;height:58px;border-radius:12px;border:1px solid #D9DCE2;background:#fff;font-size:16px;font-weight:700;cursor:pointer">Cancel</button><button onClick="{{ pad.ok }}" style="flex:1.4;height:58px;border-radius:12px;border:none;background:#010ECF;color:#fff;font-size:16px;font-weight:800;cursor:pointer">Set quantity</button></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ confirm.show }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:rgba(14,17,22,.5);z-index:50;display:flex;flex-direction:column;justify-content:flex-end">
+          <div style="background:#fff;border-radius:22px 22px 0 0;padding:20px 18px 18px">
+            <div style="width:46px;height:46px;border-radius:12px;background:#FDF1DC;color:#8A5A00;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800">!</div>
+            <div style="font-size:19px;font-weight:800;margin-top:12px">{{ confirm.title }}</div>
+            <div style="font-size:14px;color:#4A5160;line-height:1.5;margin-top:6px">{{ confirm.body }}</div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px"><sc-for list="{{ confirm.lines }}" as="x" hint-placeholder-count="0"><div style="font-size:13.5px;font-weight:600;background:#F4F5F7;border-radius:10px;padding:10px 12px">{{ x.t }}</div></sc-for></div>
+            <div style="display:flex;gap:8px;margin-top:14px"><button onClick="{{ confirm.cancel }}" style="flex:1;height:58px;border-radius:12px;border:1px solid #D9DCE2;background:#fff;font-size:16px;font-weight:700;cursor:pointer">{{ confirm.cancelLabel }}</button><button onClick="{{ confirm.ok }}" style="flex:1.4;height:58px;border-radius:12px;border:none;background:#010ECF;color:#fff;font-size:16px;font-weight:800;cursor:pointer">{{ confirm.okLabel }}</button></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ lbl.show }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:rgba(14,17,22,.5);z-index:50;display:flex;flex-direction:column;justify-content:flex-end">
+          <div style="background:#fff;border-radius:22px 22px 0 0;padding:18px 16px 18px">
+            <div style="font-size:17px;font-weight:800">Print shelf label</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:4px;font-size:12.5px;color:#4A5160"><span style="width:8px;height:8px;border-radius:50%;background:#1B9A4A"></span><span>{{ lbl.printer }}</span></div>
+            <div style="background:#E9EBEF;border-radius:14px;padding:16px;margin-top:12px;display:flex;justify-content:center">
+              <div style="width:240px;aspect-ratio:2 / 1;background:#fff;border-radius:6px;box-shadow:0 2px 8px rgba(14,17,22,.14);padding:10px 12px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between">
+                <div style="display:flex;justify-content:space-between;gap:8px"><div style="font-size:10.5px;font-weight:700;line-height:1.2">{{ lbl.name }}</div><div style="font-size:14px;font-weight:800;white-space:nowrap">{{ lbl.price }}</div></div>
+                <div style="width:100%;height:38px;background:url({{ lbl.src }}) center/100% 100% no-repeat"></div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;text-align:center">{{ lbl.code }}</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;margin-top:12px"><span style="font-size:15px;font-weight:700">Copies</span><span style="font-size:12px;color:#5B6270;margin-left:8px">50 × 25 mm</span><div style="margin-left:auto;display:flex;align-items:center;gap:8px"><button onClick="{{ lbl.dec }}" style="width:52px;height:52px;border-radius:12px;border:1px solid #D9DCE2;background:#fff;font-size:26px;cursor:pointer">−</button><span style="width:40px;text-align:center;font-size:26px;font-weight:800">{{ lbl.qty }}</span><button onClick="{{ lbl.inc }}" style="width:52px;height:52px;border-radius:12px;border:1px solid #D9DCE2;background:#fff;font-size:26px;cursor:pointer">+</button></div></div>
+            <div style="display:flex;gap:8px;margin-top:14px"><button onClick="{{ lbl.cancel }}" style="flex:1;height:58px;border-radius:12px;border:1px solid #D9DCE2;background:#fff;font-size:16px;font-weight:700;cursor:pointer">Cancel</button><button onClick="{{ lbl.send }}" style="flex:1.4;height:58px;border-radius:12px;border:none;background:#010ECF;color:#fff;font-size:16px;font-weight:800;cursor:pointer">{{ lbl.sendLabel }}</button></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ cam.show }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:#0E1116;z-index:55;display:flex;flex-direction:column;color:#fff">
+          <div style="padding:40px 18px 10px;font-size:16px;font-weight:800">Camera scan</div>
+          <div style="flex:1;margin:10px 18px;border-radius:18px;background:repeating-linear-gradient(135deg,#1A1D23 0 12px,#20242B 12px 24px);display:flex;align-items:center;justify-content:center;position:relative">
+            <div style="width:240px;height:120px;border:3px solid #fff;border-radius:12px;box-shadow:0 0 0 2000px rgba(0,0,0,.25)"></div>
+            <div style="position:absolute;left:0;right:0;top:50%;height:2px;background:#D92D20;margin:0 50px"></div>
+            <div style="position:absolute;bottom:14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#9AA0AC">camera viewfinder</div>
+          </div>
+          <div style="font-size:13px;color:#9AA0AC;text-align:center;padding:0 24px">Fallback for ordinary phones without a built-in scanner</div>
+          <div style="display:flex;gap:8px;padding:14px 18px 20px"><button onClick="{{ cam.close }}" style="flex:1;height:58px;border-radius:12px;border:1px solid #3A3F48;background:transparent;color:#fff;font-size:16px;font-weight:700;cursor:pointer">Close</button><button onClick="{{ cam.capture }}" style="flex:1.4;height:58px;border-radius:12px;border:none;background:#fff;color:#0E1116;font-size:16px;font-weight:800;cursor:pointer">Capture barcode</button></div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <div style="width:320px;flex:none;display:flex;flex-direction:column;gap:14px">
+    <div>
+      <div style="font-size:22px;font-weight:800;letter-spacing:-.02em">Retail ERP — Handheld</div>
+      <div style="font-size:13px;color:#4A5160;margin-top:6px;line-height:1.5">Staff app for a Zebra mobile computer. Scans arrive as keystrokes plus Enter, so a scanner, the yellow side triggers or the on-screen Scan button all work on any screen.</div>
+    </div>
+    <div style="background:#fff;border-radius:14px;border:1px solid #D9DCE2;overflow:hidden">
+      <div style="padding:12px 16px;border-bottom:1px solid #EEF0F3;font-size:13px;font-weight:700">Acceptance flow</div>
+      <sc-for list="{{ checklist }}" as="c" hint-placeholder-count="6"><div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #F2F3F5;font-size:13px"><span style="width:20px;height:20px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:{{ c.bg }};color:{{ c.fg }}">{{ c.mark }}</span><span style="color:{{ c.tfg }}">{{ c.label }}</span></div></sc-for>
+    </div>
+    <div style="font-size:12px;color:#5B6270;line-height:1.5">Same seed data, statuses, document prefixes, KWD format and pool tags as the back office. State is in memory; Settings has Reset demo data.</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;820px&quot;,&quot;height&quot;:&quot;860px&quot;}}">
+class Component extends DCLogic {
+  state = { ready:false };
+  componentDidMount(){ const t=()=>{ if(window.ERP) this.setState(this.init()); else setTimeout(t,40); }; t(); this.kb=e=>this.onKey(e); window.addEventListener('keydown',this.kb,true);
+    this.last=Date.now(); this.poke=()=>{ this.last=Date.now(); }; window.addEventListener('pointerdown',this.poke,true); window.addEventListener('keydown',this.poke,true);
+    this.idle=setInterval(()=>{ if(this.state.ready&&this.state.signed&&Date.now()-this.last>5*60*1000) this.lock(); },5000); }
+  componentWillUnmount(){ window.removeEventListener('keydown',this.kb,true); window.removeEventListener('pointerdown',this.poke,true); window.removeEventListener('keydown',this.poke,true); clearInterval(this.idle); clearTimeout(this.ft); }
+  lock(){ this.setState({signed:false,locked:true,pin:'',pinErr:false,pad:null,confirm:null,cam:false,lbl:null}); this.act('Session locked','No activity for 5 minutes','doc'); }
+  init(){ const db=window.ERP.seed();
+    const orders=[{no:'SO-2026-0412',cust:'Salmiya · Block 10',slot:'Today 16:00–18:00',lines:[{sku:'BE-LIP-ROS',qty:2},{sku:'FA-TOT-CRM',qty:1}]},{no:'SO-2026-0413',cust:'Jabriya · Block 8',slot:'Today 18:00–20:00',lines:[{sku:'GA-CBL-C1M',qty:3},{sku:'HO-CND-VAN',qty:1},{sku:'BE-MSK-5PK',qty:1}]},{no:'SO-2026-0415',cust:'Hawalli · Block 2',slot:'Tomorrow 10:00–12:00',lines:[{sku:'FA-HOD-GRY-M',qty:1},{sku:'GA-EAR-WHT',qty:1}]}].map(o=>({...o,status:'Picking',picked:{},short:{}}));
+    return {ready:true,db,orders,signed:false,pin:'',loc:'online',stack:['home'],ctx:{},work:{},flash:null,pad:null,confirm:null,cam:false,offline:false,queued:0,syncing:false,settings:{beep:true,vibrate:true},blind:true,lbl:null,locked:false,activity:[],test:null,done:{},clock:581,toasts:[]}; }
+  now(){ const m=this.state.clock; this.state.clock=m+1; return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
+  mut(fn){ const db=JSON.parse(JSON.stringify(this.state.db)); const x=fn(db)||{}; this.setState({db,...x}); }
+  act(text,sub,ok){ const a={text,sub,time:this.now(),dot:ok===false?'#D92D20':ok==='doc'?'#010ECF':'#1B9A4A'}; this.setState(s=>({activity:[a,...s.activity]})); }
+  beep(ok){ if(!this.state.settings.beep) return; try{ const a=this.ac||(this.ac=new (window.AudioContext||window.webkitAudioContext)()); const o=a.createOscillator(),g=a.createGain(); o.type=ok?'sine':'square'; o.frequency.value=ok?1760:220; g.gain.value=ok?.05:.08; o.connect(g); g.connect(a.destination); o.start(); o.stop(a.currentTime+(ok?.07:.3)); }catch(e){} }
+  show(ok,text,sub){ clearTimeout(this.ft); this.setState({flash:{ok,text,sub:sub||''}}); this.beep(ok); if(!ok&&this.state.settings.vibrate&&navigator.vibrate) navigator.vibrate(200); this.ft=setTimeout(()=>this.setState({flash:null}),ok?1100:1800); }
+  push(screen,ctx){ this.setState(s=>({stack:[...s.stack,screen],ctx:{...s.ctx,...(ctx||{})}})); }
+  pop(){ this.setState(s=>({stack:s.stack.length>1?s.stack.slice(0,-1):s.stack})); }
+  home(){ this.setState({stack:['home'],work:{}}); }
+  cur(){ const s=this.state.stack; return s[s.length-1]; }
+  item(code){ const db=this.state.db; return db.items.find(i=>i.barcode===code||i.sku===code); }
+
+  onKey(e){
+    if(!this.state.ready||!this.state.signed) return;
+    const now=performance.now(); let b=this.buf||(this.buf={s:'',t:0,g:[]});
+    if(e.key==='Enter'){ const fast=b.s.length>=4&&b.g.length>=3&&b.g.every(x=>x<30); const code=b.s, gaps=b.g; this.buf=null; if(fast){ e.preventDefault(); e.stopPropagation(); this.scan(code,gaps); } return; }
+    if(!e.key||e.key.length!==1||e.ctrlKey||e.metaKey) return;
+    if(b.s&&now-b.t>30){ b.s=''; b.g=[]; } if(b.s) b.g.push(now-b.t); b.s+=e.key; b.t=now;
+  }
+  burst(code){ const keys=[...code,'Enter']; let i=0; const step=()=>{ window.dispatchEvent(new KeyboardEvent('keydown',{key:keys[i++],bubbles:true})); if(i<keys.length) setTimeout(step,5); }; step(); }
+  suggest(){ const st=this.state, db=st.db, sc=this.cur(), w=st.work, loc=st.loc; const pick=a=>a[Math.floor(Math.random()*a.length)];
+    if(sc==='recvList'){ const p=db.pos.find(p=>(p.status==='Sent'||p.status==='Partially received')&&p.dest===loc); return p?p.no:pick(db.items).barcode; }
+    if(sc==='recv'){ const p=db.pos.find(x=>x.no===st.ctx.po); const open=p.lines.filter(l=>(w.c[l.sku]||0)<l.qty-l.rec).sort((a,b)=>(w.c[a.sku]||0)-(w.c[b.sku]||0)); return this.item((open[0]||p.lines[0]).sku).barcode; }
+    if(sc==='tin'){ const t=db.transfers.find(x=>x.no===st.ctx.trf); const open=t.lines.filter(l=>(w.c[l.sku]||0)<l.qty).sort((a,b)=>(w.c[a.sku]||0)-(w.c[b.sku]||0)); return this.item((open[0]||t.lines[0]).sku).barcode; }
+    if(sc==='tinList'){ const t=db.transfers.find(t=>t.status==='In transit'&&t.to===loc); return t?t.no:pick(db.items).barcode; }
+    if(sc==='pick'){ const o=st.orders.find(x=>x.no===st.ctx.so); const l=o.lines.find(l=>(o.picked[l.sku]||0)<l.qty&&!o.short[l.sku]); return this.item((l||o.lines[0]).sku).barcode; }
+    if(sc==='count'){ const keys=Object.keys(w.c||{}); const base=['BE-LIP-ROS','GA-CBL-C1M','HO-CND-VAN','FA-TOT-CRM']; const next=base.find(k=>!keys.includes(k)); return this.item(keys.length>=3&&Math.random()<.6?pick(keys):(next||pick(base))).barcode; }
+    if(sc==='tout'){ const c=db.items.filter(i=>db.stock[i.sku][loc]>0); return pick(c.slice(0,8)).barcode; }
+    return pick(db.items).barcode; }
+
+  scan(raw,gaps){
+    const E=window.ERP, st=this.state, db=st.db, code=raw.trim().toUpperCase(), sc=this.cur(), loc=st.loc;
+    if(st.offline) this.setState(s=>({queued:s.queued+1}));
+    if(sc==='settings'){ const avg=gaps&&gaps.length?gaps.reduce((a,b)=>a+b,0)/gaps.length:null; this.setState({test:{raw,sym:E.symbology(code),len:raw.length,avg}}); const ok=!!this.item(code)||/^(PO|TRF|SO)-/.test(code); this.show(ok,ok?'Test scan received':'Unknown barcode',raw); return; }
+    const doc=code.match(/^(PO|TRF|SO)-\d{4}-\d{4}$/);
+    if(doc){ if(doc[1]==='PO'){ const p=db.pos.find(x=>x.no===code&&(x.status==='Sent'||x.status==='Partially received')); if(p&&p.dest===loc){ this.setState(s=>({stack:['home','recvList','recv'],ctx:{...s.ctx,po:code},work:{c:{}}})); this.show(true,'Opened '+code,db.vendors.find(v=>v.id===p.vendor).name); this.act('Opened '+code,'Receive','doc'); return; } }
+      if(doc[1]==='TRF'){ const t=db.transfers.find(x=>x.no===code&&x.status==='In transit'&&x.to===loc); if(t){ this.setState(s=>({stack:['home','trfChoose','tinList','tin'],ctx:{...s.ctx,trf:code},work:{c:{}}})); this.show(true,'Opened '+code,'Transfer in'); return; } }
+      if(doc[1]==='SO'&&loc==='online'){ const o=st.orders.find(x=>x.no===code); if(o){ this.setState(s=>({stack:['home','pickList','pick'],ctx:{...s.ctx,so:code}})); this.show(true,'Opened '+code,'Pick order'); return; } }
+      this.show(false,'Not available here',code); this.act('Rejected '+code,'Document not open for '+E.POOL[loc].name,false); return; }
+    const it=this.item(code);
+    if(!it){ this.show(false,'Unknown barcode',code); this.act('Unknown barcode',code,false); return; }
+    const W=st.work;
+    if(sc==='recv'){ const p=db.pos.find(x=>x.no===st.ctx.po); const l=p.lines.find(x=>x.sku===it.sku); if(!l){ this.show(false,'Not on this PO',it.name); this.act('Not on '+p.no,it.name,false); return; } const n=(W.c[it.sku]||0); if(n>=l.qty-l.rec){ this.show(false,'Over-scan',it.name+' · all '+(l.qty-l.rec)+' already scanned'); this.act('Over-scan blocked',it.name,false); return; } this.setState({work:{...W,c:{...W.c,[it.sku]:n+1}}}); this.show(true,it.name,(n+1)+' of '+(l.qty-l.rec)); this.act('Scanned '+it.name,p.no+' · '+(n+1)+' of '+(l.qty-l.rec)); return; }
+    if(sc==='tin'){ const t=db.transfers.find(x=>x.no===st.ctx.trf); const l=t.lines.find(x=>x.sku===it.sku); if(!l){ this.show(false,'Not on this transfer',it.name); return; } const n=W.c[it.sku]||0; if(n>=l.qty){ this.show(false,'Over-scan',it.name+' · '+l.qty+' expected'); return; } this.setState({work:{...W,c:{...W.c,[it.sku]:n+1}}}); this.show(true,it.name,(n+1)+' of '+l.qty); this.act('Scanned '+it.name,t.no); return; }
+    if(sc==='tout'){ const n=W.c[it.sku]||0; const av=db.stock[it.sku][loc]; if(n>=av){ this.show(false,'No more stock',it.name+' · '+av+' in '+E.POOL[loc].name); return; } this.setState({work:{...W,c:{...W.c,[it.sku]:n+1}}}); this.show(true,it.name,(n+1)+' to send'); this.act('Scanned '+it.name,'Transfer out'); return; }
+    if(sc==='count'){ const n=W.c[it.sku]||0; this.setState({work:{...W,c:{...W.c,[it.sku]:n+1},last:it.sku}}); this.show(true,it.name,'Counted '+(n+1)+(W.recount&&W.recount.includes(it.sku)?' · recount':'')); this.act('Counted '+it.name,String(n+1)); return; }
+    if(sc==='pick'){ const o=st.orders.find(x=>x.no===st.ctx.so); const l=o.lines.find(x=>x.sku===it.sku); if(!l){ this.show(false,'Not on this order',it.name); this.act('Wrong item for '+o.no,it.name,false); return; } const n=o.picked[it.sku]||0; if(n>=l.qty){ this.show(false,'Already picked',it.name); return; } this.setState(s=>({orders:s.orders.map(x=>x.no===o.no?{...x,picked:{...x.picked,[it.sku]:n+1}}:x)})); this.show(true,it.name,'Picked '+(n+1)+' of '+l.qty); this.act('Picked '+it.name,o.no); return; }
+    if(sc==='wo'){ this.setState({work:{sku:it.sku,qty:1,reason:'Damaged',note:'',photo:false}}); this.show(true,it.name,db.stock[it.sku][loc]+' on hand'); return; }
+    this.setState(s=>({stack:sc==='lookup'?s.stack:[...s.stack,'lookup'],ctx:{...s.ctx,sku:it.sku},done:{...s.done,lookup:true}})); this.show(true,it.name,E.k3(it.price)); this.act('Looked up '+it.name,it.barcode);
+  }
+
+  renderVals(){
+    if(!this.state.ready||!window.ERP) return {signedOut:true,signedIn:false,is:{},flash:{},pad:{},confirm:{},cam:{},bar:{},pinDots:[],pinKeys:[],locs:[],checklist:[]};
+    const E=window.ERP, st=this.state, db=st.db, loc=st.loc, P=E.POOL[loc], other=loc==='store'?'online':'store', sc=this.cur(), W=st.work;
+    const I={}; db.items.forEach(i=>I[i.sku]=i);
+    const out={goLauncher:e=>{ e.preventDefault(); e.stopPropagation(); if(this.props.onSwitchApp) return this.props.onSwitchApp(); window.location.assign(new URL('./Retail%20ERP%20-%20Launcher.dc.html',window.location.href).href); },signedOut:!st.signed,signedIn:st.signed,netLabel:st.offline?'No signal':'Wi-Fi',trigger:()=>st.signed&&this.burst(this.suggest())};
+    const pl=E.pl; const ICON=(d,c)=>'"data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>')+'"';
+    const IC={recv:'<path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',trf:'<path d="M4 8h15l-3.5-3.5M20 16H5l3.5 3.5"/>',count:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/>',wo:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>',look:'<circle cx="11" cy="11" r="6"/><path d="M15.5 15.5L20 20"/>',pick:'<path d="M5 8h14l-1.2 12H6.2z"/><path d="M9 8a3 3 0 0 1 6 0"/>'};
+    out.locs=['online','store'].map(k=>({label:E.POOL[k].name,pick:()=>this.setState({loc:k}),bg:loc===k?'#fff':'transparent',fg:loc===k?'#0E1116':'#fff',bd:loc===k?'#fff':'#3A3F48'}));
+    out.pinHint=st.pinErr?'Wrong PIN, try 1234':st.locked?'Locked after 5 minutes of no activity · enter PIN':'Enter your PIN · demo PIN 1234';
+    out.pinDots=[0,1,2,3].map(i=>({bg:i<st.pin.length?'#fff':'transparent',bd:st.pinErr?'#FF6B5E':'#fff'}));
+    const press=k=>()=>{ if(k==='⌫') return this.setState(s=>({pin:s.pin.slice(0,-1),pinErr:false})); if(k==='') return; const p=this.state.pin+k; if(p.length<4) return this.setState({pin:p,pinErr:false}); if(p==='1234'){ if(st.locked){ this.last=Date.now(); this.setState({pin:'',signed:true,locked:false,pinErr:false}); this.act('Unlocked','Session resumed','doc'); return; } this.last=Date.now(); this.setState({pin:'',signed:true,stack:['home'],pinErr:false,done:{...st.done,signin:true}}); this.act('Signed in','Rania Faris · '+E.POOL[loc].name,'doc'); } else this.setState({pin:'',pinErr:true}); };
+    out.pinKeys=['1','2','3','4','5','6','7','8','9','','0','⌫'].map(k=>({label:k,press:press(k),bg:k===''?'transparent':'#22262E'}));
+    const done=st.done; const C=[['signin','Sign in with PIN'],['recv','Receive two lines of a PO'],['tin','Receive a transfer'],['count','Count three items'],['wo','Log one write-off'],['lookup','Look up an item']];
+    out.checklist=C.map(([k,l])=>({label:l,mark:done[k]?'✓':'',bg:done[k]?'#1B9A4A':'#EEF0F3',fg:'#fff',tfg:done[k]?'#0E1116':'#5B6270'}));
+    out.flash=st.flash?{show:true,bg:st.flash.ok?'#1B9A4A':'#D92D20',mark:st.flash.ok?'✓':'✕',text:st.flash.text,sub:st.flash.sub}:{show:false};
+    if(!st.signed) return {...out,is:{},pad:{show:false},confirm:{show:false},cam:{show:false},bar:{show:false},lbl:{show:false}};
+    out.pool={name:P.name,bg:P.bg,fg:P.fg,dot:P.dot}; out.net={label:st.offline?'Offline':'Wi-Fi',fg:st.offline?'#F2B54A':'#9AA0AC',dot:st.offline?'#E8833A':'#3DDC97'}; out.hasBack=st.stack.length>1; out.back=()=>this.pop();
+    out.offline=st.offline; out.offlineText=st.syncing?'Syncing '+pl(st.queued,'scan')+'…':'Working offline, '+pl(st.queued,'scan')+' queued'; out.syncLabel=st.syncing?'…':'Sync';
+    out.sync=()=>{ if(st.syncing) return; this.setState({syncing:true}); setTimeout(()=>{ const n=this.state.queued; this.setState({offline:false,syncing:false,queued:0}); this.show(true,'Synced',pl(n,'scan')+' uploaded'); this.act('Synced','Uploaded '+pl(n,'queued scan'),'doc'); },1300); };
+    const is={home:sc==='home',list:['recvList','tinList','pickList'].includes(sc),lines:['recv','tin','tout','count','pick'].includes(sc),trfChoose:sc==='trfChoose',countDone:sc==='countDone',wo:sc==='wo',lookup:sc==='lookup',activity:sc==='activity',settings:sc==='settings',about:sc==='about'};
+    out.is=is; let bar={show:false}; const scanBtn=()=>this.burst(this.suggest());
+    const openRecv=p=>()=>{ this.push('recv',{po:p.no}); this.setState({work:{c:{}}}); };
+    const T={home:['Home','Rania Faris · '+P.name],recvList:['Receive','Open POs'],recv:[st.ctx.po,'Receive'],trfChoose:['Transfer',''],tout:['Transfer out','To '+E.POOL[other].name],tinList:['Transfer in','In transit to '+P.name],tin:[st.ctx.trf,'Transfer in'],count:['Stock count',P.name],countDone:['Count submitted',''],wo:['Write-off',P.name],lookup:['Item lookup','Scan any item'],pickList:['Pick orders','Online orders'],pick:[st.ctx.so,'Pick'],activity:['Activity','Today'],settings:['Settings','Device and scanner'],about:['About','App and licence']};
+    out.title=(T[sc]||[''])[0]; out.subtitle=(T[sc]||['',''])[1];
+    const openPOs=db.pos.filter(p=>(p.status==='Sent'||p.status==='Partially received')&&p.dest===loc);
+    const tins=db.transfers.filter(t=>t.status==='In transit'&&t.to===loc);
+    const ords=loc==='online'?st.orders.filter(o=>o.status==='Picking'):[];
+    if(is.home){ const tile=(ic,label,sub,go,badge,primary)=>({icon:ICON(IC[ic],primary?'#FFFFFF':'#0E1116'),label,sub,go,badge,hasBadge:!!badge,bg:primary?'#010ECF':'#fff',fg:primary?'#fff':'#0E1116',bd:primary?'#010ECF':'#E1E3E8',iconBg:primary?'rgba(255,255,255,.18)':'#F1F2F5'});
+      out.home={hello:'Good morning, Rania · scan anything to start',actCount:pl(st.activity.length,'event'),goActivity:()=>this.push('activity'),
+        tiles:[tile('recv','Receive',pl(openPOs.length,'open PO'),()=>this.push('recvList'),openPOs.length,true),tile('trf','Transfer','Out or in',()=>this.push('trfChoose'),tins.length),tile('count','Count','Scan to count up',()=>{ this.push('count'); this.setState({work:{c:{}}}); },0),tile('wo','Write-off','Damaged, opened, theft',()=>{ this.push('wo'); this.setState({work:{}}); },0),tile('look','Item lookup','Stock in both pools',()=>this.push('lookup'),0),tile('pick','Pick orders',loc==='online'?pl(ords.length,'order')+' to pick':'Online Warehouse only',()=>this.push('pickList'),ords.length)],goSettings:()=>this.push('settings')};
+      bar={show:true,scan:scanBtn,camera:()=>this.setState({cam:true}),hasPrimary:false};
+    }
+    if(sc==='recvList'){ out.list={intro:'Open purchase orders for '+P.name+'. Scan a PO barcode or tap one.',rows:openPOs.map(p=>({no:p.no,st:E.chip(p.status),title:db.vendors.find(v=>v.id===p.vendor).name,sub:pl(p.lines.reduce((a,l)=>a+l.qty-l.rec,0),'unit')+' outstanding · ETA '+E.fd(p.eta),open:openRecv(p)})),empty:!openPOs.length,emptyText:'No open POs for '+P.name+'. Switch location at sign-in to see Online Warehouse POs.'}; bar={show:true,scan:scanBtn,camera:()=>this.setState({cam:true}),hasPrimary:false}; }
+    if(sc==='tinList'){ out.list={intro:'Transfers in transit to '+P.name+'.',rows:tins.map(t=>({no:t.no,st:E.chip(t.status),title:t.lines.map(l=>I[l.sku].name).join(', '),sub:'From '+E.POOL[t.from].name+' · '+pl(t.lines.reduce((a,l)=>a+l.qty,0),'unit'),open:()=>{ this.push('tin',{trf:t.no}); this.setState({work:{c:{}}}); }})),empty:!tins.length,emptyText:'Nothing in transit to '+P.name+'. Dispatch one from the back office or the other location.'}; bar={show:true,scan:scanBtn,camera:()=>this.setState({cam:true}),hasPrimary:false}; }
+    if(sc==='pickList'){ out.list={intro:loc==='online'?'Online orders waiting to be picked from the Online Warehouse.':'Online orders are picked from the Online Warehouse only.',rows:ords.map(o=>({no:o.no,st:E.chip('Picking'),title:o.cust,sub:pl(o.lines.reduce((a,l)=>a+l.qty,0),'unit')+' · '+o.slot,open:()=>this.push('pick',{so:o.no})})),empty:!ords.length,emptyText:loc==='online'?'All orders picked.':'Sign in at the Online Warehouse to pick orders.'}; bar={show:true,scan:scanBtn,camera:()=>this.setState({cam:true}),hasPrimary:false}; }
+    if(sc==='trfChoose') out.trfChoose={outSub:'Scan items to send from '+P.name+' to '+E.POOL[other].name,inSub:pl(tins.length,'transfer')+' in transit to '+P.name,goOut:()=>{ this.push('tout'); this.setState({work:{c:{}}}); },goIn:()=>this.push('tinList')};
+    const padOpen=(title,sku,val,apply)=>()=>this.setState({pad:{title,sku,value:String(val||''),apply}});
+    if(sc==='recv'){ const p=db.pos.find(x=>x.no===st.ctx.po); const c=W.c||{}; const tot=p.lines.reduce((a,l)=>a+(c[l.sku]||0),0); const lines=p.lines.filter(l=>(c[l.sku]||0)>0).length; const openL=p.lines.filter(l=>l.qty>l.rec);
+      out.lines={kA:'Scanned',vA:tot,kB:'Lines',vB:lines+' / '+openL.length,note:db.vendors.find(v=>v.id===p.vendor).name+' · receiving into '+P.name+'. Tap a line to key a quantity.'+(openL.length<p.lines.length?' '+pl(p.lines.length-openL.length,'line')+' already fully received '+(p.lines.length-openL.length===1?'is':'are')+' hidden.':''),
+        hasRecvExtra:true, issueNote:W.note||'', setIssueNote:e=>{ const v=e.target.value; this.setState(s=>({work:{...s.work,note:v}})); },
+        issues:['None','Short delivery','Over delivery'].map(r=>{ const a=(W.issue||'None')===r; return {label:r==='None'?'No issue':r.replace(' delivery',''),pick:()=>this.setState(s=>({work:{...s.work,issue:r}})),bg:a?(r==='None'?'#E3F3E8':r==='Over delivery'?'#E6E8FB':'#FDF1DC'):'#fff',fg:a?(r==='None'?'#1B7A3A':r==='Over delivery'?'#010ECF':'#8A5A00'):'#353B47',bd:a?(r==='None'?'#1B7A3A':r==='Over delivery'?'#010ECF':'#8A5A00'):'#D9DCE2'}; }),
+        photo:()=>this.setState(s=>({work:{...s.work,photo:!s.work.photo}})),photoLabel:W.photo?'✓ Damaged carton photo attached · tap to remove':'Add photo of damaged carton',photoBg:W.photo?'#F1FAF4':'#fff',photoBd:W.photo?'#1B9A4A':'#B7BCC6',photoFg:W.photo?'#1B7A3A':'#353B47',
+        rows:openL.map(l=>{ const n=c[l.sku]||0, o=l.qty-l.rec; return {name:I[l.sku].name,ar:I[l.sku].ar,code:I[l.sku].barcode,big:n,small:'of '+o+' outstanding',fg:n>=o?'#1B7A3A':n?'#010ECF':'#9AA0AC',bd:n>=o?'#A6DDB7':n?'#B9BEF2':'#E1E3E8',hasBar:true,pct:Math.min(100,n/o*100)+'%',barC:n>=o?'#1B9A4A':'#010ECF',
+          edit:padOpen('Received quantity',l.sku,n,v=>{ const q=Math.min(o,v); if(v>o) this.show(false,'Over-scan','Max '+o+' for this line'); this.setState(s=>({work:{...s.work,c:{...s.work.c,[l.sku]:q}}})); })}; })};
+      bar={show:true,scan:scanBtn,camera:()=>this.setState({cam:true}),hasPrimary:true,label:'Post receipt',op:tot?1:.45,primary:()=>{ if(!tot) return this.show(false,'Nothing scanned','Scan items first');
+        let no; this.mut(db=>{ const po=db.pos.find(x=>x.no===p.no); const cc=E.poCalc(po,db); no='GRN-2026-'+E.pad(db.seq.GRN++); let vk=0,vv=0; const ls=[];
+          cc.lines.forEach((ln,i)=>{ const q=Math.min(c[ln.sku]||0,ln.qty-ln.rec); if(!q) return; const it=db.items.find(x=>x.sku===ln.sku); const s=db.stock[ln.sku]; const S=s.store+s.online; it.cost=Math.round(((S*it.cost+q*ln.landedK)/(S+q))*1000)/1000; s[loc]+=q; po.lines[i].rec+=q; vk+=q*ln.landedK; vv+=q*ln.landedV; ls.push({sku:ln.sku,qty:q}); db.moves.push({date:E.TODAY,sku:ln.sku,loc,qty:q,type:'Goods receipt',ref:no}); });
+          const full=po.lines.every(l=>l.rec>=l.qty); po.status=full?'Received':'Partially received'; db.grns.unshift({no,po:po.no,loc,date:E.TODAY,lines:ls,by:'Rania Faris',valK:vk,valV:vv,rate:cc.r}); E.post(db,E.TODAY,no,'Goods received on '+po.no,[[E.INVACCT[loc],vk,0],['2100',0,vk]]);
+          return {stack:['home'],work:{},done:{...st.done,recv:st.done.recv||ls.length>=2}}; });
+        const iss=W.issue&&W.issue!=='None'?W.issue:null; if(no&&(iss||W.photo||(W.note||'').trim())){ E.addNote(p.no,{type:iss||(W.photo?'Damaged carton':'Receiving note'),text:(W.note||'').trim()||(iss?iss+' reported at receipt':'Damaged carton photographed'),photo:!!W.photo,by:'Rania Faris',date:E.TODAY,grn:no}); this.act('Delivery note saved',p.no+' · '+(iss||'Photo'),'doc'); }
+        this.show(true,no+' posted',pl(tot,'unit')+' · '+pl(lines,'line')); this.act(no+' posted',p.no+' · '+pl(tot,'unit')+' into '+P.name,'doc'); }};
+    }
+    if(sc==='tin'){ const t=db.transfers.find(x=>x.no===st.ctx.trf); const c=W.c||{}; const tot=t.lines.reduce((a,l)=>a+(c[l.sku]||0),0), exp=t.lines.reduce((a,l)=>a+l.qty,0);
+      out.lines={kA:'Scanned',vA:tot+' / '+exp,kB:'From',vB:E.POOL[t.from].label,note:'Scan each unit as it arrives. Short quantities are flagged on the transfer.',
+        rows:t.lines.map(l=>{ const n=c[l.sku]||0; return {name:I[l.sku].name,ar:I[l.sku].ar,code:I[l.sku].barcode,big:n,small:'of '+l.qty+' expected',fg:n>=l.qty?'#1B7A3A':n?'#010ECF':'#9AA0AC',bd:n>=l.qty?'#A6DDB7':'#E1E3E8',hasBar:true,pct:Math.min(100,n/l.qty*100)+'%',barC:n>=l.qty?'#1B9A4A':'#010ECF',hasFlag:n<l.qty&&n>0,flag:'Short '+(l.qty-n),edit:padOpen('Received quantity',l.sku,n,v=>this.setState(s=>({work:{...s.work,c:{...s.work.c,[l.sku]:Math.min(l.qty,v)}}})))}; })};
+      const postTin=()=>{ let short=0; this.mut(db=>{ const x=db.transfers.find(y=>y.no===t.no); x.status='Received'; x.received=E.TODAY; x.lines.forEach(l=>{ const q=c[l.sku]||0; l.scanned=q; short+=l.qty-q; db.stock[l.sku][loc]+=q; if(q) db.moves.push({date:E.TODAY,sku:l.sku,loc,qty:q,type:'Transfer in',ref:x.no,note:l.qty>q?'Short '+(l.qty-q):''}); }); if(short) x.short=short; return {stack:['home'],work:{},confirm:null,done:{...st.done,tin:true}}; });
+        this.show(true,t.no+' received',short?'Short '+short+' flagged':'All units scanned'); this.act(t.no+' received',short?short+' short, flagged':'Complete','doc'); };
+      bar={show:true,scan:scanBtn,camera:()=>this.setState({cam:true}),hasPrimary:true,label:'Post receipt',op:tot?1:.45,primary:()=>{ if(!tot) return this.show(false,'Nothing scanned','Scan items first'); if(tot<exp) this.setState({confirm:{title:'Post with short quantity?',body:pl(exp-tot,'unit')+' not scanned. They will be flagged as short on '+t.no+' for the back office to investigate.',lines:[],okLabel:'Post and flag',ok:postTin}}); else postTin(); }};
+    }
+    if(sc==='tout'){ const c=W.c||{}; const keys=Object.keys(c).filter(k=>c[k]>0); const tot=keys.reduce((a,k)=>a+c[k],0);
+      out.lines={kA:'To send',vA:tot,kB:'Destination',vB:E.POOL[other].label,note:'Scan items leaving '+P.name+'. Stock leaves this pool when you send; it arrives in '+E.POOL[other].name+' when scanned in.',
+        rows:keys.map(k=>({name:I[k].name,ar:I[k].ar,code:I[k].barcode,big:c[k],small:db.stock[k][loc]+' in '+P.label,fg:'#010ECF',bd:'#B9BEF2',edit:padOpen('Quantity to send',k,c[k],v=>this.setState(s=>({work:{...s.work,c:{...s.work.c,[k]:Math.min(db.stock[k][loc],v)}}})))})),empty:!keys.length,emptyText:'Scan the first item to send to '+E.POOL[other].name};
+      const send=()=>{ let no; this.mut(db=>{ no='TRF-2026-'+E.pad(db.seq.TRF++); const ls=keys.map(k=>({sku:k,qty:c[k],scanned:0})); db.transfers.unshift({no,from:loc,to:other,date:E.TODAY,status:'In transit',lines:ls,by:'Rania Faris'}); ls.forEach(l=>{ db.stock[l.sku][loc]-=l.qty; db.moves.push({date:E.TODAY,sku:l.sku,loc,qty:-l.qty,type:'Transfer out',ref:no}); }); return {stack:['home'],work:{},confirm:null}; }); this.show(true,no+' sent',pl(tot,'unit')+' in transit'); this.act(no+' dispatched','To '+E.POOL[other].name+' · '+pl(tot,'unit'),'doc'); };
+      bar={show:true,scan:scanBtn,camera:()=>this.setState({cam:true}),hasPrimary:true,label:'Send',op:tot?1:.45,primary:()=>{ if(!tot) return this.show(false,'Nothing scanned','Scan items first'); this.setState({confirm:{title:'Move stock between isolated pools?',body:'The POS sells only from Main Store and the storefront only from Online Warehouse. A transfer is the only way stock crosses.',lines:keys.map(k=>({t:I[k].name+' · '+P.label+' −'+c[k]+' now, '+E.POOL[other].label+' +'+c[k]+' on receipt'})),okLabel:'Confirm and send',ok:send}}); }};
+    }
+    if(sc==='count'){ const c=W.c||{}; const keys=Object.keys(c); const tot=keys.reduce((a,k)=>a+c[k],0); const rc=W.recount||[]; const blind=st.blind;
+      out.lines={kA:'Items counted',vA:keys.length,kB:'Units',vB:tot,note:rc.length?'Recount '+pl(rc.length,'item')+' marked below: their counts were reset. Scan them again.':'Scan repeatedly to count up. '+(blind?'System quantities stay hidden until you submit.':'System quantities are visible.'),
+        hasBlind:true,blindSub:blind?'System quantity hidden while counting':'Showing system quantity on each line',blindBg:blind?'#010ECF':'#D3D6DC',blindJ:blind?'flex-end':'flex-start',flipBlind:()=>this.setState(s=>({blind:!s.blind})),
+        rows:keys.slice().sort((a,b)=>a===W.last?-1:b===W.last?1:0).map(k=>({name:I[k].name,ar:I[k].ar,code:I[k].barcode,big:c[k],small:blind?'counted':'system '+db.stock[k][loc],fg:'#0E1116',bd:k===W.last?'#010ECF':rc.includes(k)?'#F3D2A6':'#E1E3E8',hasFlag:rc.includes(k),flag:'Recount',edit:padOpen('Counted quantity',k,c[k],v=>this.setState(s=>({work:{...s.work,c:{...s.work.c,[k]:v}}})))})),empty:!keys.length,emptyText:'Scan the first item on the shelf'};
+      const submitCount=()=>{ let no; this.mut(db=>{ no='CNT-2026-'+E.pad(db.seq.CNT++); const ls=keys.map(k=>({sku:k,sys:db.stock[k][loc],counted:c[k],cost:db.items.find(i=>i.sku===k).cost})); ls.forEach(l=>{ if(l.counted!==l.sys){ db.stock[l.sku][loc]=l.counted; db.moves.push({date:E.TODAY,sku:l.sku,loc,qty:l.counted-l.sys,type:'Count adjustment',ref:no}); } }); db.counts.unshift({no,loc,date:E.TODAY,status:'Posted',by:'Rania Faris',lines:ls}); const loss=ls.reduce((a,l)=>a+Math.max(0,l.sys-l.counted)*l.cost,0); if(loss) E.post(db,E.TODAY,no,'Count variance — '+P.name,[['5400',loss,0],[E.INVACCT[loc],0,loss]]); return {stack:['home','countDone'],ctx:{...st.ctx,countRes:{no,ls}},work:{},confirm:null,done:{...st.done,count:st.done.count||ls.length>=3}}; }); this.act(no+' submitted',pl(keys.length,'item'),'doc'); this.show(true,no+' submitted',pl(keys.length,'item')); };
+      bar={show:true,scan:scanBtn,camera:()=>this.setState({cam:true}),hasPrimary:true,label:'Submit count',op:keys.length?1:.45,primary:()=>{ if(!keys.length) return this.show(false,'Nothing counted','Scan items first');
+        const big=keys.filter(k=>!rc.includes(k)&&Math.abs(c[k]-db.stock[k][loc])>Math.max(1,db.stock[k][loc])*0.1);
+        if(big.length) return this.setState({confirm:{title:'Recount '+pl(big.length,'item')+'?',body:'The count differs from the system by more than 10 percent. Recounting now avoids posting a wrong adjustment.',lines:big.map(k=>({t:I[k].name+' · counted '+c[k]+', system '+db.stock[k][loc]})),okLabel:'Recount',cancelLabel:'Submit anyway',cancelFn:submitCount,ok:()=>{ const nc={...c}; big.forEach(k=>nc[k]=0); this.setState(s=>({confirm:null,work:{...s.work,c:nc,recount:[...rc,...big],last:big[0]}})); this.show(false,'Recount '+pl(big.length,'item'),'Counts reset to 0'); this.act('Recount requested',big.map(k=>I[k].product).join(', '),false); }}});
+        submitCount(); }};
+    }
+    if(sc==='countDone'){ const r=st.ctx.countRes||{ls:[],no:''}; const net=r.ls.reduce((a,l)=>a+(l.counted-l.sys)*l.cost,0);
+      out.countDone={no:r.no+' · '+P.name,net:(net<0?'−':net>0?'+':'')+E.k3(Math.abs(net)),netFg:net<0?'#B42318':net>0?'#1B7A3A':'#0E1116',sub:r.ls.filter(l=>l.counted!==l.sys).length+' of '+pl(r.ls.length,'line')+' with variance · stock updated',home:()=>this.home(),
+        rows:r.ls.map(l=>{ const v=l.counted-l.sys; return {name:I[l.sku].name,sub:'System '+l.sys+' · counted '+l.counted,v:(v>0?'+':v<0?'−':'')+Math.abs(v),fg:v<0?'#B42318':v>0?'#1B7A3A':'#9AA0AC'}; })}; }
+    if(sc==='pick'){ const o=st.orders.find(x=>x.no===st.ctx.so); const tot=o.lines.reduce((a,l)=>a+(o.picked[l.sku]||0),0), exp=o.lines.reduce((a,l)=>a+l.qty,0); const ready=o.lines.every(l=>(o.picked[l.sku]||0)>=l.qty||o.short[l.sku]);
+      const nextShort=o.lines.find(l=>(o.picked[l.sku]||0)<l.qty&&!o.short[l.sku]);
+      out.lines={kA:'Picked',vA:tot+' / '+exp,kB:'Delivery',vB:o.slot.split(' ')[0],note:o.cust+' · '+o.slot+'. Pick from the Online Warehouse only.',
+        rows:o.lines.map(l=>{ const n=o.picked[l.sku]||0; return {name:I[l.sku].name,ar:I[l.sku].ar,code:I[l.sku].barcode+' · '+db.stock[l.sku].online+' on hand',big:n,small:'of '+l.qty,fg:n>=l.qty?'#1B7A3A':n?'#010ECF':'#9AA0AC',bd:n>=l.qty?'#A6DDB7':o.short[l.sku]?'#F3D2A6':'#E1E3E8',hasBar:true,pct:Math.min(100,n/l.qty*100)+'%',barC:'#1B9A4A',hasFlag:!!o.short[l.sku],flag:'Short pick flagged',edit:()=>{}}; }),
+        hasSide:!!nextShort,sideLabel:nextShort?'Flag short pick: '+I[nextShort.sku].product:'',side:()=>{ if(!nextShort) return; this.setState(s=>({orders:s.orders.map(x=>x.no===o.no?{...x,short:{...x.short,[nextShort.sku]:true}}:x)})); this.show(false,'Short pick flagged',I[nextShort.sku].name); this.act('Short pick flagged',o.no+' · '+I[nextShort.sku].name,false); }};
+      bar={show:true,scan:scanBtn,camera:()=>this.setState({cam:true}),hasPrimary:true,label:'Mark packed',op:ready?1:.45,primary:()=>{ if(!ready) return this.show(false,'Not finished','Scan every line or flag a short pick'); this.setState(s=>({orders:s.orders.map(x=>x.no===o.no?{...x,status:'Packed'}:x),stack:['home','pickList']})); this.show(true,o.no+' packed',Object.keys(o.short).length?'With short pick flagged':'Ready for courier'); this.act(o.no+' packed',o.cust,'doc'); }};
+    }
+    if(is.wo){ const it=W.sku?I[W.sku]:null; const R=E.REASONS; const av=it?db.stock[it.sku][loc]:0;
+      out.wo={noItem:!it,hasItem:!!it,name:it?it.name:'',ar:it?it.ar:'',onHand:it?av+' on hand in '+P.name+' · '+E.k3(it.cost)+' each':'',qty:W.qty||1,
+        dec:()=>this.setState(s=>({work:{...s.work,qty:Math.max(1,(s.work.qty||1)-1)}})),inc:()=>this.setState(s=>({work:{...s.work,qty:Math.min(av,(s.work.qty||1)+1)}})),
+        reasons:R.map(r=>{ const a=W.reason===r; const c=E.chip(r); return {label:r,pick:()=>this.setState(s=>({work:{...s.work,reason:r}})),bg:a?c.bg:'#fff',fg:a?c.fg:'#353B47',bd:a?c.fg:'#D9DCE2'}; }),
+        note:W.note||'',setNote:e=>{ const v=e.target.value; this.setState(s=>({work:{...s.work,note:v}})); },
+        photo:()=>this.setState(s=>({work:{...s.work,photo:!s.work.photo}})),photoLabel:W.photo?'✓ Photo attached · tap to remove':'Add photo (optional)',photoBg:W.photo?'#F1FAF4':'#fff',photoBd:W.photo?'#1B9A4A':'#B7BCC6',photoFg:W.photo?'#1B7A3A':'#353B47'};
+      bar={show:true,scan:scanBtn,camera:()=>this.setState({cam:true}),hasPrimary:!!it,label:'Submit',op:it&&av>0?1:.45,primary:()=>{ if(!it||av<1) return this.show(false,'No stock to write off',it?it.name:''); const q=W.qty||1; let no; this.mut(db=>{ no='WO-2026-'+E.pad(db.seq.WO++); const value=q*it.cost; db.stock[it.sku][loc]-=q; db.writeoffs.unshift({no,date:E.TODAY,loc,sku:it.sku,qty:q,reason:W.reason,note:(W.note||'—')+(W.photo?' · photo attached':''),by:'Rania Faris',value}); db.moves.push({date:E.TODAY,sku:it.sku,loc,qty:-q,type:'Write-off · '+W.reason,ref:no}); E.post(db,E.TODAY,no,'Write-off · '+W.reason,[['5400',value,0],[E.INVACCT[loc],0,value]]); return {stack:['home'],work:{},done:{...st.done,wo:true}}; }); this.show(true,no+' logged',W.reason+' · '+q+' × '+it.product); this.act(no+' logged',W.reason+' · '+it.name,'doc'); }};
+    }
+    if(is.lookup){ const it=st.ctx.sku?I[st.ctx.sku]:null; const s=it?db.stock[it.sku]:null; const fg=q=>q===0?'#B42318':q<8?'#8A5A00':'#0E1116';
+      out.lookup={noItem:!it,hasItem:!!it,name:it?it.name:'',ar:it?it.ar:'',price:it?E.k3(it.price):'',code:it?it.barcode:'',store:s?s.store:0,online:s?s.online:0,sFg:s?fg(s.store):'',oFg:s?fg(s.online):'',
+        moves:it?db.moves.map((m,k)=>({...m,k})).filter(m=>m.sku===it.sku).sort((a,b)=>b.date.localeCompare(a.date)||b.k-a.k).slice(0,5).map(m=>({pool:E.POOL[m.loc],type:m.type,sub:E.fd(m.date)+' · '+m.ref,qty:(m.qty>0?'+':'−')+Math.abs(m.qty),fg:m.qty>0?'#1B7A3A':'#B42318'})):[],
+        print:()=>{ if(it) this.setState({lbl:{sku:it.sku,qty:1}}); }};
+      bar={show:true,scan:scanBtn,camera:()=>this.setState({cam:true}),hasPrimary:false};
+    }
+    if(is.activity) out.activity={rows:st.activity,empty:!st.activity.length};
+    if(is.settings){ const t=st.test; const set=k=>()=>this.setState(s=>({settings:{...s.settings,[k]:!s.settings[k]}}));
+      out.settings={info:[{k:'Device',v:'Warehouse handheld 1'},{k:'Model',v:'Zebra TC22 · Android'},{k:'Scanner',v:'Built-in imager · ready',fg:'#1B7A3A'},{k:'Scan output',v:'Keystrokes + Enter'},{k:'Auto-lock',v:'After 5 min idle'},{k:'Sync',v:st.offline?pl(st.queued,'scan')+' queued':'Up to date',fg:st.offline?'#8A5A00':'#1B7A3A'}],
+        toggles:[{label:'Beep on scan',sub:'Tone on success, buzz on failure',k:'beep'},{label:'Vibrate on error',sub:'Haptic feedback for unknown barcodes',k:'vibrate'}].map(x=>({label:x.label,sub:x.sub,flip:set(x.k),bg:st.settings[x.k]?'#010ECF':'#D3D6DC',j:st.settings[x.k]?'flex-end':'flex-start'})).concat([{label:'Simulate weak signal',sub:'Queue scans offline, then sync',flip:()=>this.setState(s=>({offline:!s.offline,queued:s.offline?0:3})),bg:st.offline?'#E8833A':'#D3D6DC',j:st.offline?'flex-end':'flex-start'}]),
+        testRaw:t?t.raw:'Pull the trigger…',testMeta:[{k:'Symbology',v:t?t.sym:'—'},{k:'Length',v:t?pl(t.len,'char'):'—'},{k:'Timing',v:t?(t.avg==null?'Typed':t.avg.toFixed(1)+' ms/char'):'—'}],
+        lockNow:()=>this.lock(), about:()=>this.push('about'),
+        testGood:()=>this.burst(db.items[3].barcode),testBad:()=>this.burst('9900112233'),
+        signOut:()=>this.setState({signed:false,stack:['home'],work:{}}),reset:()=>{ const keep=st.loc; this.setState({...this.init(),loc:keep}); }};
+    }
+    if(is.about) out.about={version:'Version 1.3.0 · build 2026.10.08',rows:[{k:'Device',v:'Zebra TC22'},{k:'Device ID',v:'DEV-04'},{k:'Location',v:P.name},{k:'Signed in',v:'Rania Faris'},{k:'Data',v:'Demo seed · in memory'}]};
+    out.bar=bar;
+    const pd=st.pad;
+    out.pad=pd?{show:true,title:pd.title,name:I[pd.sku].name,value:pd.value||'0',cancel:()=>this.setState({pad:null}),ok:()=>{ const v=parseInt(pd.value||'0',10); pd.apply(v); this.setState({pad:null}); },
+      keys:['1','2','3','4','5','6','7','8','9','C','0','⌫'].map(k=>({label:k,bg:k==='C'||k==='⌫'?'#F4F5F7':'#fff',fg:'#0E1116',press:()=>this.setState(s=>{ let v=s.pad.value; if(k==='C') v=''; else if(k==='⌫') v=v.slice(0,-1); else if(v.length<4) v=(v==='0'?'':v)+k; return {pad:{...s.pad,value:v}}; })}))}:{show:false};
+    const cf=st.confirm; out.confirm=cf?{show:true,title:cf.title,body:cf.body,lines:cf.lines,okLabel:cf.okLabel,ok:cf.ok,cancelLabel:cf.cancelLabel||'Cancel',cancel:cf.cancelFn||(()=>this.setState({confirm:null}))}:{show:false};
+    const lb=st.lbl; const li=lb?I[lb.sku]:null;
+    out.lbl=lb?{show:true,name:li.name,price:E.k3(li.price),src:E.eanSvg(li.barcode),code:li.barcode,qty:lb.qty,printer:'Shelf label printer · Zebra ZD421 · Main Store · online',sendLabel:'Print '+pl(lb.qty,'label'),
+      dec:()=>this.setState(s=>({lbl:{...s.lbl,qty:Math.max(1,s.lbl.qty-1)}})),inc:()=>this.setState(s=>({lbl:{...s.lbl,qty:Math.min(50,s.lbl.qty+1)}})),cancel:()=>this.setState({lbl:null}),
+      send:()=>{ this.setState({lbl:null}); this.show(true,pl(lb.qty,'label')+' sent','Zebra ZD421 · '+li.barcode); this.act('Shelf label printed',pl(lb.qty,'copy','copies')+' · '+li.name,'doc'); }}:{show:false};
+    out.cam={show:st.cam,close:()=>this.setState({cam:false}),capture:()=>{ this.setState({cam:false}); setTimeout(()=>this.burst(this.suggest()),120); }};
+    return out;
+  }
+}
+</script>
+</body>
+</html>
