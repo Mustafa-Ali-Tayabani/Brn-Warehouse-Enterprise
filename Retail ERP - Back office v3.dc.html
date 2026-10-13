@@ -13,6 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="./erp-core.js"></script>
+<script src="./erp-finance.js"></script>
 <style>
 body{margin:0;background:#F4F5F7;color:#0E1116;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 a{color:#010ECF;text-decoration:none}a:hover{color:#000A9E;text-decoration:underline}
@@ -751,7 +752,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(1,14,207,.35);out
 
 <sc-if value="{{ is.ledger }}" hint-placeholder-val="{{ false }}">
   <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:16px">
-    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">General ledger</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">All amounts in KWD · entries post from receipts, sales, payments, transfers, counts and write-offs</div></div>
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">General ledger</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">All amounts in KWD · entries post from receipts, daily close, settlements, expenses, journals, payments, transfers, counts and write-offs</div></div>
     <div style="margin-left:auto;display:flex;gap:2px;padding:3px;background:#E9EBEF;border-radius:8px"><sc-for list="{{ ledger.tabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.pick }}" style="height:28px;padding:0 14px;border:none;border-radius:6px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ t.bg }};color:{{ t.fg }};box-shadow:{{ t.sh }}">{{ t.label }}</button></sc-for></div>
   </div>
   <sc-if value="{{ ledger.isCoa }}" hint-placeholder-val="{{ false }}">
@@ -820,6 +821,301 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(1,14,207,.35);out
         <span><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ d.st.bg }};color:{{ d.st.fg }}">{{ d.st.text }}</span></span>
       </div>
     </sc-for>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.finance }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Finance</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">{{ finance.sub }}</div></div>
+    <sc-if value="{{ canEdit }}" hint-placeholder-val="{{ true }}"><div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ finance.newJv }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">New journal</button><button onClick="{{ finance.newExp }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Record expense</button><button onClick="{{ finance.capture }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Capture POS document</button></div></sc-if>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:14px">
+    <sc-for list="{{ finance.kpis }}" as="k" hint-placeholder-count="5">
+      <div onClick="{{ k.go }}" style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:16px 18px;cursor:pointer;min-width:0" style-hover="border-color:#B9BEF2;box-shadow:0 4px 16px rgba(1,14,207,.06)">
+        <div style="font-size:12.5px;color:#5B6270;font-weight:500">{{ k.label }}</div>
+        <div style="font-size:clamp(15px,1.25vw,21px);font-weight:700;letter-spacing:-.02em;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:{{ k.fg }}">{{ k.v }}</div>
+        <div style="font-size:11.5px;color:#7A8191;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ k.s }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px;margin-bottom:14px">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:16px 18px;min-width:0">
+      <div style="display:flex;align-items:baseline;gap:10px"><div style="font-weight:600">Cash and bank, last 30 days</div><div style="font-size:12px;color:#7A8191">{{ finance.cashSub }}</div></div>
+      <div style="display:flex;align-items:flex-end;gap:3px;height:160px;margin-top:16px">
+        <sc-for list="{{ finance.cash }}" as="b" hint-placeholder-count="30"><div title="{{ b.tip }}" style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;min-width:0"><span style="display:block;border-radius:3px 3px 0 0;background:{{ b.c }};height:{{ b.h }}"></span></div></sc-for>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#7A8191;margin-top:6px"><span>{{ finance.cashFrom }}</span><span>{{ finance.cashTo }}</span></div>
+    </div>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden;min-width:0">
+      <div onClick="{{ finance.goPl }}" style="display:flex;align-items:center;padding:13px 16px;border-bottom:1px solid #EEF0F3;cursor:pointer"><div style="font-weight:600">Profit and loss · {{ finance.plLabel }}</div><div style="margin-left:auto;font-size:12px;font-weight:600;color:#010ECF">Statements →</div></div>
+      <sc-for list="{{ finance.pl }}" as="r" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:10px 16px;font-size:13px;border-top:{{ r.bt }};background:{{ r.bg }}"><span style="font-weight:{{ r.fw }};color:{{ r.lfg }}">{{ r.label }}</span><span style="text-align:right;font-weight:{{ r.fw }};color:{{ r.fg }};white-space:nowrap">{{ r.v }}</span></div>
+      </sc-for>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden;min-width:0">
+      <div style="display:flex;align-items:center;padding:13px 16px;border-bottom:1px solid #EEF0F3"><div style="font-weight:600">Needs attention</div><span style="margin-left:8px;font-size:12px;color:#7A8191">{{ finance.taskCount }}</span></div>
+      <sc-for list="{{ finance.tasks }}" as="t" hint-placeholder-count="4">
+        <div onClick="{{ t.go }}" style="display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:12px;padding:11px 16px;border-bottom:1px solid #F2F3F5;align-items:center;cursor:pointer" style-hover="background:#F7F8FB"><span style="width:8px;height:8px;border-radius:50%;background:{{ t.dot }}"></span><div style="min-width:0"><div style="font-size:13px;font-weight:500">{{ t.text }}</div><div style="font-size:11.5px;color:#7A8191;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.sub }}</div></div><span style="font-size:12px;font-weight:600;color:#010ECF;white-space:nowrap">{{ t.cta }} →</span></div>
+      </sc-for>
+      <sc-if value="{{ finance.noTasks }}" hint-placeholder-val="{{ false }}"><div style="padding:28px 16px;text-align:center;font-size:13px;color:#7A8191">Nothing waiting. The books are up to date.</div></sc-if>
+    </div>
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:14px 16px;min-width:0">
+      <div style="display:flex;align-items:center;margin-bottom:14px"><div style="font-weight:600">Operating expenses · {{ finance.opexLabel }}</div><div onClick="{{ finance.goExp }}" style="margin-left:auto;font-size:12px;font-weight:600;color:#010ECF;cursor:pointer">Expenses →</div></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ finance.opex }}" as="b" hint-placeholder-count="6"><div style="display:grid;grid-template-columns:minmax(0,170px) 1fr 100px;gap:12px;align-items:center;font-size:12.5px"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#353B47">{{ b.label }}</span><span style="height:10px;background:#F1F2F5;border-radius:5px;overflow:hidden"><span style="display:block;height:100%;border-radius:5px;background:#010ECF;width:{{ b.pct }}"></span></span><span style="text-align:right;font-weight:600;white-space:nowrap">{{ b.v }}</span></div></sc-for>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.zreports }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:18px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Daily close</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">Z-reports from the Main Store POS · each closed shift posts its sales, tenders and cash count to the ledger</div></div>
+    <sc-if value="{{ canEdit }}" hint-placeholder-val="{{ true }}"><div style="margin-left:auto"><button onClick="{{ zreports.capture }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Capture Z-report</button></div></sc-if>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px">
+    <sc-for list="{{ zreports.kpis }}" as="k" hint-placeholder-count="4"><div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:14px 16px;min-width:0"><div style="font-size:12px;color:#5B6270">{{ k.label }}</div><div style="font-size:21px;font-weight:700;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:{{ k.fg }}">{{ k.v }}</div><div style="font-size:11.5px;color:#7A8191;margin-top:2px">{{ k.s }}</div></div></sc-for>
+  </div>
+  <sc-for list="{{ zreports.waiting }}" as="w" hint-placeholder-count="1">
+    <div style="display:flex;align-items:center;gap:14px;background:#FFF8F0;border:1px solid #F3D2A6;border-radius:12px;padding:14px 18px;margin-bottom:14px">
+      <span style="width:36px;height:36px;border-radius:10px;background:#FDF1DC;color:#8A5A00;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none">Z</span>
+      <div style="min-width:0"><div style="font-weight:600;font-size:13.5px">{{ w.title }}</div><div style="font-size:12.5px;color:#5B6270;margin-top:2px">{{ w.sub }}</div></div>
+      <sc-if value="{{ canEdit }}" hint-placeholder-val="{{ true }}"><button onClick="{{ w.capture }}" style="margin-left:auto;height:34px;padding:0 14px;border-radius:6px;border:1px solid #8A5A00;background:#fff;color:#8A5A00;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap">Capture now</button></sc-if>
+    </div>
+  </sc-for>
+  <div style="font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191;margin-bottom:10px">Z-reports</div>
+</sc-if>
+
+<sc-if value="{{ is.capture }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:18px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">POS capture</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px;max-width:760px">Photograph a Z-report, a POS receipt or a supplier bill. The text is read in your browser by OCR, checked against the POS feed and posted to the ledger.</div></div>
+    <sc-if value="{{ capture.hasImg }}" hint-placeholder-val="{{ false }}"><div style="margin-left:auto;display:flex;gap:8px"><button onClick="{{ capture.discard }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Discard and start over</button></div></sc-if>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:16px;align-items:start;margin-bottom:24px">
+    <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden;min-width:0">
+      <sc-if value="{{ capture.noImg }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:18px">
+          {{ capture.drop }}
+          <div style="margin-top:18px;font-size:11px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:#7A8191">No document to hand? Try a sample</div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px">
+            <sc-for list="{{ capture.samples }}" as="s" hint-placeholder-count="3"><button onClick="{{ s.pick }}" style="text-align:left;padding:11px 12px;border-radius:8px;border:1px solid #E1E3E8;background:#FAFBFC;cursor:pointer;min-width:0" style-hover="border-color:#010ECF;background:#fff"><div style="font-size:12.5px;font-weight:600;color:#0E1116">{{ s.title }}</div><div style="font-size:11.5px;color:#7A8191;margin-top:2px;line-height:1.35">{{ s.sub }}</div></button></sc-for>
+          </div>
+          <div style="margin-top:14px;font-size:12px;color:#7A8191;line-height:1.5">{{ capture.privacy }}</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ capture.hasImg }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #EEF0F3">
+          <div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ capture.name }}</div><div style="font-size:11.5px;color:#7A8191">{{ capture.imgNote }}</div></div>
+          <div style="display:flex;gap:2px;padding:3px;background:#F1F2F5;border-radius:7px;flex:none"><sc-for list="{{ capture.views }}" as="v" hint-placeholder-count="2"><button onClick="{{ v.pick }}" style="height:26px;padding:0 10px;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;background:{{ v.bg }};color:{{ v.fg }};box-shadow:{{ v.sh }}">{{ v.label }}</button></sc-for></div>
+          <button onClick="{{ capture.rerun }}" style="height:32px;padding:0 11px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:12px;font-weight:600;cursor:pointer;flex:none">Read again</button>
+        </div>
+        <div style="max-height:760px;overflow:auto;background:#E9EBEF">{{ capture.viewer }}</div>
+      </sc-if>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+      <sc-if value="{{ capture.idle }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:18px 20px">
+          <div style="font-weight:600;margin-bottom:12px">How capture works</div>
+          <sc-for list="{{ capture.steps }}" as="s" hint-placeholder-count="3"><div style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;padding:8px 0;align-items:start"><span style="width:26px;height:26px;border-radius:50%;background:rgba(1,14,207,.08);color:#010ECF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ s.n }}</span><div><div style="font-size:13px;font-weight:600">{{ s.title }}</div><div style="font-size:12.5px;color:#5B6270;line-height:1.5;margin-top:2px">{{ s.text }}</div></div></div></sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ capture.busy }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:22px 20px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:10px;height:10px;border-radius:50%;background:#010ECF;box-shadow:0 0 0 4px rgba(1,14,207,.15)"></span><div style="font-weight:600">{{ capture.progTitle }}</div><span style="margin-left:auto;font-size:12.5px;font-weight:600;color:#010ECF">{{ capture.progPctText }}</span></div>
+          <div style="height:8px;border-radius:4px;background:#EEF0F3;overflow:hidden;margin-top:14px"><span style="display:block;height:100%;border-radius:4px;background:#010ECF;width:{{ capture.progPct }};transition:width .2s"></span></div>
+          <div style="font-size:12.5px;color:#5B6270;margin-top:10px;line-height:1.5">{{ capture.progSub }}</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ capture.isErr }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border:1px solid #F3B2AB;border-radius:12px;padding:20px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:32px;height:32px;border-radius:9px;background:#FDE7E5;color:#B42318;display:flex;align-items:center;justify-content:center;font-weight:800">!</span><div style="font-weight:650">Couldn’t read this document</div></div>
+          <div style="font-size:13px;color:#4A5160;margin-top:10px;line-height:1.5">{{ capture.err }}</div>
+          <div style="display:flex;gap:8px;margin-top:14px"><button onClick="{{ capture.rerun }}" style="height:34px;padding:0 14px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:12.5px;font-weight:600;cursor:pointer">Try again</button><button onClick="{{ capture.manual }}" style="height:34px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer">Enter the values by hand</button></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ capture.done }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid #EEF0F3;flex-wrap:wrap">
+            <div style="font-weight:600">Extracted data</div>
+            <span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ capture.confBg }};color:{{ capture.confFg }}">{{ capture.confText }}</span>
+            <div style="margin-left:auto;display:flex;gap:2px;padding:3px;background:#F1F2F5;border-radius:7px"><sc-for list="{{ capture.types }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.pick }}" style="height:26px;padding:0 10px;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;background:{{ t.bg }};color:{{ t.fg }};box-shadow:{{ t.sh }}">{{ t.label }}</button></sc-for></div>
+          </div>
+          <div style="padding:8px 16px;font-size:11.5px;color:#7A8191;border-bottom:1px solid #F2F3F5;background:#FAFBFC">{{ capture.engineLine }}</div>
+          <sc-for list="{{ capture.fields }}" as="f" hint-placeholder-count="8">
+            <div onClick="{{ f.focus }}" style="display:grid;grid-template-columns:150px minmax(0,1fr) 88px;gap:12px;padding:7px 16px;align-items:center;border-bottom:1px solid #F2F3F5;background:{{ f.bg }};cursor:pointer">
+              <div style="min-width:0"><div style="font-size:12.5px;font-weight:600;color:#353B47">{{ f.label }}</div><div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#9AA0AC;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="{{ f.raw }}">{{ f.raw }}</div></div>
+              <div style="min-width:0">
+                <sc-if value="{{ f.isSel }}" hint-placeholder-val="{{ false }}">{{ f.sel }}</sc-if>
+                <sc-if value="{{ f.isInput }}" hint-placeholder-val="{{ true }}"><input type="{{ f.itype }}" value="{{ f.v }}" onChange="{{ f.set }}" placeholder="{{ f.ph }}" style="width:100%;box-sizing:border-box;height:32px;border:1px solid {{ f.bd }};border-radius:6px;padding:0 10px;font-size:13px;font-weight:600;text-align:{{ f.align }};font-family:{{ f.ff }}"></sc-if>
+              </div>
+              <span style="justify-self:end;display:inline-flex;height:20px;padding:0 8px;border-radius:10px;align-items:center;font-size:11px;font-weight:600;white-space:nowrap;background:{{ f.cBg }};color:{{ f.cFg }}">{{ f.cText }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ capture.isZ }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">
+            <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden;min-width:0">
+              <div style="padding:12px 16px;border-bottom:1px solid #EEF0F3;font-weight:600">Arithmetic checks</div>
+              <sc-for list="{{ capture.checks }}" as="c" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;padding:9px 16px;border-bottom:1px solid #F2F3F5;align-items:start"><span style="width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:{{ c.bg }};color:{{ c.fg }}">{{ c.mark }}</span><div style="min-width:0"><div style="font-size:12.5px;font-weight:500">{{ c.label }}</div><div style="font-size:11.5px;color:#7A8191;font-family:'JetBrains Mono',monospace">{{ c.detail }}</div></div></div></sc-for>
+            </div>
+            <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden;min-width:0">
+              <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #EEF0F3"><span style="font-weight:600">Against the POS feed</span><span style="margin-left:auto;display:inline-flex;height:20px;padding:0 8px;border-radius:10px;align-items:center;font-size:11px;font-weight:600;background:{{ capture.feedBg }};color:{{ capture.feedFg }}">{{ capture.feedChip }}</span></div>
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) 72px 72px 60px;gap:8px;padding:7px 16px;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191;background:#FAFBFC;border-bottom:1px solid #EEF0F3"><span>KWD</span><span style="text-align:right">Z-report</span><span style="text-align:right">POS feed</span><span style="text-align:right">Diff</span></div>
+              <sc-for list="{{ capture.compare }}" as="r" hint-placeholder-count="5"><div style="display:grid;grid-template-columns:minmax(0,1fr) 72px 72px 60px;gap:8px;padding:8px 16px;font-size:12.5px;border-bottom:1px solid #F2F3F5"><span style="color:#353B47">{{ r.label }}</span><span style="text-align:right;font-weight:600">{{ r.z }}</span><span style="text-align:right;color:#5B6270">{{ r.feed }}</span><span style="text-align:right;font-weight:600;color:{{ r.fg }}">{{ r.diff }}</span></div></sc-for>
+              <div style="padding:9px 16px;font-size:11.5px;color:#5B6270;line-height:1.45">{{ capture.feedNote }}</div>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ capture.isR }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+            <div style="padding:12px 16px;border-bottom:1px solid #EEF0F3;font-weight:600">Item lines</div>
+            <div style="display:grid;grid-template-columns:minmax(0,1.6fr) 54px 76px 80px 92px;gap:8px;padding:7px 16px;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191;background:#FAFBFC;border-bottom:1px solid #EEF0F3"><span>Item</span><span style="text-align:right">Qty</span><span style="text-align:right">Price</span><span style="text-align:right">Amount</span><span style="text-align:right">Match</span></div>
+            <sc-for list="{{ capture.items }}" as="l" hint-placeholder-count="3"><div style="display:grid;grid-template-columns:minmax(0,1.6fr) 54px 76px 80px 92px;gap:8px;padding:7px 16px;font-size:12.5px;align-items:center;border-bottom:1px solid #F2F3F5"><div style="min-width:0">{{ l.sel }}<div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#9AA0AC;margin-top:2px">Read as {{ l.raw }}</div></div><input value="{{ l.qty }}" onChange="{{ l.setQty }}" style="width:100%;box-sizing:border-box;height:30px;border:1px solid #D9DCE2;border-radius:6px;text-align:right;padding:0 6px;font-size:12.5px"><span style="text-align:right">{{ l.price }}</span><span style="text-align:right;font-weight:600">{{ l.amount }}</span><span style="justify-self:end;display:inline-flex;height:20px;padding:0 8px;border-radius:10px;align-items:center;font-size:11px;font-weight:600;background:{{ l.cBg }};color:{{ l.cFg }}">{{ l.cText }}</span></div></sc-for>
+            <sc-if value="{{ capture.noItems }}" hint-placeholder-val="{{ false }}"><div style="padding:14px 16px;font-size:12.5px;color:#B42318">No item lines found. Check the photo or read it again.</div></sc-if>
+            <div style="display:flex;padding:9px 16px;font-size:12.5px;background:#FAFBFC"><span style="color:#5B6270">{{ capture.itemSumText }}</span><span style="margin-left:auto;font-weight:600;color:{{ capture.itemSumFg }}">{{ capture.itemSumNote }}</span></div>
+          </div>
+          <div style="border-radius:12px;padding:13px 16px;font-size:13px;line-height:1.5;background:{{ capture.rBg }};color:{{ capture.rFg }};border:1px solid {{ capture.rBd }}"><div style="font-weight:650">{{ capture.rTitle }}</div><div style="margin-top:2px">{{ capture.rText }}</div></div>
+        </sc-if>
+        <sc-if value="{{ capture.hasJournal }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #EEF0F3"><span style="font-weight:600">Ledger entries to post</span><span style="font-size:12px;color:#7A8191">{{ capture.jRef }}</span><span style="margin-left:auto;display:inline-flex;height:20px;padding:0 8px;border-radius:10px;align-items:center;font-size:11px;font-weight:600;background:{{ capture.jBg }};color:{{ capture.jFg }}">{{ capture.jChip }}</span></div>
+            <sc-for list="{{ capture.journal }}" as="e" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:minmax(0,1fr) 90px 90px;gap:10px;padding:8px 16px;font-size:12.5px;border-bottom:1px solid #F2F3F5;background:{{ e.bg }}"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:{{ e.ind }};color:{{ e.fg }};font-weight:{{ e.fw }}">{{ e.acct }}</span><span style="text-align:right;font-weight:{{ e.fw }}">{{ e.dr }}</span><span style="text-align:right;font-weight:{{ e.fw }}">{{ e.cr }}</span></div></sc-for>
+          </div>
+        </sc-if>
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:14px 16px">
+          <sc-if value="{{ capture.needNote }}" hint-placeholder-val="{{ false }}"><label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160;margin-bottom:12px"><span>{{ capture.noteLabel }}</span><textarea value="{{ capture.note }}" onChange="{{ capture.setNote }}" placeholder="Visible in the audit log" style="min-height:58px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:8px 10px;font-size:13px;resize:vertical"></textarea></label></sc-if>
+          <div style="display:flex;align-items:center;gap:10px">
+            <button onClick="{{ capture.toggleText }}" style="height:34px;padding:0 12px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer">{{ capture.textLabel }}</button>
+            <div style="flex:1;min-width:0;font-size:12px;line-height:1.4;color:{{ capture.blockFg }}">{{ capture.blockText }}</div>
+            <sc-if value="{{ canEdit }}" hint-placeholder-val="{{ true }}"><button onClick="{{ capture.post }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;opacity:{{ capture.postOp }}">{{ capture.postLabel }}</button></sc-if>
+          </div>
+          <sc-if value="{{ capture.showText }}" hint-placeholder-val="{{ false }}"><pre style="margin:12px 0 0;background:#0E1116;color:#C9F2DA;border-radius:8px;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.55;white-space:pre-wrap;max-height:300px;overflow:auto">{{ capture.text }}</pre></sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+  <div style="font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191;margin-bottom:10px">Capture history</div>
+</sc-if>
+
+<sc-if value="{{ is.expenses }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:18px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Expenses</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">Rent, payroll, utilities and other operating costs · paid from bank or petty cash, or accrued until paid</div></div>
+    <sc-if value="{{ canEdit }}" hint-placeholder-val="{{ true }}"><div style="margin-left:auto;display:flex;gap:8px"><button onClick="{{ expenses.scan }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Scan a bill</button><button onClick="{{ expenses.add }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Record expense</button></div></sc-if>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px">
+    <sc-for list="{{ expenses.kpis }}" as="k" hint-placeholder-count="4"><div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:14px 16px;min-width:0"><div style="font-size:12px;color:#5B6270">{{ k.label }}</div><div style="font-size:21px;font-weight:700;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:{{ k.fg }}">{{ k.v }}</div><div style="font-size:11.5px;color:#7A8191;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ k.s }}</div></div></sc-for>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.journals }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:18px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Journal entries</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">Manual journals for month-end, corrections and accruals · every journal must balance and cannot be dated in a closed period</div></div>
+    <sc-if value="{{ canEdit }}" hint-placeholder-val="{{ true }}"><div style="margin-left:auto"><button onClick="{{ journals.add }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">New journal entry</button></div></sc-if>
+  </div>
+  <sc-if value="{{ journals.hasDue }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #C9CEF5;border-radius:12px;padding:14px 18px;margin-bottom:16px">
+      <span style="width:36px;height:36px;border-radius:10px;background:rgba(1,14,207,.08);color:#010ECF;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none">JV</span>
+      <div style="min-width:0"><div style="font-weight:600;font-size:13.5px">{{ journals.dueTitle }}</div><div style="font-size:12.5px;color:#5B6270;margin-top:2px">{{ journals.dueText }}</div></div>
+      <sc-if value="{{ canEdit }}" hint-placeholder-val="{{ true }}"><button onClick="{{ journals.useDue }}" style="margin-left:auto;height:34px;padding:0 14px;border-radius:6px;border:1px solid #010ECF;background:#fff;color:#010ECF;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap">Prepare journal</button></sc-if>
+    </div>
+  </sc-if>
+</sc-if>
+
+<sc-if value="{{ is.jvNew }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ jvNew.back }}" style="font-size:12.5px;color:#010ECF;font-weight:600;cursor:pointer;margin-bottom:10px">← Journal entries</div>
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:18px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">New journal entry</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">{{ jvNew.sub }}</div></div>
+    <div style="margin-left:auto;display:flex;gap:8px"><button onClick="{{ jvNew.back }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Cancel</button><button onClick="{{ jvNew.post }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer;opacity:{{ jvNew.postOp }}">Post journal</button></div>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:16px 18px;margin-bottom:14px;display:grid;grid-template-columns:180px minmax(0,1fr);gap:14px">
+    <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160"><span>Date</span><input type="date" value="{{ jvNew.date }}" onChange="{{ jvNew.setDate }}" style="height:36px;box-sizing:border-box;border:1px solid {{ jvNew.dateBd }};border-radius:6px;padding:0 10px;font-size:13px"></label>
+    <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160"><span>Narration</span><input value="{{ jvNew.memo }}" onChange="{{ jvNew.setMemo }}" placeholder="What is this journal for?" style="height:36px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:0 10px;font-size:13px"></label>
+    <div style="grid-column:1 / -1;font-size:12px;color:{{ jvNew.dateFg }}">{{ jvNew.dateNote }}</div>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+    <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 130px 130px 40px;gap:12px;padding:0 18px;height:36px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><span>Account</span><span>Line memo</span><span style="text-align:right">Debit KWD</span><span style="text-align:right">Credit KWD</span><span></span></div>
+    <sc-for list="{{ jvNew.lines }}" as="l" hint-placeholder-count="2">
+      <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 130px 130px 40px;gap:12px;padding:8px 18px;align-items:center;border-bottom:1px solid #F2F3F5">
+        <div style="min-width:0">{{ l.picker }}</div>
+        <input value="{{ l.memo }}" onChange="{{ l.setMemo }}" placeholder="Optional" style="height:34px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:0 10px;font-size:13px;min-width:0">
+        <input value="{{ l.dr }}" onChange="{{ l.setDr }}" placeholder="0.000" style="height:34px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:0 10px;font-size:13px;text-align:right">
+        <input value="{{ l.cr }}" onChange="{{ l.setCr }}" placeholder="0.000" style="height:34px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:0 10px;font-size:13px;text-align:right">
+        <button onClick="{{ l.remove }}" title="Remove line" style="width:32px;height:32px;border:none;background:transparent;font-size:18px;color:#9AA0AC;cursor:pointer">×</button>
+      </div>
+    </sc-for>
+    <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 130px 130px 40px;gap:12px;padding:0 18px;min-height:48px;align-items:center;background:#FAFBFC;font-size:13px;font-weight:700">
+      <div><button onClick="{{ jvNew.addLine }}" style="height:30px;padding:0 12px;border-radius:6px;border:1px dashed #B7BCC6;background:#fff;font-size:12.5px;font-weight:600;color:#010ECF;cursor:pointer">+ Add line</button></div>
+      <span style="display:flex;justify-content:flex-end"><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ jvNew.balBg }};color:{{ jvNew.balFg }}">{{ jvNew.balText }}</span></span>
+      <span style="text-align:right">{{ jvNew.tDr }}</span><span style="text-align:right">{{ jvNew.tCr }}</span><span></span>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.bankrec }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:18px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Bank reconciliation</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">{{ bankrec.sub }}</div></div>
+    <sc-if value="{{ canEdit }}" hint-placeholder-val="{{ true }}"><div style="margin-left:auto;display:flex;gap:8px"><button onClick="{{ bankrec.importStmt }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Import statement</button><button onClick="{{ bankrec.auto }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Auto-match</button></div></sc-if>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px">
+    <sc-for list="{{ bankrec.kpis }}" as="k" hint-placeholder-count="4"><div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:14px 16px;min-width:0"><div style="font-size:12px;color:#5B6270">{{ k.label }}</div><div style="font-size:21px;font-weight:700;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:{{ k.fg }}">{{ k.v }}</div><div style="font-size:11.5px;color:#7A8191;margin-top:2px">{{ k.s }}</div></div></sc-for>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:8px;padding:13px 18px;border-bottom:1px solid #EEF0F3"><span style="font-weight:600">Reconciliation at {{ bankrec.asAt }}</span><span style="margin-left:auto;display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ bankrec.recBg }};color:{{ bankrec.recFg }}">{{ bankrec.recChip }}</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr">
+      <div style="border-right:1px solid #EEF0F3"><sc-for list="{{ bankrec.left }}" as="r" hint-placeholder-count="3"><div style="display:flex;padding:9px 18px;font-size:13px;border-top:{{ r.bt }};font-weight:{{ r.fw }}"><span style="color:{{ r.lfg }}">{{ r.label }}</span><span style="margin-left:auto">{{ r.v }}</span></div></sc-for></div>
+      <div><sc-for list="{{ bankrec.right }}" as="r" hint-placeholder-count="3"><div style="display:flex;padding:9px 18px;font-size:13px;border-top:{{ r.bt }};font-weight:{{ r.fw }}"><span style="color:{{ r.lfg }}">{{ r.label }}</span><span style="margin-left:auto">{{ r.v }}</span></div></sc-for></div>
+    </div>
+  </div>
+  <div style="font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191;margin-bottom:10px">Statement lines · click a line to match it</div>
+</sc-if>
+
+<sc-if value="{{ is.statements }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Financial statements</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">{{ statements.sub }}</div></div>
+    <div style="margin-left:auto;display:flex;gap:2px;padding:3px;background:#E9EBEF;border-radius:8px"><sc-for list="{{ statements.tabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.pick }}" style="height:28px;padding:0 14px;border:none;border-radius:6px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ t.bg }};color:{{ t.fg }};box-shadow:{{ t.sh }}">{{ t.label }}</button></sc-for></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+    <div style="display:flex;gap:2px;padding:3px;background:#E9EBEF;border-radius:8px"><sc-for list="{{ statements.periods }}" as="p" hint-placeholder-count="5"><button onClick="{{ p.pick }}" style="height:28px;padding:0 11px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:{{ p.bg }};color:{{ p.fg }};box-shadow:{{ p.sh }}">{{ p.label }}</button></sc-for></div>
+    <sc-if value="{{ statements.isCustom }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:6px;align-items:center"><sc-if value="{{ statements.hasFrom }}" hint-placeholder-val="{{ true }}"><input type="date" value="{{ statements.from }}" onChange="{{ statements.setFrom }}" style="height:32px;border:1px solid #D9DCE2;border-radius:6px;padding:0 8px;font-size:12.5px"><span style="color:#9AA0AC">–</span></sc-if><input type="date" value="{{ statements.to }}" onChange="{{ statements.setTo }}" style="height:32px;border:1px solid #D9DCE2;border-radius:6px;padding:0 8px;font-size:12.5px"></div></sc-if>
+    <div style="margin-left:auto;display:flex;gap:6px"><button onClick="{{ statements.csv }}" style="height:34px;padding:0 12px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer">Export CSV</button><button onClick="{{ statements.print }}" style="height:34px;padding:0 12px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer">Print</button></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px">
+    <sc-for list="{{ statements.kpis }}" as="k" hint-placeholder-count="4"><div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:14px 16px;min-width:0"><div style="font-size:12px;color:#5B6270">{{ k.label }}</div><div style="font-size:21px;font-weight:700;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:{{ k.fg }}">{{ k.v }}</div><div style="font-size:11.5px;color:#7A8191;margin-top:2px">{{ k.s }}</div></div></sc-for>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+    <div style="display:grid;grid-template-columns:{{ statements.grid }};gap:14px;padding:0 20px;height:38px;align-items:center;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191"><sc-for list="{{ statements.head }}" as="h" hint-placeholder-count="4"><span style="text-align:{{ h.align }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ h.label }}</span></sc-for></div>
+    <sc-for list="{{ statements.rows }}" as="r" hint-placeholder-count="14">
+      <div onClick="{{ r.open }}" style="display:grid;grid-template-columns:{{ statements.grid }};gap:14px;padding:0 20px;min-height:{{ r.h }};align-items:center;font-size:13px;border-top:{{ r.bt }};background:{{ r.bg }};cursor:{{ r.cur }}">
+        <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="4"><span style="text-align:{{ c.align }};font-weight:{{ r.fw }};color:{{ c.fg }};padding-left:{{ c.ind }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:{{ r.fs }};letter-spacing:{{ r.ls }};text-transform:{{ r.tt }}">{{ c.v }}</span></sc-for>
+      </div>
+    </sc-for>
+  </div>
+  <div style="font-size:12px;color:#7A8191;margin-top:10px">{{ statements.foot }}</div>
+</sc-if>
+
+<sc-if value="{{ is.close }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:18px">
+    <div><h1 style="margin:0;font-size:28px;font-weight:650;letter-spacing:-.025em">Period close</h1><div style="margin-top:6px;color:#5B6270;font-size:13.5px">{{ close.sub }}</div></div>
+    <sc-if value="{{ canEdit }}" hint-placeholder-val="{{ true }}"><div style="margin-left:auto"><button onClick="{{ close.closeIt }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer;opacity:{{ close.closeOp }}">{{ close.closeLabel }}</button></div></sc-if>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;padding:16px 18px;margin-bottom:14px">
+    <div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:22px;font-weight:700">{{ close.progress }}</span><span style="font-size:13px;color:#5B6270">{{ close.progressSub }}</span><span style="margin-left:auto;display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:{{ close.lockBg }};color:{{ close.lockFg }}">{{ close.lockText }}</span></div>
+    <div style="height:8px;border-radius:4px;background:#EEF0F3;overflow:hidden;margin-top:12px"><span style="display:block;height:100%;border-radius:4px;background:#1B9A4A;width:{{ close.pct }}"></span></div>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden;margin-bottom:16px">
+    <sc-for list="{{ close.steps }}" as="s" hint-placeholder-count="6">
+      <div style="display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:14px;padding:14px 18px;border-bottom:1px solid #F2F3F5;align-items:center">
+        <span style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;background:{{ s.bg }};color:{{ s.fg }}">{{ s.mark }}</span>
+        <div style="min-width:0"><div style="font-size:13.5px;font-weight:600">{{ s.title }}</div><div style="font-size:12.5px;color:#5B6270;margin-top:2px;line-height:1.45">{{ s.detail }}</div></div>
+        <sc-if value="{{ s.hasAct }}" hint-placeholder-val="{{ false }}"><button onClick="{{ s.act }}" style="height:32px;padding:0 13px;border-radius:6px;border:1px solid #010ECF;background:#fff;color:#010ECF;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap">{{ s.actLabel }}</button></sc-if>
+      </div>
+    </sc-for>
+  </div>
+  <div style="font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7A8191;margin-bottom:10px">Closed periods</div>
+  <div style="background:#fff;border:1px solid #E6E8EC;border-radius:12px;overflow:hidden">
+    <sc-for list="{{ close.closed }}" as="c" hint-placeholder-count="1"><div style="display:grid;grid-template-columns:160px minmax(0,1fr) auto;gap:14px;padding:12px 18px;border-bottom:1px solid #F2F3F5;font-size:13px;align-items:center"><span style="font-weight:600">{{ c.label }}</span><span style="color:#5B6270">{{ c.sub }}</span><span style="display:inline-flex;height:22px;padding:0 9px;border-radius:11px;align-items:center;font-size:11.5px;font-weight:600;background:#EEF0F3;color:#4A5160">Locked</span></div></sc-for>
   </div>
 </sc-if>
 
@@ -1095,6 +1391,61 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(1,14,207,.35);out
     </div>
   </div>
 </sc-if>
+<sc-if value="{{ expOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(14,17,22,.45);display:flex;align-items:center;justify-content:center;z-index:60">
+    <div style="width:560px;max-width:calc(100vw - 40px);max-height:calc(100vh - 40px);overflow:auto;background:#fff;border-radius:14px;box-shadow:0 24px 64px rgba(14,17,22,.3)">
+      <div style="padding:18px 22px;border-bottom:1px solid #EEF0F3;display:flex;align-items:center"><div><div style="font-size:17px;font-weight:650">Record expense</div><div style="font-size:12.5px;color:#5B6270;margin-top:4px">{{ em.sub }}</div></div><button onClick="{{ em.close }}" style="margin-left:auto;width:30px;height:30px;border:none;background:transparent;font-size:18px;color:#7A8191;cursor:pointer">×</button></div>
+      <div style="padding:18px 22px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160"><span>Supplier or payee</span><input value="{{ em.payee }}" onChange="{{ em.setPayee }}" placeholder="e.g. Zain Kuwait" style="height:36px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:0 10px;font-size:13px"></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160"><span>Bill date</span><input type="date" value="{{ em.date }}" onChange="{{ em.setDate }}" style="height:36px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:0 10px;font-size:13px"></label>
+        <label style="grid-column:1 / -1;display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160"><span>Description</span><input value="{{ em.desc }}" onChange="{{ em.setDesc }}" placeholder="What was bought or paid for" style="height:36px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:0 10px;font-size:13px"></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160"><span>Expense account</span>{{ em.acct }}</label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160"><span>Amount KWD</span><input value="{{ em.amount }}" onChange="{{ em.setAmount }}" placeholder="0.000" style="height:36px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:0 10px;font-size:15px;font-weight:650"></label>
+        <div style="grid-column:1 / -1;display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160"><span>Paid from</span><div style="display:flex;gap:4px;padding:3px;background:#F1F2F5;border-radius:7px;align-self:flex-start"><sc-for list="{{ em.methods }}" as="m" hint-placeholder-count="3"><button onClick="{{ m.pick }}" style="height:30px;padding:0 14px;border:none;border-radius:5px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ m.bg }};color:{{ m.fg }};box-shadow:{{ m.sh }}">{{ m.label }}</button></sc-for></div></div>
+        <sc-if value="{{ em.isUnpaid }}" hint-placeholder-val="{{ false }}"><label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4A5160"><span>Due date</span><input type="date" value="{{ em.due }}" onChange="{{ em.setDue }}" style="height:36px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:0 10px;font-size:13px"></label></sc-if>
+        <div style="grid-column:1 / -1;padding:11px 13px;border-radius:8px;background:rgba(1,14,207,.06);font-size:12.5px;color:#1C2470;line-height:1.5">{{ em.posting }}</div>
+        <sc-if value="{{ em.fromOcr }}" hint-placeholder-val="{{ false }}"><div style="grid-column:1 / -1;font-size:12px;color:#1B7A3A;font-weight:500">{{ em.ocrNote }}</div></sc-if>
+      </div>
+      <div style="padding:14px 22px;border-top:1px solid #EEF0F3;display:flex;justify-content:flex-end;gap:8px;background:#FAFBFC"><button onClick="{{ em.close }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Cancel</button><button onClick="{{ em.save }}" style="height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Record expense</button></div>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ recOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(14,17,22,.45);display:flex;align-items:center;justify-content:center;z-index:60">
+    <div style="width:640px;max-width:calc(100vw - 40px);max-height:calc(100vh - 40px);overflow:auto;background:#fff;border-radius:14px;box-shadow:0 24px 64px rgba(14,17,22,.3)">
+      <div style="padding:18px 22px;border-bottom:1px solid #EEF0F3;display:flex;align-items:flex-start;gap:12px">
+        <div style="min-width:0"><div style="font-size:11.5px;color:#7A8191;font-weight:600;letter-spacing:.04em;text-transform:uppercase">{{ rm.kind }}</div><div style="font-size:16px;font-weight:650;margin-top:2px">{{ rm.desc }}</div><div style="font-size:12.5px;color:#5B6270;margin-top:3px">{{ rm.sub }}</div></div>
+        <div style="margin-left:auto;text-align:right"><div style="font-size:20px;font-weight:700;color:{{ rm.amtFg }};white-space:nowrap">{{ rm.amt }}</div><span style="display:inline-flex;margin-top:4px;height:20px;padding:0 8px;border-radius:10px;align-items:center;font-size:11px;font-weight:600;background:{{ rm.st.bg }};color:{{ rm.st.fg }}">{{ rm.st.text }}</span></div>
+      </div>
+      <sc-if value="{{ rm.isMatched }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:16px 22px">
+          <div style="font-size:11px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:#7A8191;margin-bottom:8px">Matched ledger entry</div>
+          <div style="display:grid;grid-template-columns:96px 130px minmax(0,1fr) auto;gap:10px;padding:11px 14px;border:1px solid #A6DDB7;background:#F1FAF4;border-radius:8px;font-size:12.5px;align-items:center"><span>{{ rm.m.date }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ rm.m.ref }}</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#4A5160">{{ rm.m.memo }}</span><span style="font-weight:650">{{ rm.m.amt }}</span></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ rm.isOpen }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:16px 22px 6px">
+          <div style="font-size:11px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:#7A8191;margin-bottom:8px">Ledger entries on account 1110 that could match</div>
+          <sc-for list="{{ rm.cands }}" as="c" hint-placeholder-count="2"><div style="display:grid;grid-template-columns:90px 120px minmax(0,1fr) 92px 74px;gap:10px;padding:9px 12px;border:1px solid {{ c.bd }};background:{{ c.bg }};border-radius:8px;font-size:12.5px;align-items:center;margin-bottom:6px"><span>{{ c.date }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ c.ref }}</span><div style="min-width:0"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#4A5160">{{ c.memo }}</div><div style="font-size:11px;font-weight:600;color:{{ c.hintFg }}">{{ c.hint }}</div></div><span style="text-align:right;font-weight:650">{{ c.amt }}</span><button onClick="{{ c.match }}" style="height:28px;border-radius:6px;border:1px solid #010ECF;background:#fff;color:#010ECF;font-size:12px;font-weight:600;cursor:pointer">Match</button></div></sc-for>
+          <sc-if value="{{ rm.noCands }}" hint-placeholder-val="{{ false }}"><div style="padding:12px 14px;border:1px dashed #D9DCE2;border-radius:8px;font-size:12.5px;color:#5B6270">No unmatched ledger entry with a similar amount and date. If the bank is right, post the entry below.</div></sc-if>
+        </div>
+        <div style="padding:10px 22px 18px">
+          <div style="font-size:11px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:#7A8191;margin:8px 0">Not in the books yet? Post it from the statement</div>
+          <div style="border:1px solid #E6E8EC;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px"><label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:#4A5160"><span>Other side of the entry</span>{{ rm.acct }}</label><label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:#4A5160"><span>Memo</span><input value="{{ rm.memo }}" onChange="{{ rm.setMemo }}" style="height:34px;box-sizing:border-box;border:1px solid #D9DCE2;border-radius:6px;padding:0 10px;font-size:13px"></label></div>
+            <sc-for list="{{ rm.preview }}" as="p" hint-placeholder-count="2"><div style="display:grid;grid-template-columns:minmax(0,1fr) 90px 90px;gap:10px;font-size:12.5px;color:#353B47"><span>{{ p.acct }}</span><span style="text-align:right">{{ p.dr }}</span><span style="text-align:right">{{ p.cr }}</span></div></sc-for>
+            <div style="font-size:12px;color:{{ rm.hintFg }}">{{ rm.hint }}</div>
+          </div>
+        </div>
+      </sc-if>
+      <div style="padding:14px 22px;border-top:1px solid #EEF0F3;display:flex;gap:8px;background:#FAFBFC">
+        <button onClick="{{ rm.close }}" style="height:36px;padding:0 14px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Close</button>
+        <sc-if value="{{ rm.isMatched }}" hint-placeholder-val="{{ false }}"><sc-if value="{{ canEdit }}" hint-placeholder-val="{{ true }}"><button onClick="{{ rm.unmatch }}" style="margin-left:auto;height:36px;padding:0 16px;border-radius:6px;border:1px solid #F3B2AB;background:#FDF3F2;color:#B42318;font-size:13px;font-weight:600;cursor:pointer">Unmatch</button></sc-if></sc-if>
+        <sc-if value="{{ rm.isOpen }}" hint-placeholder-val="{{ true }}"><sc-if value="{{ canEdit }}" hint-placeholder-val="{{ true }}"><button onClick="{{ rm.create }}" style="margin-left:auto;height:36px;padding:0 16px;border-radius:6px;border:none;background:#010ECF;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Post entry and match</button></sc-if></sc-if>
+      </div>
+    </div>
+  </div>
+</sc-if>
 <sc-if value="{{ drawer.show }}" hint-placeholder-val="{{ false }}">
   <div onClick="{{ drawer.close }}" style="position:fixed;inset:0;background:rgba(14,17,22,.32);z-index:58"></div>
   <div style="position:fixed;top:0;right:0;bottom:0;width:480px;max-width:100vw;background:#fff;z-index:59;box-shadow:-20px 0 60px rgba(14,17,22,.18);display:flex;flex-direction:column">
@@ -1106,7 +1457,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(1,14,207,.35);out
       <div style="padding:16px 22px 4px;font-size:11px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:#7A8191">Activity history</div>
       <sc-for list="{{ drawer.act }}" as="a" hint-placeholder-count="2"><div style="display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;padding:9px 22px;align-items:center"><span style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:{{ a.bg }};color:{{ a.fg }}">{{ a.ini }}</span><div style="min-width:0"><div style="font-size:12.5px"><span style="font-weight:600">{{ a.user }}</span><span style="color:#4A5160"> · {{ a.action }}</span></div><div style="font-size:11.5px;color:#7A8191">{{ a.detail }}</div></div><span style="font-size:11.5px;color:#5B6270;white-space:nowrap">{{ a.date }}</span></div></sc-for>
     </div>
-    <sc-if value="{{ drawer.hasLink }}" hint-placeholder-val="{{ false }}"><div style="padding:14px 22px;border-top:1px solid #EEF0F3"><button onClick="{{ drawer.link }}" style="width:100%;height:38px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">{{ drawer.linkLabel }}</button></div></sc-if>
+    <sc-if value="{{ drawer.hasLink }}" hint-placeholder-val="{{ false }}"><div style="padding:14px 22px;border-top:1px solid #EEF0F3;display:flex;gap:8px"><button onClick="{{ drawer.link }}" style="flex:1;height:38px;border-radius:6px;border:1px solid #D9DCE2;background:#fff;font-size:13px;font-weight:600;cursor:pointer">{{ drawer.linkLabel }}</button><sc-if value="{{ drawer.hasLink2 }}" hint-placeholder-val="{{ false }}"><button onClick="{{ drawer.link2 }}" style="flex:1;height:38px;border-radius:6px;border:none;background:{{ drawer.link2Bg }};color:#fff;font-size:13px;font-weight:600;cursor:pointer">{{ drawer.link2Label }}</button></sc-if></div></sc-if>
   </div>
 </sc-if>
 <sc-if value="{{ approval.show }}" hint-placeholder-val="{{ false }}">
@@ -1183,17 +1534,17 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(1,14,207,.35);out
   </sc-for>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;reorderPoint&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:8,&quot;min&quot;:1,&quot;max&quot;:30,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;dashboard&quot;,&quot;options&quot;:[&quot;dashboard&quot;,&quot;items&quot;,&quot;pos&quot;,&quot;grn&quot;,&quot;transfers&quot;,&quot;counts&quot;,&quot;writeoffs&quot;,&quot;rates&quot;,&quot;invoices&quot;,&quot;ledger&quot;,&quot;users&quot;,&quot;devices&quot;,&quot;reports&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behaviour&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;reorderPoint&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:8,&quot;min&quot;:1,&quot;max&quot;:30,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;dashboard&quot;,&quot;options&quot;:[&quot;dashboard&quot;,&quot;items&quot;,&quot;pos&quot;,&quot;grn&quot;,&quot;transfers&quot;,&quot;counts&quot;,&quot;writeoffs&quot;,&quot;rates&quot;,&quot;invoices&quot;,&quot;ledger&quot;,&quot;finance&quot;,&quot;zreports&quot;,&quot;capture&quot;,&quot;expenses&quot;,&quot;bankrec&quot;,&quot;journals&quot;,&quot;statements&quot;,&quot;close&quot;,&quot;users&quot;,&quot;devices&quot;,&quot;reports&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behaviour&quot;}}">
 class Component extends DCLogic {
   state = { ready:false };
   TDEF = { q:'', f:{}, sort:null, page:0, per:25, range:null, pop:false, saving:false, vn:'' };
   componentDidMount(){
-    const t=()=>{ if(window.ERP) this.setState(this.init()); else setTimeout(t,40); }; t();
+    const t=()=>{ if(window.ERP&&window.FIN) this.setState(this.init()); else setTimeout(t,40); }; t();
     this.kb=e=>this.onKey(e); window.addEventListener('keydown',this.kb,true);
   }
-  componentWillUnmount(){ window.removeEventListener('keydown',this.kb,true); clearTimeout(this.flashT); }
+  componentWillUnmount(){ window.removeEventListener('keydown',this.kb,true); clearTimeout(this.flashT); this.capId=(this.capId||0)+1; if(window.FIN) window.FIN.terminate(); }
   readRem(){ try{ return JSON.parse(localStorage.getItem('nv-erp-remember')||'null'); }catch(e){ return null; } }
-  init(){ const rem=this.readRem(); return { ready:true, db:window.ERP.seed(), screen:this.props.startScreen||'dashboard', loc:(rem&&rem.loc)||'all', itemSku:'FA-TEE-BLK-L', poNo:null, invNo:null, trfNo:null, vendorId:null, reportId:null, poDraft:null, grn:null, labelSel:{'FA-TEE-BLK-M':6,'BE-LIP-ROS':4,'GA-CBL-C1M':6}, labelSize:'50x25', zebra:false, trfModal:null, scanInput:'', lastScan:'', countDraft:null, countOnlyVar:false, countFocus:null, wo:{loc:'store',sku:'BE-LIP-CRL',qty:'1',reason:'Damaged',note:''}, payModal:null, ledgerTab:'journal', menuOpen:false, toasts:[], editAr:null, reval:null, tbl:{}, views:{}, dash:{preset:'30',from:'',to:''}, salesGroup:'day', settings:{suffix:'Enter',beep:true,continuous:true}, scanFlash:null, testScan:null, testInput:'', clock:581, signed:!!rem, signStep:1, signForm:{email:'noura@najmavalue.kw',pw:'demo1234',remember:true,err:''}, signLoc:'all', role:(rem&&rem.role)||'owner', simError:false, loading:false, search:null, notifOpen:false, approval:null, schedModal:null, schedules:[{id:1,report:'sales',freq:'Weekly',fmt:'PDF',to:['Noura Al-Saleh','Layla Karim']},{id:2,report:'payables',freq:'Monthly',fmt:'CSV',to:['Layla Karim']}], drawer:null, itemForm:null }; }
+  init(){ const rem=this.readRem(); return { ready:true, db:window.ERP.seed(), screen:this.props.startScreen||'dashboard', loc:(rem&&rem.loc)||'all', itemSku:'FA-TEE-BLK-L', poNo:null, invNo:null, trfNo:null, vendorId:null, reportId:null, poDraft:null, grn:null, labelSel:{'FA-TEE-BLK-M':6,'BE-LIP-ROS':4,'GA-CBL-C1M':6}, labelSize:'50x25', zebra:false, trfModal:null, scanInput:'', lastScan:'', countDraft:null, countOnlyVar:false, countFocus:null, wo:{loc:'store',sku:'BE-LIP-CRL',qty:'1',reason:'Damaged',note:''}, payModal:null, ledgerTab:'journal', menuOpen:false, toasts:[], editAr:null, reval:null, tbl:{}, views:{}, dash:{preset:'30',from:'',to:''}, salesGroup:'day', settings:{suffix:'Enter',beep:true,continuous:true}, scanFlash:null, testScan:null, testInput:'', clock:581, signed:!!rem, signStep:1, signForm:{email:'noura@najmavalue.kw',pw:'demo1234',remember:true,err:''}, signLoc:'all', role:(rem&&rem.role)||'owner', simError:false, loading:false, search:null, notifOpen:false, approval:null, schedModal:null, schedules:[{id:1,report:'sales',freq:'Weekly',fmt:'PDF',to:['Noura Al-Saleh','Layla Karim']},{id:2,report:'payables',freq:'Monthly',fmt:'CSV',to:['Layla Karim']}], drawer:null, itemForm:null, cap:null, expModal:null, recModal:null, jv:null, fs:{tab:'pl',period:'mtd',from:'',to:'',bs:'today',asOf:''} }; }
 
   mut(fn){ if(this.state.role==='viewer'){ this.toast('Viewer role is read-only. Switch role in the user menu to make changes.',true); return; } const db=JSON.parse(JSON.stringify(this.state.db)); const extra=fn(db)||{}; this.setState({db,...extra}); }
   now(){ const m=this.state.clock||581; this.state.clock=m+1; return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
@@ -1338,20 +1689,20 @@ class Component extends DCLogic {
   hchart(rows,o){ o=o||{}; const max=Math.max(...rows.map(r=>Math.abs(r.v)),0.0001); return {isV:false,isH:true,empty:!rows.length||max<=0.0001,title:o.title||'',legend:o.legend||[],rows:rows.map(r=>({label:r.label,v:o.fmt?o.fmt(r.v):r.v,pct:(Math.abs(r.v)/max*100).toFixed(1)+'%',c:r.c||o.c||'#010ECF'}))}; }
 
   renderValsOld(){
-    if(!this.state.ready||!window.ERP) return { ready:false, is:{}, T:{show:false}, scan:{text:'Scanner ready',bg:'#fff',fg:'#4A5160',bd:'#E6E8EC',dot:'#3DDC97',ring:'rgba(61,220,151,.2)'} };
+    if(!this.state.ready||!window.ERP||!window.FIN) return { ready:false, is:{}, T:{show:false}, scan:{text:'Scanner ready',bg:'#fff',fg:'#4A5160',bd:'#E6E8EC',dot:'#3DDC97',ring:'rgba(61,220,151,.2)'} };
     const E=window.ERP, st=this.state, db=st.db;
     const REORDER=this.props.reorderPoint??8;
     const I={}; db.items.forEach(i=>I[i.sku]=i);
     const V={}; db.vendors.forEach(v=>V[v.id]=v);
-    const SCREENS=['dashboard','items','item','labels','pos','poNew','po','grn','vendors','transfers','trf','counts','writeoffs','rates','invoices','invoice','ledger','users','devices','reports','report','vendor','itemForm'];
+    const SCREENS=['dashboard','items','item','labels','pos','poNew','po','grn','vendors','transfers','trf','counts','writeoffs','rates','invoices','invoice','ledger','users','devices','reports','report','vendor','itemForm','finance','zreports','capture','expenses','journals','jvNew','bankrec','statements','close'];
     const is={}; SCREENS.forEach(k=>is[k]=st.screen===k);
-    const parent={item:'items',poNew:'pos',po:'pos',trf:'transfers',invoice:'invoices',vendor:'vendors',itemForm:'items',report:st.reportId==='shrinkage'?'shrink':'reports'}[st.screen]||st.screen;
-    const badges={pos:db.pos.filter(p=>p.status==='Sent'||p.status==='Partially received').length,transfers:db.transfers.filter(t=>t.status!=='Received').length,invoices:db.invoices.filter(i=>E.invStatus(i)==='Overdue').length,devices:db.devices.filter(d=>d.status==='Low battery').length,approvals:db.pos.filter(p=>p.status==='Pending approval').length};
-    const NAV=[['Overview',[['dashboard','Dashboard']]],['Items',[['items','Item list'],['labels','Barcode labels']]],['Purchasing',[['pos','Purchase orders'],['approvals','Approvals'],['grn','Goods receipt'],['vendors','Vendors']]],['Warehouse',[['transfers','Transfers'],['counts','Stock counts'],['writeoffs','Write-offs'],['shrink','Shrinkage report']]],['Finance',[['rates','Exchange rates'],['invoices','Supplier invoices'],['ledger','General ledger']]],['Reports',[['reports','All reports']]],['Admin',[['users','Users and roles'],['devices','Devices']]]];
+    const parent={item:'items',poNew:'pos',po:'pos',trf:'transfers',invoice:'invoices',vendor:'vendors',itemForm:'items',jvNew:'journals',report:st.reportId==='shrinkage'?'shrink':'reports'}[st.screen]||st.screen;
+    const badges={pos:db.pos.filter(p=>p.status==='Sent'||p.status==='Partially received').length,transfers:db.transfers.filter(t=>t.status!=='Received').length,invoices:db.invoices.filter(i=>E.invStatus(i)==='Overdue').length,devices:db.devices.filter(d=>d.status==='Low battery').length,approvals:db.pos.filter(p=>p.status==='Pending approval').length,zreports:db.zreports.filter(z=>z.status!=='Posted').length,bankrec:db.bank.filter(b=>!b.match).length,expenses:db.expenses.filter(e=>this.expStatus(e)==='Overdue').length};
+    const NAV=[['Overview',[['dashboard','Dashboard']]],['Items',[['items','Item list'],['labels','Barcode labels']]],['Purchasing',[['pos','Purchase orders'],['approvals','Approvals'],['grn','Goods receipt'],['vendors','Vendors']]],['Warehouse',[['transfers','Transfers'],['counts','Stock counts'],['writeoffs','Write-offs'],['shrink','Shrinkage report']]],['Finance',[['finance','Overview'],['zreports','Daily close'],['capture','POS capture (OCR)'],['expenses','Expenses'],['invoices','Supplier invoices'],['bankrec','Bank reconciliation'],['journals','Journal entries'],['ledger','General ledger'],['statements','Financial statements'],['close','Period close'],['rates','Exchange rates']]],['Reports',[['reports','All reports']]],['Admin',[['users','Users and roles'],['devices','Devices']]]];
     const titles={}; NAV.forEach(([g,its])=>its.forEach(([id,l])=>titles[id]=[g,l]));
     const RM=this.reportMeta(); const rmeta=RM.find(r=>r.id===st.reportId);
-    Object.assign(titles,{vendor:['Purchasing','Vendor detail'],itemForm:['Items',st.itemForm&&st.itemForm.mode==='edit'?'Edit item':'New item'],item:['Items',st.itemSku],poNew:['Purchasing','New purchase order'],po:['Purchasing',st.poNo],trf:['Warehouse',st.trfNo],invoice:['Finance',st.invNo],report:['Reports',rmeta?rmeta.title:'']});
-    const nav=NAV.map(([title,its])=>({title,items:its.map(([id,label])=>{ const a=parent===id; const bad=id==='invoices'||id==='devices'; return {label,go:id==='shrink'?()=>this.openReport('shrinkage'):id==='approvals'?()=>{ this.go('pos')(); this.tset('pos',{f:{status:['Pending approval']},page:0}); }:this.go(id),bg:a?'rgba(1,14,207,.08)':'transparent',fg:a?'#010ECF':'#353B47',fw:a?600:500,mark:a?'#010ECF':'#C9CDD4',badge:badges[id]||0,hasBadge:!!badges[id],badgeBg:bad?'#FDE7E5':'#E6E8FB',badgeFg:bad?'#B42318':'#010ECF'}; })}));
+    Object.assign(titles,{vendor:['Purchasing','Vendor detail'],itemForm:['Items',st.itemForm&&st.itemForm.mode==='edit'?'Edit item':'New item'],item:['Items',st.itemSku],poNew:['Purchasing','New purchase order'],po:['Purchasing',st.poNo],trf:['Warehouse',st.trfNo],invoice:['Finance',st.invNo],jvNew:['Finance','New journal entry'],report:['Reports',rmeta?rmeta.title:'']});
+    const nav=NAV.map(([title,its])=>({title,items:its.map(([id,label])=>{ const a=parent===id; const bad=id==='invoices'||id==='devices'||id==='expenses'; return {label,go:id==='shrink'?()=>this.openReport('shrinkage'):id==='approvals'?()=>{ this.go('pos')(); this.tset('pos',{f:{status:['Pending approval']},page:0}); }:this.go(id),bg:a?'rgba(1,14,207,.08)':'transparent',fg:a?'#010ECF':'#353B47',fw:a?600:500,mark:a?'#010ECF':'#C9CDD4',badge:badges[id]||0,hasBadge:!!badges[id],badgeBg:bad?'#FDE7E5':'#E6E8FB',badgeFg:bad?'#B42318':'#010ECF'}; })}));
     const locOpts=[['all','All','#7A8191'],['store','Store','#12A594'],['online','Online','#7C4DFF']].map(([k,label,dot])=>({label,dot,pick:()=>this.setState({loc:k}),bg:st.loc===k?'#fff':'transparent',fg:st.loc===k?'#0E1116':'#5B6270',sh:st.loc===k?'0 1px 2px rgba(14,17,22,.12)':'none'}));
     const go=(s,x)=>this.go(s,x);
     const qFg=q=>q===0?'#B42318':q<REORDER?'#8A5A00':'#0E1116';
@@ -1368,6 +1719,7 @@ class Component extends DCLogic {
     SCREENS.forEach(k=>{ if(is[k]&&this['v_'+k]) out[k]=this['v_'+k](ctx); });
     out.T=(out[st.screen]&&out[st.screen].T)||{show:false};
     if(this.v_modals) Object.assign(out,this.v_modals(ctx));
+    Object.assign(out,this.v_finModals(ctx));
     return out;
   }
 
@@ -1823,7 +2175,7 @@ class Component extends DCLogic {
     const A=E.ACCTS; const name={},type={}; A.forEach(a=>{ name[a[0]]=a[1]; type[a[0]]=a[2]; });
     const tabs=[['journal','Journal'],['coa','Chart of accounts'],['tb','Trial balance']].map(([k,l])=>{ const a=st.ledgerTab===k; return {label:l,pick:()=>this.setState({ledgerTab:k}),bg:a?'#fff':'transparent',fg:a?'#0E1116':'#5B6270',sh:a?'0 1px 2px rgba(14,17,22,.12)':'none'}; });
     const bal={},n={}; db.ledger.forEach(e=>{ bal[e.acct]=(bal[e.acct]||0)+e.dr-e.cr; n[e.acct]=(n[e.acct]||0)+1; });
-    const rtype=e=>e.ref==='OPEN'?'Opening':e.ref.startsWith('Z-')?'POS sales':e.ref.startsWith('SO-')?'Online sales':e.ref.split('-')[0];
+    const RT={Z:'POS daily close',SO:'Online sales',KN:'K-Net settlement',CS:'Card settlement',CD:'Cash deposit',BC:'Bank charge',BS:'Bank statement',RCT:'POS offline sale',EXP:'Expense',JV:'Journal'}; const rtype=e=>e.ref==='OPEN'?'Opening':RT[e.ref.split('-')[0]]||e.ref.split('-')[0];
     const out={tabs,isCoa:st.ledgerTab==='coa',isTb:st.ledgerTab==='tb'};
     if(st.ledgerTab==='journal'){
       const res=this.table('ledger',()=>({title:'General ledger — journal',file:'ledger',noun:'entries',ph:'Search reference, memo, account…',rows:db.ledger,dateOf:e=>e.date,defaultSort:{k:'date',dir:-1},
@@ -1836,7 +2188,7 @@ class Component extends DCLogic {
           {k:'dr',label:'Debit',csvLabel:'Debit KWD',w:'110px',align:'right',val:e=>e.dr,total:'n3',cell:e=>C.n(e.dr?E.nf(e.dr,3):''),csv:e=>e.dr?E.nf(e.dr,3):''},
           {k:'cr',label:'Credit',csvLabel:'Credit KWD',w:'110px',align:'right',val:e=>e.cr,total:'n3',cell:e=>C.n(e.cr?E.nf(e.cr,3):''),csv:e=>e.cr?E.nf(e.cr,3):''}],
         filters:[{k:'acct',label:'Account',opts:A.map(a=>[a[0],a[0]+' '+a[1]]),get:e=>e.acct},{k:'type',label:'Account type',opts:['Asset','Liability','Equity','Revenue','Expense'].map(x=>[x,x]),get:e=>type[e.acct]},
-          {k:'rt',label:'Reference type',opts:['Opening','GRN','INV','WO','CNT','TRF','POS sales','Online sales'].map(x=>[x,x]),get:rtype}],
+          {k:'rt',label:'Reference type',opts:['Opening','GRN','INV','WO','CNT','TRF','POS daily close','POS offline sale','Online sales','K-Net settlement','Card settlement','Cash deposit','Expense','Journal','Bank charge','Bank statement'].map(x=>[x,x]),get:rtype}],
         rowBg:e=>e.date===E.TODAY?'rgba(1,14,207,.035)':'#fff'}));
       this.tkey='ledger'; out.T=res.view;
     }
@@ -2084,9 +2436,9 @@ class Component extends DCLogic {
           {k:'bdr',label:'Closing debit',csvLabel:'Closing debit KWD',w:'130px',align:'right',val:r=>Math.max(0,r.cb),total:'n3',cell:r=>C.n(r.cb>0.0005?E.nf(r.cb,3):'','',{fw:600})},{k:'bcr',label:'Closing credit',csvLabel:'Closing credit KWD',w:'130px',align:'right',val:r=>Math.max(0,-r.cb),total:'n3',cell:r=>C.n(r.cb<-0.0005?E.nf(-r.cb,3):'','',{fw:600})}],
         filters:[{k:'type',label:'Account type',opts:['Asset','Liability','Equity','Revenue','Expense'].map(x=>[x,x]),get:r=>r.a[2]}]});
       S=(rows,range)=>{ const all=A.map(a=>{ const pd=db.ledger.filter(e=>e.acct===a[0]&&e.date>=range.from&&e.date<=range.to); return [a[0],pd.reduce((s,e)=>s+e.cr-e.dr,0)]; }); const g=k=>(all.find(x=>x[0]===k)||[0,0])[1];
-        const rev=g('4000')+g('4010'), cogs=-g('5000'), gp=rev-cogs, shr=-g('5400'), net=gp-shr;
-        return {kpis:[{label:'Revenue',v:E.k3(rev),s:'Store '+E.k3(g('4000'))+' · online '+E.k3(g('4010'))},{label:'Cost of goods sold',v:E.k3(cogs)},{label:'Gross profit',v:E.k3(gp),s:(rev?gp/rev*100:0).toFixed(1)+'% margin',fg:'#1B7A3A'},{label:'Net profit after shrinkage',v:E.k3(net),s:'Shrinkage '+E.k3(shr)+' · no operating costs modelled',fg:net>=0?'#1B7A3A':'#B42318'}],
-          chart:this.vchart([{label:'Revenue',a:rev,c:'#010ECF'},{label:'COGS',a:cogs,c:'#9AA3F5'},{label:'Gross profit',a:gp,c:'#1B9A4A'},{label:'Shrinkage',a:shr,c:'#D9542B'},{label:'Net',a:Math.max(0,net),c:'#0A6E65'}],{title:'Profit and loss for the period',top:p=>E.nf(p.a,0)})}; };
+        const rev=g('4000')+g('4010')+g('4050'), cogs=-g('5000'), gp=rev-cogs, shr=-g('5400'), opex=-A.filter(a=>a[0]>='6000').reduce((s2,a)=>s2+g(a[0]),0), net=gp-shr-opex;
+        return {kpis:[{label:'Net revenue',v:E.k3(rev),s:'Store '+E.k3(g('4000'))+' · online '+E.k3(g('4010'))},{label:'Cost of goods sold',v:E.k3(cogs)},{label:'Gross profit',v:E.k3(gp),s:(rev?gp/rev*100:0).toFixed(1)+'% margin',fg:'#1B7A3A'},{label:'Net profit',v:E.k3(net),s:'Shrinkage '+E.k3(shr)+' · operating costs '+E.k3(opex),fg:net>=0?'#1B7A3A':'#B42318'}],
+          chart:this.vchart([{label:'Revenue',a:rev,c:'#010ECF'},{label:'COGS',a:cogs,c:'#9AA3F5'},{label:'Gross profit',a:gp,c:'#1B9A4A'},{label:'Shrinkage',a:shr,c:'#D9542B'},{label:'Operating costs',a:opex,c:'#E8833A'},{label:'Net',a:Math.max(0,net),c:'#0A6E65'}],{title:'Profit and loss for the period',top:p=>E.nf(p.a,0)})}; };
     }
     if(id==='sales'){
       const g=st.salesGroup;
@@ -2145,14 +2497,14 @@ class Component extends DCLogic {
 
   renderVals(){
     const st=this.state;
-    if(!st.ready||!window.ERP) return {...this.renderValsOld(),signin:{show:false},notif:{},search:{show:false},docAct:{show:false},drawer:{show:false},approval:{show:false},sched:{show:false},me:{ini:'',first:''},canEdit:true,noAccess:false};
+    if(!st.ready||!window.ERP||!window.FIN) return {...this.renderValsOld(),signin:{show:false},notif:{},search:{show:false},docAct:{show:false},drawer:{show:false},approval:{show:false},sched:{show:false},me:{ini:'',first:''},canEdit:true,noAccess:false};
     const E=window.ERP, me=this.me(), R=this.ROLES();
     if(!me.locs.includes(st.loc)) st.loc=me.locs[0];
-    const SEC={items:'Items',item:'Items',itemForm:'Items',labels:'Items',pos:'Purchasing',poNew:'Purchasing',po:'Purchasing',grn:'Purchasing',vendors:'Purchasing',vendor:'Purchasing',transfers:'Warehouse',trf:'Warehouse',counts:'Warehouse',writeoffs:'Warehouse',rates:'Finance',invoices:'Finance',invoice:'Finance',ledger:'Finance',users:'Admin',devices:'Admin'};
+    const SEC={items:'Items',item:'Items',itemForm:'Items',labels:'Items',pos:'Purchasing',poNew:'Purchasing',po:'Purchasing',grn:'Purchasing',vendors:'Purchasing',vendor:'Purchasing',transfers:'Warehouse',trf:'Warehouse',counts:'Warehouse',writeoffs:'Warehouse',rates:'Finance',invoices:'Finance',invoice:'Finance',ledger:'Finance',finance:'Finance',zreports:'Finance',capture:'Finance',expenses:'Finance',journals:'Finance',jvNew:'Finance',bankrec:'Finance',statements:'Finance',close:'Finance',users:'Admin',devices:'Admin'};
     const meta=this.reportMeta().find(r=>r.id===st.reportId); const sec=SEC[st.screen]; let deny=null;
     if(sec&&me.hide.includes(sec)) deny=sec;
     else if(st.screen==='report'&&meta&&!this.repAllowed(meta)) deny=meta.title;
-    else if(!me.edit&&(st.screen==='poNew'||st.screen==='itemForm')) deny='editing';
+    else if(!me.edit&&(st.screen==='poNew'||st.screen==='itemForm'||st.screen==='jvNew')) deny='editing';
     this.denied=!!deny;
     const out=this.renderValsOld();
     out.nav=out.nav.filter(g=>!me.hide.includes(g.title));
@@ -2198,6 +2550,8 @@ class Component extends DCLogic {
     const add=(label,items)=>{ if(items.length) g.push({label,items}); };
     const locs=st.loc==='all'?['store','online']:[st.loc];
     if(me.fin) add('Overdue invoices',db.invoices.filter(v=>E.invStatus(v)==='Overdue').map(v=>({text:v.no+' · '+V[v.vendor].name,sub:E.mny(v.amount-v.paid,v.ccy)+' · '+E.pl(E.dayDiff(v.due,E.TODAY),'day')+' overdue',dot:'#D92D20',open:()=>this.nav('invoice',{invNo:v.no})})));
+    if(me.fin){ add('Daily close',db.zreports.filter(z=>z.status==='Awaiting Z-report').map(z=>({text:z.no+' · Z-report not captured',sub:E.fd(z.date)+' · '+z.cashier+' · revenue not in the ledger yet',dot:'#E8833A',open:()=>this.startCapture(z.no)})));
+      add('Bills due',db.expenses.filter(e=>e.status!=='Paid'&&e.due<=E.addDays(E.TODAY,7)).map(e=>({text:e.no+' · '+e.payee,sub:E.k3(e.amount)+' · '+(e.due<E.TODAY?'overdue since '+E.fd(e.due):'due '+E.fd(e.due)),dot:e.due<E.TODAY?'#D92D20':'#F2B54A',open:()=>this.nav('expenses',{drawer:{kind:'exp',no:e.no}})}))); }
     add('Out of stock',db.items.filter(i=>i.active).flatMap(i=>locs.filter(l=>db.stock[i.sku][l]===0).map(l=>({text:i.name,sub:'0 in '+E.POOL[l].name,dot:'#E8833A',open:()=>this.nav('item',{itemSku:i.sku,editAr:null})}))));
     add('Transfers waiting',db.transfers.filter(t=>t.status==='In transit'&&E.dayDiff(t.date,E.TODAY)>2).map(t=>({text:t.no+' in transit for '+E.pl(E.dayDiff(t.date,E.TODAY),'day'),sub:E.POOL[t.from].name+' → '+E.POOL[t.to].name,dot:'#F2B54A',open:()=>this.nav('trf',{trfNo:t.no})})));
     if(!me.hide.includes('Purchasing')) add('Awaiting approval',db.pos.filter(p=>p.status==='Pending approval').map(p=>({text:p.no+' · '+E.k3(E.poCalc(p,db).totalK),sub:V[p.vendor].name+' · above KWD '+E.APPROVAL_LIMIT,dot:'#010ECF',open:()=>this.nav('po',{poNo:p.no})})));
@@ -2215,6 +2569,10 @@ class Component extends DCLogic {
       db.pos.forEach(p=>{ if(m(p.no+' '+V[p.vendor].name+' '+p.status)) P('Purchase orders','PO',['#E6E8FB','#010ECF'],p.no+' · '+V[p.vendor].name,p.status+' · '+E.mny(E.poCalc(p,db).totalV,p.ccy),()=>this.nav('po',{poNo:p.no}),E.fd(p.date)); });
       db.vendors.forEach(v=>{ if(m(v.name+' '+v.id+' '+v.contact+' '+v.country)) P('Vendors','VEN',['#F1F2F5','#353B47'],v.name,v.id+' · '+v.country+' · '+v.ccy,()=>this.nav('vendor',{vendorId:v.id}),v.terms); }); }
     if(me.fin&&!me.hide.includes('Finance')) db.invoices.forEach(v=>{ if(m(v.no+' '+V[v.vendor].name+' '+v.po)) P('Invoices','INV',['#FDF1DC','#8A5A00'],v.no+' · '+V[v.vendor].name,E.invStatus(v)+' · '+E.mny(v.amount-v.paid,v.ccy)+' open',()=>this.nav('invoice',{invNo:v.no}),'Due '+E.fd(v.due)); });
+    if(me.fin&&!me.hide.includes('Finance')){
+      db.zreports.forEach(z=>{ if(m(z.no+' '+z.cashier+' z-report daily close '+z.status)) P('Daily close','Z',['#FDF1DC','#8A5A00'],z.no+' · '+E.fd(z.date),z.status+' · '+E.k3(z.net)+' net · '+z.cashier,()=>z.status==='Posted'?this.nav('zreports',{drawer:{kind:'z',no:z.no}}):this.startCapture(z.no),z.source); });
+      db.expenses.forEach(x=>{ if(m(x.no+' '+x.payee+' '+x.desc+' expense')) P('Expenses','EXP',['#FDF1DC','#8A5A00'],x.no+' · '+x.payee,x.desc+' · '+E.k3(x.amount),()=>this.nav('expenses',{drawer:{kind:'exp',no:x.no}}),E.fd(x.date)); });
+      db.journals.forEach(j=>{ if(m(j.no+' '+j.memo+' journal')) P('Journals','JV',['#FDF1DC','#8A5A00'],j.no+' · '+j.memo,E.k3(j.lines.reduce((a,l)=>a+l.dr,0))+' · '+j.by,()=>this.nav('journals',{drawer:{kind:'jv',no:j.no}}),E.fd(j.date)); }); }
     if(!me.hide.includes('Warehouse')) db.transfers.forEach(t=>{ if(m(t.no+' '+t.status+' '+t.lines.map(l=>l.sku).join(' '))) P('Transfers','TRF',['#EEE8FD','#5B2FD1'],t.no+' · '+E.POOL[t.from].label+' → '+E.POOL[t.to].label,t.status+' · '+E.pl(t.lines.reduce((a,l)=>a+l.qty,0),'unit'),()=>this.nav('trf',{trfNo:t.no}),E.fd(t.date)); });
     this.reportMeta().filter(r=>this.repAllowed(r)).forEach(r=>{ if(m(r.title+' '+r.desc+' report')) P('Reports','RPT',['#F1F2F5','#353B47'],r.title,r.desc,()=>{ this.setState({search:null}); this.openReport(r.id); },r.group); });
     return out;
@@ -2244,6 +2602,17 @@ class Component extends DCLogic {
   }
   drawerVals(){
     const st=this.state, d=st.drawer, E=window.ERP, db=st.db; if(!d) return {show:false}; const I={}; db.items.forEach(i=>I[i.sku]=i); const close=()=>this.setState({drawer:null});
+    const F=window.FIN; const ledLines=ref=>db.ledger.filter(e=>e.ref===ref).map(e=>({name:e.acct+' · '+F.name(e.acct),sub:E.fd(e.date)+' · '+e.memo,v:e.dr?'Dr '+E.nf(e.dr,3):'Cr '+E.nf(e.cr,3),fg:e.dr?'#0E1116':'#5B6270'}));
+    if(d.kind==='z'){ const z=db.zreports.find(x=>x.no===d.no); if(!z) return {show:false}; const L=(name,v,o)=>({name,sub:'',v:v==null?'—':E.nf(v,3),fg:'#0E1116',...(o||{})}); const exp=z.float+z.cash; const cap=db.captures.find(c=>c.ref===z.no);
+      return {show:true,close,kind:'Z-report · daily close',no:z.no,st:E.chip(z.status),facts:[{k:'Business date',v:E.fd(z.date)},{k:'Register',v:z.register+' · Main Store'},{k:'Cashier',v:z.cashier},{k:'Receipts',v:z.receipts+' receipts · '+z.units+' items'},{k:'Source',v:z.source+(cap&&cap.conf?' · '+cap.conf+'%':'')},{k:'Posted',v:z.postedBy?z.postedBy+' · '+E.fd(z.postedOn):'—'}],
+        lines:[L('Gross sales',z.gross),L('Discounts and returns',z.disc+z.ret),L('Net sales',z.net,{sub:'Credited to 4000 Sales — Main Store'}),L('Cash',z.cash),L('K-Net',z.knet,{sub:'To 1120, settles next day less 0.75%'}),L('Card',z.card,{sub:'To 1130, settles in two days less 2.25%'}),L('Expected cash in drawer',exp,{sub:'Float '+E.nf(z.float,3)+' + cash sales'}),L('Counted cash',z.counted),{name:'Over / short',sub:z.note||'',v:z.os==null?'—':(z.os>0?'+':z.os<0?'−':'')+E.nf(Math.abs(z.os),3),fg:z.os<0?'#B42318':z.os>0?'#1B7A3A':'#9AA0AC'}],
+        act:this.actRows([z.no,...(cap?[cap.no]:[])]),hasLink:true,linkLabel:'Open ledger entries',link:()=>this.openLedgerRef(z.no),hasLink2:false}; }
+    if(d.kind==='exp'){ const x=db.expenses.find(y=>y.no===d.no); if(!x) return {show:false}; const s=this.expStatus(x); const cap=db.captures.find(c=>c.ref===x.no); const pay=s!=='Paid'&&this.canEdit()&&this.me().fin;
+      return {show:true,close,kind:'Expense',no:x.no,st:E.chip(s),facts:[{k:'Payee',v:x.payee},{k:'Bill date',v:E.fd(x.date)},{k:'Account',v:x.acct+' · '+F.name(x.acct)},{k:'Amount',v:E.k3(x.amount)},{k:'Paid from',v:{Bank:'Bank transfer',Cash:'Petty cash',Unpaid:'Accrued to 2200'}[x.method]},{k:s==='Paid'?'Paid on':'Due',v:s==='Paid'?E.fd(x.paidOn):E.fd(x.due)},{k:'Description',v:x.desc},{k:'Recorded by',v:x.by+(cap?' · read by OCR':'')}],
+        lines:ledLines(x.no),act:this.actRows([x.no,...(cap?[cap.no]:[])]),hasLink:true,linkLabel:'Open in general ledger',link:()=>this.openLedgerRef(x.no),hasLink2:pay,link2Label:'Pay now',link2Bg:'#010ECF',link2:()=>this.payExpense(x.no)}; }
+    if(d.kind==='jv'){ const j=db.journals.find(y=>y.no===d.no); if(!j) return {show:false}; const canRev=(j.status||'Posted')==='Posted'&&!j.reverses&&this.canEdit()&&this.me().fin;
+      return {show:true,close,kind:'Journal entry',no:j.no,st:E.chip(j.status||'Posted'),facts:[{k:'Date',v:E.fd(j.date)},{k:'Posted by',v:j.by},{k:'Amount',v:E.k3(j.lines.reduce((a,l)=>a+l.dr,0))},{k:j.reverses?'Reverses':j.reversedBy?'Reversed by':'Lines',v:j.reverses||j.reversedBy||String(j.lines.length)},{k:'Narration',v:j.memo}],
+        lines:j.lines.map(l=>({name:l.acct+' · '+F.name(l.acct),sub:l.memo||'',v:l.dr?'Dr '+E.nf(l.dr,3):'Cr '+E.nf(l.cr,3),fg:l.dr?'#0E1116':'#5B6270'})),act:this.actRows([j.no]),hasLink:true,linkLabel:'Open in general ledger',link:()=>this.openLedgerRef(j.no),hasLink2:canRev,link2Label:'Reverse',link2Bg:'#B42318',link2:()=>this.reverseJv(j.no)}; }
     if(d.kind==='grn'){ const g=db.grns.find(x=>x.no===d.no); if(!g) return {show:false}; const p=db.pos.find(x=>x.no===g.po); const v=db.vendors.find(x=>x.id===p.vendor);
       return {show:true,close,kind:'Goods receipt',no:g.no,st:E.chip('Posted'),facts:[{k:'Purchase order',v:g.po},{k:'Vendor',v:v.name},{k:'Received into',v:E.POOL[g.loc].name},{k:'Received by',v:g.by+(g.time?' · '+g.time:'')},{k:'Date',v:E.fd(g.date)},{k:'Value',v:E.k3(g.valK||0)}],
         lines:g.lines.map(l=>({name:I[l.sku].name,sub:l.sku+' · '+I[l.sku].barcode,v:'+'+l.qty,fg:'#1B7A3A'})),act:this.actRows([g.no]),hasLink:!this.me().hide.includes('Purchasing'),linkLabel:'Open '+g.po,link:()=>this.nav('po',{poNo:g.po})}; }
@@ -2369,6 +2738,438 @@ class Component extends DCLogic {
     db.items.forEach(i=>{ const n=st.labelSel[i.sku]||0; const src=E.eanSvg(i.barcode).slice(1,-1); for(let k=0;k<n;k++) cells+='<div class="l"><div class="t"><span>'+esc(i.name)+'</span><b>'+E.k3(i.price)+'</b></div><img src="'+src+'"><div class="c">'+i.barcode+'</div></div>'; });
     this.printHtml('<!doctype html><html><head><meta charset="utf-8"><title>Shelf labels</title><style>@page{size:A4;margin:10mm}body{font-family:Inter,Arial,sans-serif;margin:0;color:#0E1116}.g{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm}.l{border:.3mm dashed #bbb;height:34mm;padding:2.5mm 3mm;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;break-inside:avoid}.t{display:flex;justify-content:space-between;gap:2mm;font-size:8pt}.t b{font-size:10pt;white-space:nowrap}img{width:100%;height:12mm}.c{font-family:monospace;font-size:7pt;letter-spacing:1px;text-align:center}.b{display:flex;align-items:center;gap:6px;font-size:7pt;color:#7A8191;margin-top:6mm}.b img{height:12px;width:auto}</style></head><body><div class="g">'+cells+'</div><div class="b"><span>Powered by</span><img src="'+logo+'" alt="brn dynamics"></div></body></html>');
     this.toast('A4 label sheet sent to print');
+  }
+  // ---------- finance: shared ----------
+  locked(date){ return !!date&&date<=this.state.db.lockDate; }
+  lockMsg(){ return 'The books are closed to '+window.ERP.fd(this.state.db.lockDate)+'. Date this after the closed period.'; }
+  acctOpts(codes){ const F=window.FIN; return (codes||window.ERP.ACCTS.map(a=>a[0])).map(c=>[c,c+' · '+F.name(c)]); }
+  seg(opts,cur,pick){ return opts.map(([k,l])=>{ const a=cur===k; return {label:l,pick:()=>pick(k),bg:a?'#fff':'transparent',fg:a?'#0E1116':'#5B6270',sh:a?'0 1px 2px rgba(14,17,22,.12)':'none'}; }); }
+  feedFor(date){ const db=this.state.db; const I={}; db.items.forEach(i=>I[i.sku]=i); const ss=db.sales.filter(s=>s.date===date&&!s.offline); const by=p=>ss.filter(s=>s.pay===p).reduce((a,s)=>a+s.total,0);
+    return {n:ss.length,cash:by('Cash'),knet:by('K-Net'),card:by('Card'),net:ss.reduce((a,s)=>a+s.total,0),cogs:window.FIN.r3(ss.reduce((a,s)=>a+s.lines.reduce((b,l)=>b+l.qty*I[l.sku].cost,0),0))}; }
+  expStatus(e){ return e.status==='Paid'?'Paid':e.due&&e.due<window.ERP.TODAY?'Overdue':'Unpaid'; }
+  openLedgerRef(ref){ this.nav('ledger',{ledgerTab:'journal'}); this.tset('ledger',{q:ref,page:0,range:{preset:'all'},f:{}}); }
+  openLedgerAcct(code,from,to){ this.nav('ledger',{ledgerTab:'journal'}); this.tset('ledger',{q:'',f:{acct:[code]},page:0,range:from?{preset:'custom',from,to}:{preset:'all'}}); }
+  addCapture(db,type,ref,c,status){ const E=window.ERP; const no='CAP-2026-'+E.pad(db.seq.CAP++); db.captures.unshift({no,date:E.TODAY,time:this.now(),type,file:(c&&c.name)||'Manual entry',conf:(c&&c.confAvg)||0,status:status||'Posted',ref,by:this.me().name}); this.aud(db,'Document captured',no,type+' '+ref+((c&&c.confAvg)?' · OCR confidence '+c.confAvg+'%':' · keyed by hand')); return no; }
+  jvTemplate(end){ const E=window.ERP; const [y,m]=end.split('-'); const mon=new Date(end+'T12:00:00Z').toLocaleString('en-GB',{month:'long',timeZone:'UTC'});
+    return {date:end,memo:'Month-end: depreciation and insurance, '+mon+' '+y,lines:[{acct:'6800',memo:'Fixtures 4,200 over 60 months',dr:'70.000',cr:''},{acct:'1590',memo:'',dr:'',cr:'70.000'},{acct:'6950',memo:'Insurance 240 over 12 months',dr:'20.000',cr:''},{acct:'1400',memo:'',dr:'',cr:'20.000'}]}; }
+  openJv(tpl){ if(!this.canEdit()) return this.toast('Viewer role is read-only',true); const E=window.ERP; this.load(); this.setState({screen:'jvNew',menuOpen:false,drawer:null,jv:tpl||{date:E.TODAY,memo:'',lines:[{acct:'6950',memo:'',dr:'',cr:''},{acct:'1110',memo:'',dr:'',cr:''}]}}); }
+  openExp(pre){ if(!this.canEdit()) return this.toast('Viewer role is read-only',true); const E=window.ERP; this.setState({menuOpen:false,expModal:{payee:'',date:E.TODAY,desc:'',acct:'6950',amount:'',method:'Bank',due:E.addDays(E.TODAY,14),...(pre||{})}}); }
+  startCapture(expect){ this.capId=(this.capId||0)+1; this.load(); this.setState({screen:'capture',menuOpen:false,drawer:null,search:null,cap:{stage:'empty',expect:expect||null}}); }
+
+  // ---------- finance overview ----------
+  v_finance({E,st,db}){
+    const F=window.FIN, T=E.TODAY, ms=T.slice(0,8)+'01'; const pl=F.pl(db,ms,T), sep=F.pl(db,'2026-09-01','2026-09-30'); const s=F.sums(db,'2000-01-01',T); const g=c=>s[c]||0;
+    const cash=g('1100')+g('1110'), settle=g('1120')+g('1130'), ap=-g('2100'), acc=-g('2200');
+    const days=[]; for(let i=29;i>=0;i--) days.push(E.addDays(T,-i)); const base=F.cashBal(db,E.addDays(days[0],-1)); const mv={}; db.ledger.forEach(e=>{ if((e.acct==='1100'||e.acct==='1110')&&e.date>=days[0]) mv[e.date]=(mv[e.date]||0)+e.dr-e.cr; });
+    let run=base; const series=days.map(d=>{ run+=mv[d]||0; return {d,v:run}; }); const mn=Math.min(...series.map(x=>x.v)), mx=Math.max(...series.map(x=>x.v));
+    const tasks=[]; const fin=this.me().fin;
+    db.zreports.filter(z=>z.status==='Awaiting Z-report').forEach(z=>{ const f=this.feedFor(z.date); tasks.push({dot:'#E8833A',text:'Capture '+z.no+' for '+E.fd(z.date),sub:'Shift closed by '+z.cashier+' · POS feed '+E.k3(f.net)+' · not in the ledger yet',cta:'Capture',go:()=>this.startCapture(z.no)}); });
+    const ub=db.bank.filter(b=>!b.match); if(ub.length) tasks.push({dot:'#010ECF',text:'Reconcile '+E.pl(ub.length,'bank line'),sub:'Statement imported to '+E.fd(db.bank[db.bank.length-1].date)+' · '+E.k3(ub.reduce((a,b)=>a+Math.abs(b.amt),0))+' unmatched',cta:'Reconcile',go:this.go('bankrec')});
+    const unpaid=db.expenses.filter(e=>e.status!=='Paid'); if(unpaid.length){ const od=unpaid.filter(e=>this.expStatus(e)==='Overdue'); tasks.push({dot:od.length?'#D92D20':'#F2B54A',text:E.pl(unpaid.length,'unpaid bill')+' · '+E.k3(unpaid.reduce((a,e)=>a+e.amount,0)),sub:unpaid.map(e=>e.payee+' due '+E.fds(e.due)).join(' · '),cta:'Review',go:()=>{ this.go('expenses')(); this.tset('expenses',{f:{status:['Unpaid','Overdue']},page:0}); }}); }
+    const oi=db.invoices.filter(v=>E.invStatus(v)==='Overdue'); if(oi.length) tasks.push({dot:'#D92D20',text:E.pl(oi.length,'overdue supplier invoice'),sub:E.k3(oi.reduce((a,v)=>a+(v.amount-v.paid)*E.invRate(db,v),0))+' at booked rates',cta:'Pay',go:()=>{ this.go('invoices')(); this.tset('invoices',{f:{status:['Overdue']},page:0}); }});
+    const cl=this.closeSteps(); if(cl.end<=T) tasks.push({dot:'#5B2FD1',text:cl.label+' close · '+cl.done+' of '+cl.steps.length+' steps done',sub:cl.steps.filter(x=>!x.ok).map(x=>x.short).join(' · ')||'Ready to close',cta:'Continue',go:this.go('close')});
+    const opx=sep.sections[2].rows.filter(r=>r.v>0.0005).sort((a,b)=>b.v-a.v); const omax=Math.max(...opx.map(r=>r.v),0.001);
+    return {
+      sub:'Najma Value · all amounts in KWD · books closed to '+E.fd(db.lockDate),
+      newJv:()=>this.openJv(), newExp:()=>this.openExp(), capture:()=>this.startCapture(), goPl:()=>this.nav('statements',{fs:{...st.fs,tab:'pl'}}), goExp:this.go('expenses'),
+      kpis:[{label:'Cash and bank',v:E.k3(cash),s:'Bank '+E.nf(g('1110'),3)+' · drawer '+E.nf(g('1100'),3),fg:'#0E1116',go:this.go('bankrec')},
+        {label:'In settlement',v:E.k3(settle),s:'K-Net '+E.nf(g('1120'),3)+' · card '+E.nf(g('1130'),3),fg:'#0E1116',go:()=>this.openLedgerAcct('1120')},
+        {label:'Payables',v:E.k3(ap+acc),s:'Suppliers '+E.nf(ap,3)+' · accrued '+E.nf(acc,3),fg:'#0E1116',go:this.go('invoices')},
+        {label:'Net profit · October to date',v:E.k3(pl.net),s:'September '+E.k3(sep.net)+' · '+sep.nm.toFixed(1)+'% margin',fg:pl.net>=0?'#1B7A3A':'#B42318',go:()=>this.nav('statements',{fs:{...st.fs,tab:'pl',period:'mtd'}})},
+        {label:'Gross margin · October to date',v:pl.gm.toFixed(1)+'%',s:'Net revenue '+E.k3(pl.rev),fg:'#0E1116',go:()=>this.nav('statements',{fs:{...st.fs,tab:'pl',period:'mtd'}})}],
+      cash:series.map((x,i)=>({h:(10+(mx>mn?(x.v-mn)/(mx-mn)*90:50)).toFixed(1)+'%',c:i===series.length-1?'#010ECF':'#9AA3F5',tip:E.fd(x.d)+' · '+E.k3(x.v)})),
+      cashSub:'Drawer plus bank · now '+E.k3(cash), cashFrom:E.fd(days[0]), cashTo:E.fd(T),
+      plLabel:'October to date',
+      pl:[{label:'Net revenue',v:E.k3(pl.rev)},{label:'Cost of sales',v:'− '+E.nf(pl.cos,3)},{label:'Gross profit · '+pl.gm.toFixed(1)+'%',v:E.k3(pl.gp),fw:650,bt:'1px solid #EEF0F3'},{label:'Operating expenses',v:'− '+E.nf(pl.opex,3)},{label:'Net profit',v:E.k3(pl.net),fw:700,bt:'1px solid #0E1116',bg:'#FAFBFC',fg:pl.net>=0?'#1B7A3A':'#B42318'}].map(r=>({fw:500,bt:'none',bg:'#fff',fg:'#0E1116',lfg:'#353B47',...r})),
+      tasks, taskCount:E.pl(tasks.length,'item'), noTasks:!tasks.length,
+      opexLabel:'September 2026', opex:opx.map(r=>({label:r.name,v:E.k3(r.v),pct:(r.v/omax*100).toFixed(1)+'%'}))
+    };
+  }
+
+  // ---------- daily close ----------
+  v_zreports({E,st,db,C}){
+    const ZS=db.zreports, mo=E.TODAY.slice(0,7); const mtd=ZS.filter(z=>z.status==='Posted'&&z.date.startsWith(mo)); const waitZ=ZS.filter(z=>z.status==='Awaiting Z-report');
+    const caps=db.captures.filter(c=>c.type==='Z-report'&&c.status==='Posted'&&c.date.startsWith(mo)); const os=mtd.reduce((a,z)=>a+(z.os||0),0);
+    const sgn=v=>(v>0?'+':v<0?'−':'')+E.nf(Math.abs(v),3);
+    const res=this.table('zreports',()=>({title:'Daily close — Z-reports',file:'z-reports',noun:'Z-reports',ph:'Search Z-report, cashier…',rows:ZS,dateOf:z=>z.date,defaultSort:{k:'date',dir:-1},
+      search:z=>z.no+' '+z.cashier+' '+z.source+' '+z.status,
+      cols:[
+        {k:'no',label:'Z-report',w:'110px',val:z=>z.no,cell:z=>C.m(z.no,z.register+' · '+z.cashier.split(' ')[0],{fg:'#010ECF'})},
+        {k:'date',label:'Business date',w:'110px',val:z=>z.date,cell:z=>C.d(E.fd(z.date),['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][E.weekday(z.date)]),csv:z=>z.date},
+        {k:'rc',label:'Receipts',w:'70px',align:'right',val:z=>z.receipts,total:'int',cell:z=>C.n(z.receipts)},
+        {k:'net',label:'Net sales',csvLabel:'Net sales KWD',w:'96px',align:'right',val:z=>z.net,total:'n3',cell:z=>C.n(E.nf(z.net,3),'',{fw:650})},
+        {k:'cash',label:'Cash',csvLabel:'Cash KWD',w:'80px',align:'right',val:z=>z.cash,total:'n3',cell:z=>C.n(E.nf(z.cash,3))},
+        {k:'knet',label:'K-Net',csvLabel:'K-Net KWD',w:'80px',align:'right',val:z=>z.knet,total:'n3',cell:z=>C.n(E.nf(z.knet,3))},
+        {k:'card',label:'Card',csvLabel:'Card KWD',w:'80px',align:'right',val:z=>z.card,total:'n3',cell:z=>C.n(E.nf(z.card,3))},
+        {k:'os',label:'Over/short',csvLabel:'Over/short KWD',w:'88px',align:'right',val:z=>z.os||0,total:'n3',cell:z=>z.os==null?C.n('—','',{fg:'#9AA0AC'}):C.n(z.os?sgn(z.os):'0.000','',{fg:z.os<0?'#B42318':z.os>0?'#1B7A3A':'#9AA0AC',fw:z.os?650:400}),csv:z=>z.os==null?'':z.os.toFixed(3)},
+        {k:'src',label:'Source',w:'108px',val:z=>z.source,cell:z=>z.source==='—'?C.d('—'):C.chip(z.source==='OCR capture'?{text:'OCR capture',bg:'#E6E8FB',fg:'#010ECF'}:{text:z.source,bg:'#EEF0F3',fg:'#4A5160'}),csv:z=>z.source},
+        {k:'st',label:'Status',w:'136px',val:z=>z.status,cell:z=>C.chip(E.chip(z.status==='Awaiting Z-report'?'Awaiting Z-report':z.status)),csv:z=>z.status}],
+      filters:[{k:'st',label:'Status',opts:[['Posted','Posted'],['Awaiting Z-report','Awaiting Z-report']],get:z=>z.status},{k:'src',label:'Source',opts:[['OCR capture','OCR capture'],['Keyed in','Keyed in']],get:z=>z.source},{k:'cashier',label:'Cashier',opts:['Ahmad Rahman','Sara Haddad','Omar Nasser'].map(x=>[x,x]),get:z=>z.cashier},{k:'os',label:'Cash count',opts:[['diff','With over/short'],['exact','Exact']],get:z=>z.os?'diff':'exact'}],
+      rowBg:z=>z.status==='Posted'?'#fff':'#FFFBF5',
+      open:z=>z.status==='Posted'?this.setState({drawer:{kind:'z',no:z.no}}):this.startCapture(z.no)}));
+    this.tkey='zreports';
+    return {T:res.view, capture:()=>this.startCapture(waitZ[0]&&waitZ[0].no),
+      kpis:[{label:'Awaiting capture',v:String(waitZ.length),fg:waitZ.length?'#8A5A00':'#1B7A3A',s:waitZ.map(z=>z.no).join(', ')||'Every closed shift is posted'},
+        {label:'Net sales posted · October',v:E.k3(mtd.reduce((a,z)=>a+z.net,0)),fg:'#0E1116',s:E.pl(mtd.length,'Z-report')},
+        {label:'Cash over / short · October',v:sgn(os),fg:os<-0.0005?'#B42318':'#1B7A3A',s:E.pl(mtd.filter(z=>z.os).length,'shift')+' with a difference'},
+        {label:'Captured by OCR · October',v:String(caps.length),fg:'#0E1116',s:caps.length?'Average confidence '+(caps.reduce((a,c)=>a+c.conf,0)/caps.length).toFixed(1)+'%':'No captures yet'}],
+      waiting:waitZ.map(z=>{ const f=this.feedFor(z.date); return {title:z.no+' · '+E.fd(z.date)+' · shift closed, Z-report not captured',sub:z.cashier+' closed the till at 22:15. The POS feed shows '+E.k3(f.net)+' across '+E.pl(f.n,'receipt')+'. The day’s revenue and cash count reach the ledger once the Z-report is posted.',capture:()=>this.startCapture(z.no)}; })};
+  }
+
+  // ---------- POS capture (OCR) ----------
+  async capFile(f){ if(!f) return; if(!/^image\//.test(f.type||'')) return this.toast('Choose a photo (JPG, PNG or WebP). PDFs are not supported yet.',true); if(f.size>15e6) return this.toast('That image is larger than 15 MB',true);
+    try{ const src=await window.FIN.readFile(f); this.capStart(src,f.name); }catch(e){ this.toast(e.message,true); } }
+  capSample(kind){ const E=window.ERP,F=window.FIN,db=this.state.db; const I={}; db.items.forEach(i=>I[i.sku]=i); let src,name;
+    try{
+      if(kind==='z'){ const z=db.zreports.find(x=>x.status==='Awaiting Z-report')||db.zreports.filter(x=>x.status==='Posted').slice(-1)[0]; const counted=z.counted!=null?z.counted:F.r3(z.float+z.cash-0.25); src=F.sampleZ(z,counted); name='Z-report '+z.no+' · sample photo.png'; }
+      else if(kind==='receipt'){ const L=[['BE-LIP-ROS',2],['FA-TOT-CRM',1],['GA-CBL-C1M',1]].map(([sku,qty])=>({sku,qty,price:I[sku].price})); const r={no:'RCT-1007-901',date:E.TODAY,time:'14:22',register:'POS-02 OFFLINE',cashier:'Omar Nasser',pay:'Cash',lines:L,total:F.r3(L.reduce((a,l)=>a+l.qty*l.price,0))}; src=F.sampleReceipt(r,I); name='Receipt RCT-1007-901 · sample photo.png'; }
+      else { src=F.sampleBill({merchant:'Al-Mulla Office Supplies',addr:'Shuwaikh Industrial, Kuwait',tel:'2481 5500',no:'AM-55821',date:E.TODAY,pay:'Cash',lines:[['Thermal rolls 80mm x20',12],['Cleaning supplies kit',6.75],['Price labels 50x25 x2',4.5]]}); name='Al-Mulla bill AM-55821 · sample photo.png'; }
+    }catch(e){ return this.toast('Could not draw the sample: '+e.message,true); }
+    this.capStart(src,name); }
+  async capStart(src,name){ const id=this.capId=(this.capId||0)+1; const F=window.FIN; const keep=this.state.cap||{};
+    this.setState({cap:{stage:'prep',name,expect:keep.expect||null,view:'orig',prog:{t:'Preparing the image',p:0.04}}});
+    let img; try{ img=await F.prepare(src); }catch(e){ if(id===this.capId) this.setState(s=>({cap:{...s.cap,stage:'error',err:e.message}})); return; }
+    if(id!==this.capId) return; this.setState(s=>({cap:{...s.cap,img}}),()=>this.capOcr()); }
+  async capOcr(force){ const id=this.capId=(this.capId||0)+1; const F=window.FIN; const c=this.state.cap; if(!c||!c.img) return;
+    this.setState(s=>({cap:{...s.cap,stage:'ocr',err:null,prog:{t:'Starting the OCR engine',p:0.05}}}));
+    const L={'loading tesseract core':'Downloading the OCR engine','initializing tesseract':'Starting the OCR engine','loading language traineddata':'Downloading English language data','loading language traineddata (from cache)':'Loading English language data','initializing api':'Starting the OCR engine','recognizing text':'Reading the text'};
+    let last=0; const prog=m=>{ if(id!==this.capId) return; const now=performance.now(); if(now-last<120&&(m.progress||0)<1) return; last=now; const p=m.status==='recognizing text'?0.3+0.7*(m.progress||0):0.05+0.25*(m.progress||0); this.setState(s=>({cap:{...s.cap,prog:{t:L[m.status]||'Working',p}}})); };
+    try{ const ocr=await F.recognize(c.img.enh,prog); if(id!==this.capId) return; this.capApply(ocr,force); }
+    catch(e){ if(id===this.capId) this.setState(s=>({cap:{...s.cap,stage:'error',err:(e&&e.message)||String(e)}})); } }
+  capApply(ocr,force){ const F=window.FIN; const r=F.parse(ocr,force,this.state.db.items); const vals={},meta={};
+    r.fields.forEach(f=>{ vals[f.k]=f.v; meta[f.k]={conf:f.conf,line:f.line,raw:f.raw,inferred:f.inferred,orig:f.v,found:f.found}; });
+    const got=r.fields.filter(f=>f.found&&!f.inferred&&f.line!=null); const confAvg=got.length?Math.round(got.reduce((a,f)=>a+f.conf,0)/got.length*10)/10:0;
+    this.setState(s=>({cap:{...s.cap,stage:'done',ocr,type:r.type,vals,meta,confAvg,items:r.items.map(x=>({...x,qty:String(x.qty)})),focus:null,note:'',showText:false}})); }
+  capViewer(cap){ const h=React.createElement; const W=cap.img.w,H=cap.img.h; const src=cap.view==='enh'?cap.img.enh:cap.img.orig; const all=cap.view==='lines';
+    const used={}; Object.entries(cap.meta||{}).forEach(([k,m])=>{ if(m&&m.line!=null) used[m.line]=k; }); (cap.items||[]).forEach(it=>{ if(it.line!=null) used[it.line]='item'; });
+    const fl=cap.focus&&cap.meta&&cap.meta[cap.focus]?cap.meta[cap.focus].line:null; const lines=(cap.ocr&&cap.ocr.lines)||[];
+    const boxes=lines.map((l,i)=>{ if(!l.bbox||(used[i]==null&&!all&&i!==fl)) return null; const b=l.bbox, on=i===fl, c=on?'#010ECF':l.conf<60?'#D92D20':l.conf<85?'#E8833A':'#1B9A4A';
+      return h('div',{key:i,title:l.text+' · '+l.conf+'%',style:{position:'absolute',left:(b.x0/W*100-0.4)+'%',top:(b.y0/H*100-0.3)+'%',width:((b.x1-b.x0)/W*100+0.8)+'%',height:((b.y1-b.y0)/H*100+0.6)+'%',border:(on?2.5:1.5)+'px solid '+c,background:on?'rgba(1,14,207,.16)':'transparent',borderRadius:3,boxSizing:'border-box',pointerEvents:'none'}}); });
+    const busy=cap.stage==='ocr'||cap.stage==='prep';
+    return h('div',{style:{position:'relative',lineHeight:0}},h('img',{src,alt:'Captured document',style:{width:'100%',display:'block',opacity:busy?0.55:1,transition:'opacity .2s'}}),...boxes,
+      busy?h('div',{style:{position:'absolute',left:0,right:0,top:0,lineHeight:1.4,padding:'10px 14px',background:'rgba(14,17,22,.78)',color:'#fff',fontSize:12.5,fontWeight:600}},(cap.prog&&cap.prog.t||'Working')+' · '+Math.round(((cap.prog&&cap.prog.p)||0)*100)+'%'):null); }
+  v_capture({E,st,db,I,C}){
+    const F=window.FIN, h=React.createElement; const cap=st.cap||{stage:'empty'}; const set=p=>this.setState(s=>({cap:{...(s.cap||{stage:'empty'}),...p}}));
+    const hasImg=!!cap.img, done=cap.stage==='done', busy=cap.stage==='prep'||cap.stage==='ocr';
+    const pick=e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=''; if(f) this.capFile(f); };
+    const res=this.table('captures',()=>({title:'Capture history',file:'captures',noun:'captures',ph:'Search capture, document, file…',rows:db.captures,dateOf:c=>c.date,defaultSort:{k:'date',dir:-1},
+      search:c=>c.no+' '+c.type+' '+c.ref+' '+c.file+' '+c.by,
+      cols:[{k:'no',label:'Capture',w:'140px',val:c=>c.no,cell:c=>C.m(c.no)},{k:'date',label:'Captured',w:'120px',val:c=>c.date+' '+c.time,cell:c=>C.d(E.fd(c.date),c.time),csv:c=>c.date+' '+c.time},
+        {k:'type',label:'Document',w:'minmax(0,1fr)',val:c=>c.type,cell:c=>C.t(c.type+' · '+c.ref,c.file)},{k:'conf',label:'OCR confidence',w:'170px',val:c=>c.conf,cell:c=>c.conf?C.bar(c.conf.toFixed(1)+'%',c.conf,c.conf>=90?'#1B9A4A':c.conf>=75?'#F2B54A':'#D92D20'):C.d('Keyed by hand'),csv:c=>c.conf},
+        {k:'by',label:'By',w:'130px',val:c=>c.by,cell:c=>C.d(c.by)},{k:'st',label:'Status',w:'100px',val:c=>c.status,cell:c=>C.chip(E.chip(c.status)),csv:c=>c.status}],
+      filters:[{k:'type',label:'Document',opts:[['Z-report','Z-report'],['POS receipt','POS receipt'],['Supplier bill','Supplier bill']],get:c=>c.type},{k:'st',label:'Status',opts:[['Posted','Posted'],['Verified','Verified']],get:c=>c.status}],
+      open:c=>{ if(c.type==='Z-report'&&db.zreports.find(z=>z.no===c.ref)) this.setState({drawer:{kind:'z',no:c.ref}}); else if(c.type==='Supplier bill'&&db.expenses.find(x=>x.no===c.ref)) this.setState({drawer:{kind:'exp',no:c.ref}}); else this.openLedgerRef(c.ref); }}));
+    this.tkey='captures';
+    const zs=db.zreports.find(x=>x.status==='Awaiting Z-report')||db.zreports.filter(x=>x.status==='Posted').slice(-1)[0];
+    const out={T:res.view,hasImg,noImg:!hasImg,idle:!hasImg&&!busy&&cap.stage!=='error',busy,isErr:cap.stage==='error',done,err:cap.err||'',name:cap.name||'',
+      discard:()=>{ this.capId=(this.capId||0)+1; this.setState({cap:{stage:'empty',expect:null}}); },
+      privacy:'Photos stay in this browser. The OCR engine (Tesseract.js, about 5 MB) downloads once, the first time you read a document.',
+      samples:[{title:'Z-report',sub:zs?zs.no+' · '+E.fds(zs.date)+' shift':'Last closed shift',pick:()=>this.capSample('z')},{title:'Offline POS receipt',sub:'From the backup till',pick:()=>this.capSample('receipt')},{title:'Supplier bill',sub:'Al-Mulla Office Supplies',pick:()=>this.capSample('bill')}],
+      steps:[{n:1,title:'Capture',text:'Drop a photo, take one with a phone camera, or use a sample. The image is straightened for contrast and shadows are removed.'},{n:2,title:'Review',text:'Every field shows the line it was read from and a confidence score. Totals are checked against each other and against the POS feed.'},{n:3,title:'Post',text:'A Z-report posts the day’s sales, tenders and cash count. An offline receipt posts the sale and its stock. A bill becomes an expense.'}],
+      drop:h('div',{style:{display:'flex',flexDirection:'column',gap:10}},
+        h('label',{onDragOver:e=>{ e.preventDefault(); if(!cap.drag) set({drag:true}); },onDragLeave:()=>set({drag:false}),onDrop:e=>{ e.preventDefault(); set({drag:false}); const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) this.capFile(f); },
+          style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:8,minHeight:220,border:'1.5px dashed '+(cap.drag?'#010ECF':'#B7BCC6'),borderRadius:12,background:cap.drag?'rgba(1,14,207,.05)':'#FAFBFC',cursor:'pointer',textAlign:'center',padding:20,boxSizing:'border-box'}},
+          h('input',{type:'file',accept:'image/*',onChange:pick,style:{display:'none'}}),
+          h('span',{style:{width:46,height:46,borderRadius:12,background:'rgba(1,14,207,.08)',display:'flex',alignItems:'center',justifyContent:'center'}},h('span',{style:{width:20,height:15,border:'2.5px solid #010ECF',borderRadius:4,boxSizing:'border-box',position:'relative',display:'block'}},h('span',{style:{position:'absolute',left:'50%',top:'50%',width:7,height:7,marginLeft:-3.5,marginTop:-3.5,border:'2px solid #010ECF',borderRadius:'50%',boxSizing:'border-box'}}))),
+          h('div',{style:{fontSize:14,fontWeight:650}},'Drop a photo here, or click to choose one'),
+          h('div',{style:{fontSize:12.5,color:'#5B6270',maxWidth:380,lineHeight:1.5}},'JPG, PNG or WebP up to 15 MB. Lay the slip flat, fill the frame and avoid glare.'+(cap.expect?' Expecting '+cap.expect+'.':''))),
+        h('label',{style:{alignSelf:'flex-start',display:'inline-flex',alignItems:'center',height:32,padding:'0 12px',borderRadius:6,border:'1px solid #D9DCE2',background:'#fff',fontSize:12.5,fontWeight:600,cursor:'pointer'}},h('input',{type:'file',accept:'image/*',capture:'environment',onChange:pick,style:{display:'none'}}),'Use the camera on a phone or tablet')),
+      progTitle:(cap.prog&&cap.prog.t)||'Working', progPct:Math.round(((cap.prog&&cap.prog.p)||0)*100)+'%', progPctText:Math.round(((cap.prog&&cap.prog.p)||0)*100)+'%',
+      progSub:cap.stage==='prep'?'Scaling the photo and evening out light and shadow so the text stands out.':'The first read downloads the OCR engine and English language data. After that a document takes a few seconds.',
+      rerun:()=>{ if(cap.img) this.capOcr(); else this.setState({cap:{stage:'empty',expect:cap.expect||null}}); },
+      manual:()=>this.capApply({text:'',conf:0,lines:[],ms:0},cap.type||'z')};
+    if(hasImg){ out.viewer=this.capViewer(cap); out.imgNote=cap.img.w+' × '+cap.img.h+' px'+(cap.ocr?' · '+E.pl(cap.ocr.lines.length,'text line')+' found':'');
+      out.views=this.seg([['orig','Photo'],['enh','Enhanced'],['lines','All lines']],cap.view||'orig',k=>set({view:k})); }
+    if(!done){ this.capCtx=null; return out; }
+
+    const type=cap.type, vals=cap.vals||{}, meta=cap.meta||{}; const n=k=>F.num(vals[k]); const nz=k=>n(k)||0; const fm=v=>v==null?'—':E.nf(v,3);
+    const MONEY=['gross','disc','ret','net','cash','knet','card','float','expected','counted','os','total'], INT=['receipts','units'];
+    const sels={acct:()=>this.sel(vals.acct||'6950',this.acctOpts(E.EXP_ACCTS),v=>this.capSet('acct',v)),
+      pay:()=>this.sel(vals.pay||(type==='bill'?'Cash':'Cash'),type==='bill'?[['Cash','Petty cash'],['Bank','Bank transfer'],['Card','Bank card'],['K-Net','K-Net'],['Unpaid','Unpaid · accrue']]:[['Cash','Cash'],['K-Net','K-Net'],['Card','Card']],v=>this.capSet('pay',v))};
+    const fields=F.FIELDS[type].map(([k,label])=>{ const m=meta[k]||{}; const v=vals[k]==null?'':String(vals[k]); const edited=m.orig!=null&&v!==String(m.orig); const empty=!v.trim();
+      const c=edited?['Edited','#E6E8FB','#010ECF']:empty?['Missing','#FDE7E5','#B42318']:m.inferred?['Calculated','#EEF0F3','#4A5160']:m.line==null?[m.raw?'Suggested':'Entered','#EEF0F3','#4A5160']:m.conf>=85?['High · '+m.conf+'%','#E3F3E8','#1B7A3A']:m.conf>=60?['Review · '+m.conf+'%','#FDF1DC','#8A5A00']:['Low · '+m.conf+'%','#FDE7E5','#B42318'];
+      const isSel=!!sels[k]; const money=MONEY.includes(k);
+      return {k,label,v,raw:m.raw||(cap.ocr&&cap.ocr.lines.length?'Not found on the document':'Type the value'),isSel,isInput:!isSel,sel:isSel?sels[k]():null,itype:k==='date'?'date':'text',
+        ph:money?'0.000':k==='date'?'':INT.includes(k)?'0':'',align:money||INT.includes(k)?'right':'left',ff:k==='zno'||k==='rno'||k==='billNo'?"'JetBrains Mono',monospace":'inherit',bd:empty&&!['disc','ret','time','register','units'].includes(k)?'#F3B2AB':'#D9DCE2',
+        set:e=>this.capSet(k,e.target.value),focus:()=>set({focus:k}),bg:cap.focus===k?'rgba(1,14,207,.05)':'#fff',cText:c[0],cBg:c[1],cFg:c[2]}; });
+    const conf=cap.confAvg||0;
+    Object.assign(out,{fields,types:this.seg([['z','Z-report'],['receipt','POS receipt'],['bill','Supplier bill']],type,k=>{ if(k!==type) this.capApply(cap.ocr||{text:'',conf:0,lines:[],ms:0},k); }),
+      confText:cap.ocr&&cap.ocr.lines.length?'OCR confidence '+conf.toFixed(0)+'%':'Entered by hand',confBg:!cap.ocr||!cap.ocr.lines.length?'#EEF0F3':conf>=85?'#E3F3E8':conf>=65?'#FDF1DC':'#FDE7E5',confFg:!cap.ocr||!cap.ocr.lines.length?'#4A5160':conf>=85?'#1B7A3A':conf>=65?'#8A5A00':'#B42318',
+      engineLine:cap.ocr&&cap.ocr.lines.length?'Read as a '+({z:'Z-report',receipt:'POS receipt',bill:'supplier bill'}[type])+' · Tesseract 5, English · '+E.pl(cap.ocr.lines.length,'line')+' in '+(cap.ocr.ms/1000).toFixed(1)+' s · page confidence '+cap.ocr.conf+'% · click a field to see where it was read':'No OCR text · fill in the fields from the paper document',
+      isZ:type==='z',isR:type==='receipt',isB:type==='bill',text:cap.ocr?cap.ocr.text:'',showText:!!cap.showText,textLabel:cap.showText?'Hide OCR text':'Show OCR text',toggleText:()=>set({showText:!cap.showText}),
+      note:cap.note||'',setNote:e=>set({note:e.target.value}),needNote:false});
+    let blocker=null, ready='', jHead=[], post=null, postLabel='Post';
+    const JL=(title,lines)=>{ jHead.push({acct:title,dr:'',cr:'',fw:650,fg:'#353B47',bg:'#FAFBFC',ind:'0'}); lines.filter(l=>Math.abs(l[1])>0.0005||Math.abs(l[2])>0.0005).forEach(l=>jHead.push({acct:l[0]+' · '+F.name(l[0]),dr:l[1]>0.0005?E.nf(l[1],3):'',cr:l[2]>0.0005?E.nf(l[2],3):'',fw:400,fg:'#0E1116',bg:'#fff',ind:'10px'})); return lines; };
+    let jDr=0,jCr=0; const tally=ls=>ls.forEach(l=>{ jDr+=l[1]>0?l[1]:0; jCr+=l[2]>0?l[2]:0; });
+    if(type==='z'){
+      const checks=F.zChecks(vals); out.checks=checks.map(c=>({...c,mark:c.ok?'✓':'✕',bg:c.ok?'#E3F3E8':'#FDE7E5',fg:c.ok?'#1B7A3A':'#B42318'}));
+      const date=vals.date, zno=(vals.zno||'').trim().toUpperCase(); const feed=date?this.feedFor(date):null; const zr=db.zreports.find(z=>z.no===zno)||(date?db.zreports.find(z=>z.date===date):null);
+      const cmp=[['Receipts','receipts','n',0],['Net sales','net','net',3],['Cash','cash','cash',3],['K-Net','knet','knet',3],['Card','card','card',3]].map(([label,k,fk,dp])=>{ const zv=n(k), fv=feed&&feed.n?feed[fk]:null; const d=zv!=null&&fv!=null?zv-fv:null; const bad=d!=null&&Math.abs(d)>=0.0005;
+        return {label,z:zv==null?'—':E.nf(zv,dp),feed:fv==null?'—':E.nf(fv,dp),diff:d==null?'—':bad?(d>0?'+':'−')+E.nf(Math.abs(d),dp):'0',fg:bad?'#B42318':'#1B7A3A',bad}; });
+      const hasFeed=!!(feed&&feed.n), feedOk=hasFeed&&!cmp.some(r=>r.bad||r.z==='—');
+      Object.assign(out,{compare:cmp,feedChip:!hasFeed?'No POS data':feedOk?'Matches':'Differs',feedBg:!hasFeed?'#EEF0F3':feedOk?'#E3F3E8':'#FDE7E5',feedFg:!hasFeed?'#4A5160':feedOk?'#1B7A3A':'#B42318',
+        feedNote:!date?'Enter the business date to compare with the POS feed.':!hasFeed?'The POS recorded no sales on '+E.fd(date)+'.':zr&&zr.status==='Posted'?zr.no+' was already posted on '+E.fd(zr.postedOn)+' by '+zr.postedBy+'. Posting it again would count the day twice.':'POS feed for '+E.fd(date)+': '+E.pl(feed.n,'receipt')+' from POS-01.'+(feedOk?'':' Explain any difference before posting.')});
+      const os=nz('os'); const sales=JL('Daily close · sales, tenders and cash count',[['1100',nz('cash')+os,0],['1120',nz('knet'),0],['1130',nz('card'),0],['4050',nz('disc')+nz('ret'),0],['6900',os<0?-os:0,os>0?os:0],['4000',0,nz('gross')]]); tally(sales);
+      if(hasFeed){ const cg=JL('Cost of sales · from the POS feed',[['5000',feed.cogs,0],['1300',0,feed.cogs]]); tally(cg); }
+      out.needNote=hasFeed&&!feedOk; out.noteLabel='Why does the Z-report differ from the POS feed?';
+      blocker=!zno||!/^Z-\d{4}$/.test(zno)?'Enter the Z-report number, e.g. Z-1006.':!date?'Enter the business date.':this.locked(date)?this.lockMsg():zr&&zr.status==='Posted'?zr.no+' is already posted. This looks like a duplicate.':!hasFeed?'No POS sales on '+E.fd(date)+' to close.':!checks.every(c=>c.ok)?'Fix the values that fail the arithmetic checks.':out.needNote&&!(cap.note||'').trim()?'Add a note explaining the difference to the POS feed.':null;
+      ready='Ready · posts '+E.k3(nz('net'))+' net sales'+(os?' and a cash '+(os>0?'overage':'shortage')+' of '+E.nf(Math.abs(os),3):'')+' dated '+E.fd(date);
+      postLabel='Post '+(zno||'Z-report'); post=()=>this.capPostZ(zno,date,feed);
+    }
+    if(type==='receipt'){
+      const items=(cap.items||[]).map((it,i)=>{ const q=parseInt(it.qty,10)||0; const item=it.sku?I[it.sku]:null; const priceOk=item&&Math.abs(item.price-it.price)<0.0005; const stock=item?db.stock[it.sku].store:0;
+        return {...it,q,item,priceOk,stock,i,amountV:F.r3(q*it.price)}; });
+      const sum=F.r3(items.reduce((a,x)=>a+x.amountV,0)), total=n('total'); const rno=(vals.rno||'').trim().toUpperCase(); const rec=db.sales.find(s=>s.no===rno);
+      out.items=items.map(x=>({raw:x.raw,qty:x.qty,price:E.nf(x.price,3),amount:E.nf(x.amountV,3),setQty:e=>this.capItem(x.i,{qty:e.target.value.replace(/[^0-9]/g,'')}),
+        sel:this.sel(x.sku||'',[['','Choose the item…'],...db.items.map(i=>[i.sku,i.sku+' · '+i.name])],v=>this.capItem(x.i,{sku:v||null})),
+        ...(!x.item?{cText:'Unknown SKU',cBg:'#FDE7E5',cFg:'#B42318'}:!x.priceOk?{cText:'Price differs',cBg:'#FDF1DC',cFg:'#8A5A00'}:!rec&&x.q>x.stock?{cText:'Only '+x.stock+' in store',cBg:'#FDE7E5',cFg:'#B42318'}:{cText:'Matched',cBg:'#E3F3E8',cFg:'#1B7A3A'})}));
+      out.noItems=!items.length; out.itemSumText='Item lines add up to '+E.k3(sum); const sumOk=total!=null&&Math.abs(sum-total)<0.0015; out.itemSumNote=total==null?'No total read':sumOk?'✓ Matches the receipt total':'Receipt total is '+E.k3(total); out.itemSumFg=sumOk?'#1B7A3A':'#B42318';
+      const pay=vals.pay||'Cash', tacct={Cash:'1100','K-Net':'1120',Card:'1130'}[pay]||'1100';
+      if(rec){ const same=Math.abs(rec.total-(total||0))<0.0015; Object.assign(out,{rTitle:same?'Already in the POS feed: '+rec.no:'In the POS feed with a different total',rText:'Recorded on '+E.fd(rec.date)+' at '+rec.time+' by '+rec.cashier+' · '+rec.pay+' · '+E.k3(rec.total)+'. '+(same?'Nothing to post. Saving keeps this photo as a verified copy.':'Check the paper receipt against '+rec.no+' before saving.'),rBg:same?'#F1FAF4':'#FFF8F0',rFg:same?'#1B5E31':'#7A4E00',rBd:same?'#A6DDB7':'#F3D2A6'});
+        blocker=!same?'The total differs from '+rec.no+' in the POS feed.':null; ready='Matches '+rec.no+' · saved as a verified copy, nothing is posted'; postLabel='Save as verified'; post=()=>this.capVerifyReceipt(rec.no); }
+      else { const cogs=F.r3(items.reduce((a,x)=>a+(x.item?x.q*x.item.cost:0),0));
+        Object.assign(out,{rTitle:rno?rno+' is not in the POS feed':'Receipt number not read',rText:'A receipt from the backup till while POS-01 was offline. Posting records the sale: '+E.pl(items.reduce((a,x)=>a+x.q,0),'unit')+' leave Main Store stock, '+E.k3(total||0)+' goes to sales and the '+pay+' tender to '+tacct+' '+F.name(tacct)+'.',rBg:'#F4F5FB',rFg:'#1C2470',rBd:'#C9CEF5'});
+        tally(JL('Offline sale · '+pay,[[tacct,total||0,0],['4000',0,total||0]])); tally(JL('Cost of sales and stock',[['5000',cogs,0],['1300',0,cogs]]));
+        blocker=!/^RCT-\d{4}-\d{3}$/.test(rno)?'Enter the receipt number, e.g. RCT-1007-901.':!vals.date?'Enter the receipt date.':this.locked(vals.date)?this.lockMsg():!items.length?'No item lines to post.':items.some(x=>!x.item)?'Pick the item for every unknown SKU.':items.some(x=>x.q<=0)?'Every line needs a quantity.':!sumOk?'Item lines do not add up to the receipt total.':items.some(x=>x.q>x.stock)?'Not enough stock in Main Store for one of the items.':null;
+        ready='Ready · posts an offline sale of '+E.k3(total||0)+' dated '+E.fd(vals.date); postLabel='Post offline sale'; post=()=>this.capPostReceipt(rno,items,pay,tacct,total); }
+    }
+    if(type==='bill'){
+      const total=n('total'), acct=vals.acct||'6950', pay=vals.pay||'Cash'; const method=pay==='Unpaid'?'Unpaid':pay==='Cash'?'Cash':'Bank'; const cr=method==='Cash'?'1100':method==='Bank'?'1110':'2200';
+      tally(JL('Expense · '+(vals.merchant||'supplier'),[[acct,total||0,0],[cr,0,total||0]]));
+      blocker=!(vals.merchant||'').trim()?'Enter the supplier name.':!(total>0)?'Enter the bill total.':!vals.date?'Enter the bill date.':this.locked(vals.date)?this.lockMsg():null;
+      ready='Ready · opens the expense form prefilled with '+E.k3(total||0)+' to '+acct+' '+F.name(acct); postLabel='Review and record expense';
+      post=()=>this.openExp({payee:vals.merchant,date:vals.date,desc:'Bill '+(vals.billNo||'')+' · read by OCR',acct,amount:total.toFixed(3),method,due:E.addDays(vals.date,14),fromOcr:{name:cap.name,conf:cap.confAvg||0,billNo:vals.billNo||''}});
+    }
+    const bal=Math.abs(jDr-jCr)<0.0015;
+    Object.assign(out,{hasJournal:jHead.length>0,journal:[...jHead,{acct:'Total',dr:E.nf(jDr,3),cr:E.nf(jCr,3),fw:700,fg:'#0E1116',bg:'#FAFBFC',ind:'0'}],jRef:type==='z'?(vals.zno||''):type==='receipt'?(vals.rno||''):'',
+      jChip:bal?'Balanced':'Out of balance',jBg:bal?'#E3F3E8':'#FDE7E5',jFg:bal?'#1B7A3A':'#B42318'});
+    if(!blocker&&!bal) blocker='The entry does not balance. Check the amounts.';
+    if(!this.me().fin) blocker='Your role cannot post to the ledger.';
+    this.capCtx={blocker};
+    Object.assign(out,{postLabel,postOp:blocker?0.45:1,blockText:blocker||ready,blockFg:blocker?'#B42318':'#1B7A3A',post:()=>{ if(this.capCtx&&this.capCtx.blocker) return this.toast(this.capCtx.blocker,true); if(!this.canEdit()) return this.toast('Viewer role is read-only',true); post(); }});
+    return out;
+  }
+  capSet(k,v){ this.setState(s=>({cap:{...s.cap,vals:{...s.cap.vals,[k]:v}}})); }
+  capItem(i,p){ this.setState(s=>{ const items=s.cap.items.slice(); items[i]={...items[i],...p}; return {cap:{...s.cap,items}}; }); }
+  capPostZ(zno,date,feed){ const E=window.ERP,F=window.FIN; const c=this.state.cap, v=c.vals; const n=k=>F.num(v[k])||0; let net=0,os=0;
+    this.mut(db=>{ let z=db.zreports.find(x=>x.no===zno)||db.zreports.find(x=>x.date===date&&x.status!=='Posted'); if(!z){ z={no:zno,date,register:'POS-01',cashier:'',float:E.FLOAT,units:0}; db.zreports.push(z); db.zreports.sort((a,b)=>a.date.localeCompare(b.date)); }
+      os=F.r3(n('os')); net=n('net');
+      Object.assign(z,{no:zno,date,register:(v.register||z.register||'POS-01').trim(),cashier:(v.cashier||z.cashier||'').trim(),receipts:parseInt(v.receipts,10)||feed.n,units:parseInt(v.units,10)||z.units||0,gross:n('gross'),disc:n('disc'),ret:n('ret'),net,cash:n('cash'),knet:n('knet'),card:n('card'),float:n('float'),counted:n('counted'),os,status:'Posted',source:'OCR capture',postedBy:this.me().name,postedOn:E.TODAY,note:(c.note||'').trim()});
+      E.post(db,date,zno,'Store sales — daily close',[['1100',z.cash+os,0],['1120',z.knet,0],['1130',z.card,0],['4050',z.disc+z.ret,0],['6900',os<0?-os:0,os>0?os:0],['4000',0,z.gross]]);
+      if(feed.cogs) E.post(db,date,zno,'Cost of store sales',[['5000',feed.cogs,0],['1300',0,feed.cogs]]);
+      this.addCapture(db,'Z-report',zno,c); this.aud(db,'Z-report posted',zno,(c.ocr&&c.ocr.lines.length?'Captured by OCR':'Keyed by hand')+' · net sales '+E.k3(net)+(os?' · cash '+(os>0?'over ':'short ')+E.nf(Math.abs(os),3):'')+(c.note?' · '+c.note.trim():''));
+      return {screen:'zreports',cap:{stage:'empty'}}; });
+    this.capId=(this.capId||0)+1; this.toast(zno+' posted · '+E.k3(net)+' net sales'+(os?' · cash '+(os>0?'over ':'short ')+E.nf(Math.abs(os),3)+' to 6900':'')+' · ledger updated'); }
+  capPostReceipt(rno,items,pay,tacct,total){ const E=window.ERP,F=window.FIN; const c=this.state.cap, v=c.vals;
+    this.mut(db=>{ const lines=items.map(x=>({sku:x.sku,qty:x.q,price:x.price})); const IT={}; db.items.forEach(i=>IT[i.sku]=i); const cogs=F.r3(lines.reduce((a,l)=>a+l.qty*IT[l.sku].cost,0));
+      db.sales.push({no:rno,date:v.date,time:(v.time||'').trim()||this.now(),cashier:(v.cashier||'').trim()||'—',pay,lines,total,offline:true,register:(v.register||'POS-02').trim()});
+      lines.forEach(l=>{ db.stock[l.sku].store-=l.qty; db.moves.push({date:v.date,sku:l.sku,loc:'store',qty:-l.qty,type:'Sale · POS offline',ref:rno}); });
+      E.post(db,v.date,rno,'Offline POS sale · '+pay,[[tacct,total,0],['4000',0,total]]); E.post(db,v.date,rno,'Cost of offline sale',[['5000',cogs,0],['1300',0,cogs]]);
+      this.addCapture(db,'POS receipt',rno,c); this.aud(db,'Offline sale posted',rno,E.pl(lines.reduce((a,l)=>a+l.qty,0),'unit')+' · '+E.k3(total)+' · '+pay);
+      return {cap:{stage:'empty'}}; });
+    this.capId=(this.capId||0)+1; this.toast(rno+' posted as an offline sale · '+E.k3(total)+' · Main Store stock updated'); }
+  capVerifyReceipt(no){ const c=this.state.cap; this.mut(db=>{ const s=db.sales.find(x=>x.no===no); if(s) s.verified=true; this.addCapture(db,'POS receipt',no,c,'Verified'); return {cap:{stage:'empty'}}; }); this.capId=(this.capId||0)+1; this.toast(no+' verified against the POS feed · photo kept with the capture history'); }
+
+  // ---------- expenses ----------
+  v_expenses({E,st,db,C}){
+    const F=window.FIN, mo=E.TODAY.slice(0,7); const xs=db.expenses; const mtd=xs.filter(e=>e.date.startsWith(mo)&&e.acct!=='1400'); const unpaid=xs.filter(e=>e.status!=='Paid'); const od=unpaid.filter(e=>this.expStatus(e)==='Overdue');
+    const sepX=xs.filter(e=>e.date.startsWith('2026-09')&&e.acct!=='1400'); const byA={}; sepX.forEach(e=>byA[e.acct]=(byA[e.acct]||0)+e.amount); const top=Object.entries(byA).sort((a,b)=>b[1]-a[1])[0];
+    const meth={Bank:'Bank transfer',Cash:'Petty cash',Unpaid:'Accrued'};
+    const res=this.table('expenses',()=>({title:'Expenses',file:'expenses',noun:'expenses',ph:'Search expense, payee, account…',rows:xs,dateOf:e=>e.date,defaultSort:{k:'date',dir:-1},
+      search:e=>e.no+' '+e.payee+' '+e.desc+' '+e.acct+' '+F.name(e.acct),
+      cols:[{k:'no',label:'Expense',w:'130px',val:e=>e.no,cell:e=>C.m(e.no,e.ocr?'Read by OCR':'',{sfg:'#010ECF'})},{k:'date',label:'Date',w:'110px',val:e=>e.date,cell:e=>C.d(E.fd(e.date)),csv:e=>e.date},
+        {k:'payee',label:'Payee',w:'minmax(0,1.4fr)',val:e=>e.payee,cell:e=>C.t(e.payee,e.desc),csvx:[['Payee',e=>e.payee],['Description',e=>e.desc]]},
+        {k:'acct',label:'Account',w:'minmax(0,1fr)',val:e=>e.acct,cell:e=>C.t(F.name(e.acct),e.acct,{ws:'nowrap'}),csv:e=>e.acct+' '+F.name(e.acct)},
+        {k:'m',label:'Paid from',w:'110px',val:e=>e.method,cell:e=>C.d(meth[e.method]||e.method),csv:e=>e.method},
+        {k:'amt',label:'Amount',csvLabel:'Amount KWD',w:'110px',align:'right',val:e=>e.amount,total:'n3',cell:e=>C.n(E.nf(e.amount,3),'',{fw:650})},
+        {k:'st',label:'Status',w:'100px',val:e=>this.expStatus(e),cell:e=>C.chip(E.chip(this.expStatus(e))),csv:e=>this.expStatus(e)},
+        {k:'act',label:'',w:'96px',align:'right',noExport:true,cell:e=>e.status!=='Paid'&&this.me().fin?C.btn('Pay now',()=>this.payExpense(e.no)):C.t('')}],
+      filters:[{k:'status',label:'Status',opts:['Paid','Unpaid','Overdue'].map(x=>[x,x]),get:e=>this.expStatus(e)},{k:'acct',label:'Account',opts:E.EXP_ACCTS.map(c=>[c,c+' '+F.name(c)]),get:e=>e.acct},{k:'m',label:'Paid from',opts:Object.entries(meth),get:e=>e.method}],
+      open:e=>this.setState({drawer:{kind:'exp',no:e.no}})}));
+    this.tkey='expenses';
+    return {T:res.view,add:()=>this.openExp(),scan:()=>this.startCapture(),
+      kpis:[{label:'October to date',v:E.k3(mtd.reduce((a,e)=>a+e.amount,0)),fg:'#0E1116',s:E.pl(mtd.length,'expense')},
+        {label:'Unpaid bills',v:E.k3(unpaid.reduce((a,e)=>a+e.amount,0)),fg:od.length?'#B42318':'#0E1116',s:E.pl(unpaid.length,'bill')+(od.length?' · '+od.length+' overdue':' · none overdue')},
+        {label:'Petty cash · October',v:E.k3(mtd.filter(e=>e.method==='Cash').reduce((a,e)=>a+e.amount,0)),fg:'#0E1116',s:'Drawer balance '+E.k3(F.sums(db,'2000-01-01',E.TODAY)['1100']||0)},
+        {label:'Largest cost · September',v:top?F.name(top[0]):'—',fg:'#0E1116',s:top?E.k3(top[1])+' of '+E.k3(sepX.reduce((a,e)=>a+e.amount,0)):''}]};
+  }
+  payExpense(no){ const E=window.ERP; const e0=this.state.db.expenses.find(x=>x.no===no); if(!e0||e0.status==='Paid') return;
+    this.mut(db=>{ const e=db.expenses.find(x=>x.no===no); e.status='Paid'; e.paidOn=E.TODAY; E.post(db,E.TODAY,no,'Payment to '+e.payee,[['2200',e.amount,0],['1110',0,e.amount]]); this.aud(db,'Expense paid',no,E.k3(e.amount)+' by bank transfer'); return {drawer:null}; });
+    this.toast(no+' paid · '+E.k3(e0.amount)+' · Dr 2200 Accrued expenses / Cr 1110 Bank'); }
+
+  // ---------- journals ----------
+  v_journals({E,st,db,C}){
+    const F=window.FIN; const due=this.closeSteps().steps.find(x=>x.key==='jv'&&!x.ok);
+    const res=this.table('journals',()=>({title:'Journal entries',file:'journals',noun:'journals',ph:'Search journal, narration, account…',rows:db.journals,dateOf:j=>j.date,defaultSort:{k:'date',dir:-1},
+      search:j=>j.no+' '+j.memo+' '+j.by+' '+j.lines.map(l=>l.acct+' '+F.name(l.acct)).join(' '),
+      cols:[{k:'no',label:'Journal',w:'130px',val:j=>j.no,cell:j=>C.m(j.no)},{k:'date',label:'Date',w:'110px',val:j=>j.date,cell:j=>C.d(E.fd(j.date)),csv:j=>j.date},
+        {k:'memo',label:'Narration',w:'minmax(0,1.8fr)',val:j=>j.memo,cell:j=>C.t(j.memo,j.lines.map(l=>l.acct).join(' · '))},
+        {k:'n',label:'Lines',w:'70px',align:'right',val:j=>j.lines.length,cell:j=>C.n(j.lines.length)},
+        {k:'amt',label:'Amount',csvLabel:'Amount KWD',w:'120px',align:'right',val:j=>j.lines.reduce((a,l)=>a+l.dr,0),total:'n3',cell:j=>C.n(E.nf(j.lines.reduce((a,l)=>a+l.dr,0),3),'',{fw:650})},
+        {k:'by',label:'Posted by',w:'130px',val:j=>j.by,cell:j=>C.d(j.by)},
+        {k:'st',label:'Status',w:'110px',val:j=>j.status||'Posted',cell:j=>C.chip(E.chip(j.status||'Posted')),csv:j=>j.status||'Posted'}],
+      filters:[{k:'st',label:'Status',opts:[['Posted','Posted'],['Reversed','Reversed']],get:j=>j.status||'Posted'}],
+      open:j=>this.setState({drawer:{kind:'jv',no:j.no}})}));
+    this.tkey='journals';
+    return {T:res.view,add:()=>this.openJv(),hasDue:!!due,dueTitle:due?due.title+' · '+due.label:'',dueText:due?due.detail:'',useDue:()=>{ const cl=this.closeSteps(); this.openJv(this.jvTemplate(cl.end)); }};
+  }
+  v_jvNew({E,st,db,go}){
+    const F=window.FIN; const j=st.jv; if(!j) return {}; const upd=fn=>this.setState(s=>{ const n=JSON.parse(JSON.stringify(s.jv)); fn(n); return {jv:n}; });
+    const num=v=>F.num(v)||0; const clean=v=>v.replace(/[^0-9.]/g,'');
+    const tDr=j.lines.reduce((a,l)=>a+num(l.dr),0), tCr=j.lines.reduce((a,l)=>a+num(l.cr),0); const diff=F.r3(tDr-tCr); const bal=Math.abs(diff)<0.0005&&tDr>0;
+    const lk=this.locked(j.date);
+    const problem=!j.date?'Pick a date.':lk?this.lockMsg():!j.memo.trim()?'Add a narration.':j.lines.length<2?'A journal needs at least two lines.':j.lines.some(l=>(num(l.dr)>0)===(num(l.cr)>0))?'Each line needs either a debit or a credit.':!bal?'Debits and credits must be equal.':null;
+    return {sub:'Posts straight to the general ledger · '+(j.memo?j.memo:'manual journal'),back:go('journals'),date:j.date,setDate:e=>{ const v=e.target.value; upd(n=>{ n.date=v; }); },memo:j.memo,setMemo:e=>{ const v=e.target.value; upd(n=>{ n.memo=v; }); },
+      dateBd:lk?'#F3B2AB':'#D9DCE2',dateFg:lk?'#B42318':'#7A8191',dateNote:lk?this.lockMsg():j.date?'Posts in '+new Date(j.date+'T12:00:00Z').toLocaleString('en-GB',{month:'long',year:'numeric',timeZone:'UTC'})+' · books are open after '+E.fd(db.lockDate):'',
+      lines:j.lines.map((l,i)=>({picker:this.sel(l.acct,this.acctOpts(),v=>upd(n=>{ n.lines[i].acct=v; })),memo:l.memo,setMemo:e=>{ const v=e.target.value; upd(n=>{ n.lines[i].memo=v; }); },dr:l.dr,cr:l.cr,
+        setDr:e=>{ const v=clean(e.target.value); upd(n=>{ n.lines[i].dr=v; if(v) n.lines[i].cr=''; }); },setCr:e=>{ const v=clean(e.target.value); upd(n=>{ n.lines[i].cr=v; if(v) n.lines[i].dr=''; }); },remove:()=>upd(n=>{ if(n.lines.length>2) n.lines.splice(i,1); })})),
+      addLine:()=>upd(n=>{ n.lines.push({acct:'6950',memo:'',dr:diff<0?(-diff).toFixed(3):'',cr:diff>0?diff.toFixed(3):''}); }),
+      tDr:E.nf(tDr,3),tCr:E.nf(tCr,3),balText:bal?'Balanced':tDr||tCr?'Difference '+E.nf(Math.abs(diff),3):'Enter amounts',balBg:bal?'#E3F3E8':'#FDF1DC',balFg:bal?'#1B7A3A':'#8A5A00',postOp:problem?0.45:1,
+      post:()=>{ if(problem) return this.toast(problem,true); let no; this.mut(db=>{ no='JV-2026-'+E.pad(db.seq.JV++); const lines=j.lines.map(l=>({acct:l.acct,dr:F.r3(num(l.dr)),cr:F.r3(num(l.cr)),memo:l.memo.trim()})); db.journals.unshift({no,date:j.date,memo:j.memo.trim(),by:this.me().name,lines,status:'Posted'}); E.post(db,j.date,no,j.memo.trim(),lines.map(l=>[l.acct,l.dr,l.cr])); this.aud(db,'Journal posted',no,j.memo.trim()+' · '+E.k3(tDr)); return {screen:'journals',jv:null}; }); this.toast(no+' posted · '+E.k3(tDr)+' · dated '+E.fd(j.date)); }};
+  }
+  reverseJv(no){ const E=window.ERP; if(!this.canEdit()) return this.toast('Viewer role is read-only',true); let rn;
+    this.mut(db=>{ const j=db.journals.find(x=>x.no===no); rn='JV-2026-'+E.pad(db.seq.JV++); const lines=j.lines.map(l=>({acct:l.acct,dr:l.cr,cr:l.dr,memo:l.memo})); db.journals.unshift({no:rn,date:E.TODAY,memo:'Reversal of '+no+': '+j.memo,by:this.me().name,lines,status:'Posted',reverses:no}); j.status='Reversed'; j.reversedBy=rn;
+      E.post(db,E.TODAY,rn,'Reversal of '+no,lines.map(l=>[l.acct,l.dr,l.cr])); this.aud(db,'Journal reversed',no,'Reversed by '+rn); return {drawer:null}; });
+    this.toast(no+' reversed by '+rn+' dated '+E.fd(E.TODAY)); }
+
+  // ---------- bank reconciliation ----------
+  v_bankrec({E,st,db,C}){
+    const F=window.FIN; const SD=db.bank.length?db.bank[db.bank.length-1].date:E.TODAY; const used=new Set(db.bank.filter(b=>b.match).map(b=>b.match)); const L={}; db.ledger.forEach(e=>L[e.id]=e);
+    const stmt=F.r3(db.bankOpen+db.bank.reduce((a,b)=>a+b.amt,0)); const book=F.r3(db.ledger.filter(e=>e.acct==='1110'&&e.date<=SD).reduce((a,e)=>a+e.dr-e.cr,0)); const bookNow=F.r3(db.ledger.filter(e=>e.acct==='1110').reduce((a,e)=>a+e.dr-e.cr,0));
+    const UL=db.bank.filter(b=>!b.match), UB=db.ledger.filter(e=>e.acct==='1110'&&e.ref!=='OPEN'&&e.date<=SD&&!used.has(e.id)); const ul=F.r3(UL.reduce((a,b)=>a+b.amt,0)), ub=F.r3(UB.reduce((a,e)=>a+e.dr-e.cr,0));
+    const adjB=F.r3(stmt-ul), adjL=F.r3(book-ub), diff=F.r3(adjB-adjL); const sg=v=>(v<0?'−':'')+E.nf(Math.abs(v),3); const pm=v=>(v<0?'− ':v>0?'+ ':'')+E.nf(Math.abs(v),3);
+    const res=this.table('bankrec',()=>({title:'Bank statement lines',file:'bank-statement',noun:'lines',ph:'Search description, reference…',rows:db.bank,dateOf:b=>b.date,defaultSort:{k:'date',dir:-1},
+      search:b=>b.id+' '+b.desc+' '+(b.match&&L[b.match]?L[b.match].ref+' '+L[b.match].memo:''),
+      cols:[{k:'date',label:'Date',w:'110px',val:b=>b.date+b.id,cell:b=>C.d(E.fd(b.date),b.id),csv:b=>b.date},{k:'desc',label:'Statement description',w:'minmax(0,1.6fr)',val:b=>b.desc,cell:b=>C.t(b.desc,'',{fs:'12.5px',ws:'nowrap'})},
+        {k:'in',label:'Money in',csvLabel:'In KWD',w:'110px',align:'right',val:b=>Math.max(0,b.amt),total:'n3',cell:b=>C.n(b.amt>0?E.nf(b.amt,3):'','',{fg:'#1B7A3A',fw:600})},
+        {k:'out',label:'Money out',csvLabel:'Out KWD',w:'110px',align:'right',val:b=>Math.max(0,-b.amt),total:'n3',cell:b=>C.n(b.amt<0?E.nf(-b.amt,3):'','',{fw:600})},
+        {k:'m',label:'Ledger entry',w:'minmax(0,1fr)',val:b=>b.match?L[b.match].ref:'',cell:b=>b.match&&L[b.match]?C.m(L[b.match].ref,E.fd(L[b.match].date)+' · '+L[b.match].memo,{fs:'12px'}):C.d('—'),csv:b=>b.match&&L[b.match]?L[b.match].ref:''},
+        {k:'st',label:'Status',w:'110px',val:b=>b.match?'Matched':'Unmatched',cell:b=>C.chip(E.chip(b.match?'Matched':'Unmatched')),csv:b=>b.match?'Matched':'Unmatched'}],
+      filters:[{k:'st',label:'Status',opts:[['Unmatched','Unmatched'],['Matched','Matched']],get:b=>b.match?'Matched':'Unmatched'},{k:'dir',label:'Direction',opts:[['in','Money in'],['out','Money out']],get:b=>b.amt>=0?'in':'out'}],
+      rowBg:b=>b.match?'#fff':'#FFFDF7',open:b=>this.setState({recModal:{id:b.id,acct:null,memo:''}})}));
+    this.tkey='bankrec';
+    const R=(label,v,o)=>({label,v,bt:'none',fw:500,lfg:'#353B47',...(o||{})});
+    return {T:res.view,sub:'Bank — current account · statement imported to '+E.fd(SD)+' · matched against ledger account 1110',asAt:E.fd(SD),
+      importStmt:()=>this.toast('The statement for '+E.fd(E.addDays(SD,1))+' is published by the bank tomorrow morning. Statements import as MT940 or CSV.'),auto:()=>this.autoMatch(),
+      kpis:[{label:'Statement balance · '+E.fds(SD),v:E.k3(stmt),fg:'#0E1116',s:E.pl(db.bank.length,'line')+' imported'},{label:'Ledger balance · 1110',v:E.k3(bookNow),fg:'#0E1116',s:'At '+E.fds(SD)+': '+E.k3(book)},
+        {label:'Unmatched statement lines',v:String(UL.length),fg:UL.length?'#8A5A00':'#1B7A3A',s:UL.length?'Net '+sg(ul):'Everything on the statement is matched'},{label:'Unmatched ledger entries',v:String(UB.length),fg:UB.length?'#8A5A00':'#1B7A3A',s:UB.length?'Net '+sg(ub)+' to '+E.fds(SD):'All entries to '+E.fds(SD)+' cleared'}],
+      left:[R('Statement balance',E.k3(stmt)),R('Take out '+E.pl(UL.length,'unmatched statement line'),pm(-ul)),R('Matched bank balance',E.k3(adjB),{bt:'1px solid #E6E8EC',fw:700})],
+      right:[R('Ledger 1110 balance at '+E.fds(SD),E.k3(book)),R('Take out '+E.pl(UB.length,'unmatched ledger entry','unmatched ledger entries'),pm(-ub)),R('Matched ledger balance',E.k3(adjL),{bt:'1px solid #E6E8EC',fw:700})],
+      recChip:Math.abs(diff)>=0.0005?'Difference '+sg(diff):UL.length||UB.length?'Matched items agree · '+E.pl(UL.length+UB.length,'item')+' open':'Fully reconciled',recBg:Math.abs(diff)>=0.0005?'#FDE7E5':UL.length||UB.length?'#FDF1DC':'#E3F3E8',recFg:Math.abs(diff)>=0.0005?'#B42318':UL.length||UB.length?'#8A5A00':'#1B7A3A'};
+  }
+  autoMatch(){ const E=window.ERP; let n=0,left=0;
+    this.mut(db=>{ const used=new Set(db.bank.filter(b=>b.match).map(b=>b.match)); const pool=db.ledger.filter(e=>e.acct==='1110'&&e.ref!=='OPEN'&&!used.has(e.id));
+      db.bank.filter(b=>!b.match).forEach(b=>{ let best=null,bd=99; pool.forEach(e=>{ if(used.has(e.id)||Math.abs((e.dr-e.cr)-b.amt)>=0.0005) return; const d=Math.abs(E.dayDiff(e.date,b.date)); if(d<=3&&d<bd){ bd=d; best=e; } }); if(best){ b.match=best.id; used.add(best.id); n++; } else left++; });
+      if(n) this.aud(db,'Bank lines auto-matched','BANK',E.pl(n,'line')+' matched on amount and date'); });
+    this.toast(n?E.pl(n,'line')+' matched on amount and date · '+(left?left+' need a decision':'nothing left to review'):'No new matches · '+E.pl(left,'line')+' need a decision',!n&&left>0); }
+  recSuggest(b){ const d=b.desc; return /FEE|CHARGE|COMMISSION/.test(d)?'6700':/KNET/.test(d)?'1120':/VISA|MC|MASTERCARD/.test(d)?'1130':/CASH DEPOSIT/.test(d)?'1100':/MYFATOORAH/.test(d)?'4010':b.amt<0?'6950':'3000'; }
+  recLines(b,acct){ const E=window.ERP,F=window.FIN,db=this.state.db; if(acct==='1120'||acct==='1130'){ const s=(db.settlements||[]).find(x=>x.acct===acct&&Math.abs(x.net-b.amt)<0.005&&!db.ledger.some(e=>e.ref===x.ref));
+      if(s) return {lines:[['1110',s.net,0],['6400',s.fee,0],[acct,0,s.gross]],ref:s.ref,memo:s.lab+' settlement for '+s.z,hint:'Matches the '+s.lab+' batch for '+s.z+': gross '+E.nf(s.gross,3)+' less '+(s.lab==='K-Net'?'0.75%':'2.25%')+' fee '+E.nf(s.fee,3)+'.',ok:true}; }
+    const a=Math.abs(b.amt); const lines=b.amt>=0?[['1110',a,0],[acct,0,a]]:[[acct,a,0],['1110',0,a]]; return {lines,ref:acct==='6700'?'BC-'+b.date.slice(5,7)+b.date.slice(8,10):'BS-'+b.id.slice(3),memo:acct==='6700'?'Bank charge · '+b.desc.toLowerCase():b.desc,hint:acct==='6700'?'Posts the fee as a bank charge.':'Posts '+E.nf(a,3)+' between 1110 and '+acct+' '+F.name(acct)+'.',ok:true}; }
+
+  // ---------- statements ----------
+  fsRange(){ const E=window.ERP; const f=this.state.fs; const T=E.TODAY;
+    if(f.tab==='bs'){ const as=f.bs==='sep'?'2026-09-30':f.bs==='aug'?'2026-08-31':f.bs==='custom'?(f.asOf||T):T; const cmp=as>'2026-08-31'?'2026-08-31':E.OPEN_DATE; return {as,cmp,label:'At '+E.fd(as),cmpLabel:'At '+E.fd(cmp)}; }
+    const P={mtd:['2026-10-01',T,'October to date','2026-09-01',E.addDays('2026-09-01',E.dayDiff('2026-10-01',T)),'Same days, September'],sep:['2026-09-01','2026-09-30','September 2026','2026-08-08','2026-08-31','August 2026'],aug:['2026-08-08','2026-08-31','August 2026',null,null,null],all:[E.OPEN_DATE,T,'Since opening',null,null,null]}[f.period];
+    if(P) return {from:P[0],to:P[1],label:P[2],cf:P[3],ct:P[4],cmpLabel:P[5]}; const from=f.from||'2026-09-01', to=f.to||T; return {from,to,label:E.fd(from)+' – '+E.fd(to)}; }
+  v_statements({E,st,db}){
+    const F=window.FIN; const f=st.fs; const set=p=>this.setState(s=>({fs:{...s.fs,...p}})); const r=this.fsRange(); const isPl=f.tab!=='bs';
+    const fmt=v=>v==null?'':Math.abs(v)<0.0005?'—':v<0?'('+E.nf(-v,3)+')':E.nf(v,3);
+    const rows=[]; const H=t=>rows.push({cells:[{v:t,align:'left',fg:'#7A8191',ind:'0'}],fw:650,fs:'11px',ls:'.06em',tt:'uppercase',h:'34px',bg:'#FAFBFC',bt:'1px solid #EEF0F3',cur:'default',open:()=>{}});
+    const row=(label,vals,o)=>{ o=o||{}; rows.push({cells:[{v:label,align:'left',fg:o.lfg||'#0E1116',ind:o.ind||'0'},...vals.map((v,i)=>({v:typeof v==='string'?v:fmt(v),align:'right',fg:o.vfg&&i===0?o.vfg:'#0E1116',ind:'0'}))],fw:o.fw||400,fs:'13px',ls:'normal',tt:'none',h:o.h||'40px',bg:o.bg||'#fff',bt:o.bt||'1px solid #F2F3F5',cur:o.open?'pointer':'default',open:o.open||(()=>{})}); };
+    let kpis, head, grid, foot;
+    if(isPl){ const cur=F.pl(db,r.from,r.to), cmp=r.cf?F.pl(db,r.cf,r.ct):null; const ch=(a,b)=>b==null?'':Math.abs(b)<0.0005?'—':((a-b)/Math.abs(b)*100>=0?'+':'')+((a-b)/Math.abs(b)*100).toFixed(0)+'%';
+      const vs=(a,b)=>cmp?[a,b,ch(a,b)]:[a];
+      cur.sections.forEach((s,si)=>{ H(s.title); s.rows.forEach((x,i)=>{ const y=cmp?cmp.sections[si].rows[i].v:null; if(Math.abs(x.v)<0.0005&&(y==null||Math.abs(y)<0.0005)) return; row(x.code+'  '+x.name,vs(x.v,y),{ind:'14px',open:()=>this.openLedgerAcct(x.code,r.from,r.to)}); });
+        row('Total '+s.title.toLowerCase(),vs(s.total,cmp?cmp.sections[si].total:null),{fw:600,bt:'1px solid #E6E8EC'});
+        if(si===1) row('Gross profit · '+cur.gm.toFixed(1)+'% margin',vs(cur.gp,cmp?cmp.gp:null),{fw:700,bt:'1.5px solid #0E1116',h:'44px'}); });
+      row('Net profit · '+cur.nm.toFixed(1)+'% of revenue',vs(cur.net,cmp?cmp.net:null),{fw:700,bt:'1.5px solid #0E1116',h:'48px',bg:'#F7F8FB',vfg:cur.net>=0?'#1B7A3A':'#B42318'});
+      head=[{label:'Account',align:'left'},{label:r.label,align:'right'},...(cmp?[{label:r.cmpLabel,align:'right'},{label:'Change',align:'right'}]:[])]; grid=cmp?'minmax(0,1fr) 160px 160px 90px':'minmax(0,1fr) 180px';
+      kpis=[{label:'Net revenue',v:E.k3(cur.rev),fg:'#0E1116',s:cmp?ch(cur.rev,cmp.rev)+' against '+r.cmpLabel:r.label},{label:'Gross profit',v:E.k3(cur.gp),fg:'#0E1116',s:cur.gm.toFixed(1)+'% margin'},{label:'Operating expenses',v:E.k3(cur.opex),fg:'#0E1116',s:(cur.rev?cur.opex/cur.rev*100:0).toFixed(1)+'% of revenue'},{label:'Net profit',v:E.k3(cur.net),fg:cur.net>=0?'#1B7A3A':'#B42318',s:cur.nm.toFixed(1)+'% net margin'}];
+      foot='Accrual basis · KWD · store revenue posts at daily close, online revenue daily, stock at average landed cost. Click an account to open its ledger entries.'+(db.zreports.some(z=>z.status!=='Posted'&&z.date>=r.from&&z.date<=r.to)?' Some Z-reports in this period are not posted yet, so store revenue is incomplete.':''); }
+    else { const b=F.bs(db,r.as), c=F.bs(db,r.cmp); const two=(a,x)=>[a,x];
+      H('Assets'); row('Current assets',['',''],{fw:600,lfg:'#353B47'}); b.cur.forEach((x,i)=>row(x.code+'  '+x.name,two(x.v,c.cur[i].v),{ind:'14px',open:()=>this.openLedgerAcct(x.code)})); row('Total current assets',two(b.tCur,c.tCur),{fw:600,bt:'1px solid #E6E8EC'});
+      row('Non-current assets',['',''],{fw:600,lfg:'#353B47'}); b.fixed.forEach((x,i)=>row(x.code+'  '+x.name,two(x.v,c.fixed[i].v),{ind:'14px',open:()=>this.openLedgerAcct(x.code)})); row('Net fixed assets',two(b.tFixed,c.tFixed),{fw:600,bt:'1px solid #E6E8EC'});
+      row('Total assets',two(b.ta,c.ta),{fw:700,bt:'1.5px solid #0E1116',h:'46px',bg:'#F7F8FB'});
+      H('Liabilities'); b.liab.forEach((x,i)=>row(x.code+'  '+x.name,two(x.v,c.liab[i].v),{ind:'14px',open:()=>this.openLedgerAcct(x.code)})); row('Total liabilities',two(b.tl,c.tl),{fw:600,bt:'1px solid #E6E8EC'});
+      H('Equity'); b.eq.forEach((x,i)=>row((x.code?x.code+'  ':'')+x.name,two(x.v,c.eq[i].v),{ind:'14px',open:x.code?()=>this.openLedgerAcct(x.code):null})); row('Total equity',two(b.te,c.te),{fw:600,bt:'1px solid #E6E8EC'});
+      row('Total liabilities and equity',two(b.tle,c.tle),{fw:700,bt:'1.5px solid #0E1116',h:'46px',bg:'#F7F8FB'});
+      head=[{label:'Account',align:'left'},{label:r.label,align:'right'},{label:r.cmpLabel,align:'right'}]; grid='minmax(0,1fr) 170px 170px';
+      kpis=[{label:'Total assets',v:E.k3(b.ta),fg:'#0E1116',s:r.label},{label:'Total liabilities',v:E.k3(b.tl),fg:'#0E1116',s:'Payables and accruals'},{label:'Equity',v:E.k3(b.te),fg:'#0E1116',s:'Including earnings since opening'},{label:'Current ratio',v:b.tl?(b.tCur/b.tl).toFixed(2)+' ×':'—',fg:'#0E1116',s:'Current assets ÷ liabilities'}];
+      foot=b.ok?'Balanced: total assets equal liabilities plus equity. Earnings since opening are not yet closed to retained earnings.':'Out of balance by '+E.nf(b.ta-b.tle,3)+'. Check the trial balance.'; }
+    const txt=rows.map(x=>x.cells.map(c=>c.v));
+    return {sub:isPl?'Profit and loss · '+r.label+(r.cmpLabel?' · compared with '+r.cmpLabel:''):'Balance sheet at '+E.fd(r.as)+' · compared with '+E.fd(r.cmp),
+      tabs:this.seg([['pl','Profit and loss'],['bs','Balance sheet']],isPl?'pl':'bs',k=>set({tab:k})),
+      periods:isPl?this.seg([['mtd','October to date'],['sep','September'],['aug','August'],['all','Since opening'],['custom','Custom']],f.period,k=>set({period:k})):this.seg([['today','Today'],['sep','30 Sep 2026'],['aug','31 Aug 2026'],['custom','Pick a date']],f.bs,k=>set({bs:k})),
+      isCustom:isPl?f.period==='custom':f.bs==='custom',hasFrom:isPl,from:f.from||'2026-09-01',to:isPl?(f.to||E.TODAY):(f.asOf||E.TODAY),setFrom:e=>set({from:e.target.value}),setTo:e=>{ const v=e.target.value; set(isPl?{to:v}:{asOf:v}); },
+      kpis,head,grid,rows,foot,
+      csv:()=>{ const esc=v=>{ const s=String(v); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }; const lines=[head.map(x=>esc(x.label)).join(','),...txt.map(t=>t.map(esc).join(','))]; const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(isPl?'profit-and-loss':'balance-sheet')+'-'+E.TODAY+'.csv'; document.body.appendChild(a); a.click(); a.remove(); this.toast((isPl?'Profit and loss':'Balance sheet')+' exported to CSV'); },
+      print:()=>this.printTable(isPl?'Profit and loss':'Balance sheet',isPl?r.label+(r.cmpLabel?' · compared with '+r.cmpLabel:''):r.label+' · compared with '+r.cmpLabel,head.map((x,i)=>({label:x.label,right:i>0})),txt.map(t=>head.map((_,i)=>t[i]==null?'':t[i])),[])};
+  }
+
+  // ---------- period close ----------
+  closeSteps(){ const E=window.ERP,F=window.FIN,db=this.state.db; const per=db.close.period; const [y,m]=per.split('-').map(Number); const end=new Date(Date.UTC(y,m,0)).toISOString().slice(0,10); const start=per+'-01';
+    const label=new Date(start+'T12:00:00Z').toLocaleString('en-GB',{month:'long',year:'numeric',timeZone:'UTC'});
+    const zs=db.zreports.filter(z=>z.date>=start&&z.date<=end), zOpen=zs.filter(z=>z.status!=='Posted');
+    const bOpen=db.bank.filter(b=>b.date<=end&&!b.match), covers=db.bank.some(b=>b.date>end)||(db.bank.length&&db.bank[db.bank.length-1].date>=end&&end<E.TODAY);
+    const grns=db.grns.filter(g=>g.date>=start&&g.date<=end), noInv=grns.filter(g=>!db.invoices.some(v=>v.grn===g.no));
+    const jv=db.journals.find(j=>j.date===end&&/month-end/i.test(j.memo)&&j.status!=='Reversed');
+    const acc=db.expenses.filter(e=>e.method==='Unpaid'&&e.date>=start&&e.date<=end);
+    const bal={}; db.ledger.forEach(e=>{ bal[e.acct]=(bal[e.acct]||0)+e.dr-e.cr; }); const dr=Object.values(bal).reduce((a,v)=>a+Math.max(0,v),0), cr=Object.values(bal).reduce((a,v)=>a+Math.max(0,-v),0);
+    const steps=[
+      {key:'z',title:'Daily close posted for every trading day',short:E.pl(zOpen.length,'Z-report')+' to post',ok:!zOpen.length&&zs.length>0,detail:zOpen.length?zOpen.map(z=>z.no).join(', ')+' not posted yet':zs.length?E.pl(zs.length,'Z-report')+' posted · '+E.k3(zs.reduce((a,z)=>a+z.net,0))+' store net sales':'No trading days yet',act:this.go('zreports'),actLabel:'Open daily close'},
+      {key:'bank',title:'Bank reconciled to '+E.fd(end),short:'bank to reconcile',ok:!!covers&&!bOpen.length,detail:!covers?'The bank statement does not reach '+E.fd(end)+' yet.':bOpen.length?E.pl(bOpen.length,'statement line')+' not matched: '+bOpen.slice(0,2).map(b=>b.desc.toLowerCase()+' '+E.nf(b.amt,3)).join(' · '):'Every statement line to '+E.fd(end)+' is matched to the ledger',act:()=>{ this.go('bankrec')(); this.tset('bankrec',{f:{st:['Unmatched']},range:{preset:'custom',from:start,to:end},page:0}); },actLabel:'Reconcile'},
+      {key:'inv',title:'Supplier invoices entered for the month’s receipts',short:'invoices to enter',ok:!noInv.length,detail:noInv.length?noInv.map(g=>g.no).join(', ')+' have no invoice':E.pl(grns.length,'goods receipt')+', all invoiced',act:this.go('invoices'),actLabel:'Open invoices'},
+      {key:'jv',title:'Month-end journal posted',label:label,short:'month-end journal',ok:!!jv,detail:jv?jv.no+' · '+jv.memo+' · posted by '+jv.by:'Depreciation of fixtures (70.000) and prepaid insurance (20.000) are not posted for '+label+'.',act:()=>this.openJv(this.jvTemplate(end)),actLabel:'Prepare journal'},
+      {key:'acc',title:'Accrued expenses reviewed',short:'accruals to review',ok:!!db.close.accruals,detail:(acc.length?E.pl(acc.length,'unpaid bill')+' dated in '+label+' accrued to 2200: '+acc.map(e=>e.payee+' '+E.nf(e.amount,3)).join(' · '):'No unpaid bills dated in '+label)+(db.close.accruals?' · reviewed':''),act:()=>this.mut(db=>{ db.close.accruals=true; this.aud(db,'Accruals reviewed',per,label); }),actLabel:'Mark reviewed'},
+      {key:'tb',title:'Trial balance balances',short:'trial balance',ok:Math.abs(dr-cr)<0.01,detail:'Debits '+E.k3(dr)+' · credits '+E.k3(cr),act:()=>this.nav('ledger',{ledgerTab:'tb'}),actLabel:'Open'}];
+    return {per,start,end,label,steps,done:steps.filter(s=>s.ok).length}; }
+  v_close({E,st,db}){
+    const cl=this.closeSteps(); const all=cl.done===cl.steps.length; const early=cl.end>=E.TODAY; const canAct=this.canEdit()&&this.me().fin;
+    return {sub:'Close '+cl.label+' to lock it against new postings. Books are locked to '+E.fd(db.lockDate)+'.',
+      progress:cl.done+' of '+cl.steps.length,progressSub:'steps complete for '+cl.label,pct:(cl.done/cl.steps.length*100).toFixed(0)+'%',lockText:'Locked to '+E.fd(db.lockDate),lockBg:'#EEF0F3',lockFg:'#4A5160',
+      steps:cl.steps.map(s=>({title:s.title,detail:s.detail,mark:s.ok?'✓':'!',bg:s.ok?'#E3F3E8':'#FDF1DC',fg:s.ok?'#1B7A3A':'#8A5A00',hasAct:!s.ok&&canAct||s.key==='tb',act:s.act,actLabel:s.actLabel})),
+      closeLabel:early?cl.label+' closes after '+E.fd(cl.end):'Close '+cl.label,closeOp:all&&!early?1:0.45,
+      closeIt:()=>{ if(early) return this.toast(cl.label+' is still running. It can be closed after '+E.fd(cl.end)+'.',true); if(!all) return this.toast('Finish the open steps first: '+cl.steps.filter(s=>!s.ok).map(s=>s.short).join(', '),true); if(!this.me().fin) return this.toast('Only Finance can close a period',true);
+        this.mut(db=>{ db.lockDate=cl.end; db.closed.unshift({period:cl.per,by:this.me().name,on:E.TODAY,lock:cl.end}); const [y,m]=cl.per.split('-').map(Number); db.close={period:m===12?(y+1)+'-01':y+'-'+String(m+1).padStart(2,'0'),accruals:false}; this.aud(db,'Period closed',cl.per,cl.label+' locked to '+E.fd(cl.end)); });
+        this.toast(cl.label+' closed · nothing can be posted on or before '+E.fd(cl.end)+' now'); },
+      closed:db.closed.map(c=>({label:new Date(c.period+'-01T12:00:00Z').toLocaleString('en-GB',{month:'long',year:'numeric',timeZone:'UTC'}),sub:'Closed by '+c.by+' on '+E.fd(c.on)+' · locked to '+E.fd(c.lock||c.period+'-31')}))};
+  }
+
+  // ---------- finance modals ----------
+  v_finModals({E,st,db}){
+    const F=window.FIN; const out={expOpen:!!st.expModal,recOpen:!!st.recModal};
+    if(st.expModal){ const m=st.expModal; const set=p=>this.setState(s=>({expModal:{...s.expModal,...p}})); const amt=F.num(m.amount); const cr=m.method==='Cash'?'1100':m.method==='Bank'?'1110':'2200';
+      out.em={sub:m.fromOcr?'From '+m.fromOcr.name:'Posts to the general ledger as soon as you save',payee:m.payee,setPayee:e=>set({payee:e.target.value}),date:m.date,setDate:e=>set({date:e.target.value}),desc:m.desc,setDesc:e=>set({desc:e.target.value}),
+        acct:this.sel(m.acct,this.acctOpts(E.EXP_ACCTS),v=>set({acct:v})),amount:m.amount,setAmount:e=>set({amount:e.target.value.replace(/[^0-9.]/g,'')}),
+        methods:this.seg([['Bank','Bank transfer'],['Cash','Petty cash'],['Unpaid','Unpaid · accrue']],m.method,k=>set({method:k})),isUnpaid:m.method==='Unpaid',due:m.due,setDue:e=>set({due:e.target.value}),
+        posting:'Posts Dr '+m.acct+' '+F.name(m.acct)+' / Cr '+cr+' '+F.name(cr)+(amt?' for '+E.k3(amt):'')+(m.method==='Unpaid'?'. Pay it later from the expenses list.':'.')+(this.locked(m.date)?' The date is in a closed period.':''),
+        fromOcr:!!m.fromOcr,ocrNote:m.fromOcr?'✓ Prefilled by OCR'+(m.fromOcr.billNo?' from bill '+m.fromOcr.billNo:'')+' · confidence '+(m.fromOcr.conf||0).toFixed(0)+'%. The photo is kept with the capture history.':'',
+        close:()=>this.setState({expModal:null}),
+        save:()=>{ const payee=(m.payee||'').trim(); if(!payee) return this.toast('Enter the supplier or payee',true); if(!(amt>0)) return this.toast('Enter an amount in KWD',true); if(!m.date) return this.toast('Pick the bill date',true); if(this.locked(m.date)) return this.toast(this.lockMsg(),true); if(m.method==='Unpaid'&&!m.due) return this.toast('Pick a due date',true);
+          let no; this.mut(db=>{ no='EXP-2026-'+E.pad(db.seq.EXP++); const e={no,date:m.date,acct:m.acct,payee,desc:(m.desc||'').trim()||F.name(m.acct),amount:F.r3(amt),method:m.method,due:m.method==='Unpaid'?m.due:undefined,status:m.method==='Unpaid'?'Unpaid':'Paid',paidOn:m.method==='Unpaid'?null:m.date,by:this.me().name,ocr:!!m.fromOcr};
+            db.expenses.unshift(e); E.post(db,m.date,no,payee+' · '+e.desc,[[m.acct,e.amount,0],[cr,0,e.amount]]); this.aud(db,'Expense recorded',no,payee+' · '+E.k3(e.amount)+' · '+m.method);
+            if(m.fromOcr) this.addCapture(db,'Supplier bill',no,{name:m.fromOcr.name,confAvg:m.fromOcr.conf});
+            return {expModal:null,...(m.fromOcr?{cap:{stage:'empty'},screen:'expenses'}:{})}; });
+          if(m.fromOcr) this.capId=(this.capId||0)+1; this.toast(no+' recorded · '+E.k3(amt)+' to '+m.acct+' '+F.name(m.acct)); }};
+    }
+    if(st.recModal){ const rm=st.recModal; const b=db.bank.find(x=>x.id===rm.id); if(!b){ out.recOpen=false; return out; } const L={}; db.ledger.forEach(e=>L[e.id]=e); const used=new Set(db.bank.filter(x=>x.match).map(x=>x.match));
+      const acct=rm.acct||this.recSuggest(b); const sug=this.recLines(b,acct); const set=p=>this.setState(s=>({recModal:{...s.recModal,...p}}));
+      const cands=b.match?[]:db.ledger.filter(e=>e.acct==='1110'&&e.ref!=='OPEN'&&!used.has(e.id)&&Math.sign(e.dr-e.cr)===Math.sign(b.amt)).map(e=>{ const v=e.dr-e.cr, d=Math.abs(v-b.amt), days=E.dayDiff(e.date,b.date); return {e,v,d,days}; }).filter(x=>x.d<Math.max(1,Math.abs(b.amt)*0.05)&&Math.abs(x.days)<=10).sort((x,y)=>x.d-y.d||Math.abs(x.days)-Math.abs(y.days)).slice(0,5);
+      const m=b.match?L[b.match]:null;
+      out.rm={kind:'Statement line '+b.id+' · '+E.fd(b.date),desc:b.desc,sub:b.amt>=0?'Money in':'Money out',amt:(b.amt<0?'−':'+')+E.nf(Math.abs(b.amt),3),amtFg:b.amt<0?'#0E1116':'#1B7A3A',st:E.chip(b.match?'Matched':'Unmatched'),isMatched:!!b.match,isOpen:!b.match,
+        m:m?{date:E.fd(m.date),ref:m.ref,memo:m.memo,amt:E.nf(m.dr-m.cr,3)}:{},
+        cands:cands.map(x=>({date:E.fd(x.e.date),ref:x.e.ref,memo:x.e.memo,amt:E.nf(x.v,3),hint:x.d<0.0005?'Exact amount'+(x.days?' · '+E.pl(Math.abs(x.days),'day')+' apart':' · same day'):'Differs by '+E.nf(x.d,3),hintFg:x.d<0.0005?'#1B7A3A':'#8A5A00',bd:x.d<0.0005?'#A6DDB7':'#E6E8EC',bg:x.d<0.0005?'#F7FCF8':'#fff',
+          match:()=>{ if(!this.canEdit()) return this.toast('Viewer role is read-only',true); this.mut(db=>{ db.bank.find(y=>y.id===b.id).match=x.e.id; this.aud(db,'Bank line matched',b.id,b.desc+' ↔ '+x.e.ref); return {recModal:null}; }); this.toast(b.id+' matched to '+x.e.ref); }})),noCands:!cands.length,
+        acct:this.sel(acct,this.acctOpts(['1100','1120','1130','2100','2200','3000','4010','6400','6700','6950']),v=>set({acct:v})),memo:rm.memo||sug.memo,setMemo:e=>set({memo:e.target.value}),
+        preview:sug.lines.map(l=>({acct:l[0]+' · '+F.name(l[0]),dr:l[1]?E.nf(l[1],3):'',cr:l[2]?E.nf(l[2],3):''})),hint:this.locked(b.date)?this.lockMsg():sug.hint,hintFg:this.locked(b.date)?'#B42318':'#5B6270',
+        close:()=>this.setState({recModal:null}),
+        unmatch:()=>{ if(this.locked(b.date)) return this.toast('This line is in a closed period and stays matched',true); this.mut(db=>{ db.bank.find(y=>y.id===b.id).match=null; this.aud(db,'Bank line unmatched',b.id,b.desc); return {recModal:null}; }); this.toast(b.id+' unmatched'); },
+        create:()=>{ if(this.locked(b.date)) return this.toast(this.lockMsg(),true); if(!this.me().fin) return this.toast('Only Finance can post to the ledger',true); let ref;
+          this.mut(db=>{ ref=sug.ref; E.post(db,b.date,ref,(rm.memo||sug.memo).trim(),sug.lines); const e=db.ledger.slice().reverse().find(x=>x.ref===ref&&x.acct==='1110'); db.bank.find(y=>y.id===b.id).match=e.id; this.aud(db,'Bank line posted and matched',b.id,ref+' · '+E.k3(Math.abs(b.amt))); return {recModal:null}; });
+          this.toast(ref+' posted from the statement and matched to '+b.id); }};
+    }
+    return out;
   }
   // @@METHODS
 }

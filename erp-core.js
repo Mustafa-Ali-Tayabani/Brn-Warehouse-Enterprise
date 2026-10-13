@@ -15,7 +15,7 @@ const POOL={
   online:{key:'online',label:'Online',name:'Online Warehouse',bg:'#EEE8FD',fg:'#5B2FD1',dot:'#7C4DFF'}
 };
 const INVACCT={store:'1300',online:'1310'};
-const STAT={Draft:['#EEF0F3','#4A5160'],Sent:['#E6E8FB','#010ECF'],'Partially received':['#FDF1DC','#8A5A00'],Received:['#E3F3E8','#1B7A3A'],Closed:['#EEF0F3','#4A5160'],'In transit':['#FDF1DC','#8A5A00'],Unpaid:['#E6E8FB','#010ECF'],'Partially paid':['#FDF1DC','#8A5A00'],Paid:['#E3F3E8','#1B7A3A'],Overdue:['#FDE7E5','#B42318'],Posted:['#E3F3E8','#1B7A3A'],'In progress':['#E6E8FB','#010ECF'],Active:['#E3F3E8','#1B7A3A'],Inactive:['#EEF0F3','#4A5160'],Damaged:['#FDE7E5','#B42318'],'Opened pack':['#FDF1DC','#8A5A00'],Theft:['#F3E8FD','#7A2BB5'],'Count variance':['#EEF0F3','#4A5160'],Invited:['#E6E8FB','#010ECF'],Online:['#E3F3E8','#1B7A3A'],Idle:['#EEF0F3','#4A5160'],'Low battery':['#FDE7E5','#B42318'],'In stock':['#E3F3E8','#1B7A3A'],Low:['#FDF1DC','#8A5A00'],Out:['#FDE7E5','#B42318'],'On time':['#E3F3E8','#1B7A3A'],Late:['#FDF1DC','#8A5A00'],'Pending approval':['#FDF1DC','#8A5A00'],Approved:['#E3F3E8','#1B7A3A'],Picking:['#E6E8FB','#010ECF'],Packed:['#E3F3E8','#1B7A3A']};
+const STAT={Draft:['#EEF0F3','#4A5160'],Sent:['#E6E8FB','#010ECF'],'Partially received':['#FDF1DC','#8A5A00'],Received:['#E3F3E8','#1B7A3A'],Closed:['#EEF0F3','#4A5160'],'In transit':['#FDF1DC','#8A5A00'],Unpaid:['#E6E8FB','#010ECF'],'Partially paid':['#FDF1DC','#8A5A00'],Paid:['#E3F3E8','#1B7A3A'],Overdue:['#FDE7E5','#B42318'],Posted:['#E3F3E8','#1B7A3A'],'In progress':['#E6E8FB','#010ECF'],Active:['#E3F3E8','#1B7A3A'],Inactive:['#EEF0F3','#4A5160'],Damaged:['#FDE7E5','#B42318'],'Opened pack':['#FDF1DC','#8A5A00'],Theft:['#F3E8FD','#7A2BB5'],'Count variance':['#EEF0F3','#4A5160'],Invited:['#E6E8FB','#010ECF'],Online:['#E3F3E8','#1B7A3A'],Idle:['#EEF0F3','#4A5160'],'Low battery':['#FDE7E5','#B42318'],'In stock':['#E3F3E8','#1B7A3A'],Low:['#FDF1DC','#8A5A00'],Out:['#FDE7E5','#B42318'],'On time':['#E3F3E8','#1B7A3A'],Late:['#FDF1DC','#8A5A00'],'Pending approval':['#FDF1DC','#8A5A00'],Approved:['#E3F3E8','#1B7A3A'],Picking:['#E6E8FB','#010ECF'],Packed:['#E3F3E8','#1B7A3A'],'Awaiting Z-report':['#FDF1DC','#8A5A00'],Matched:['#E3F3E8','#1B7A3A'],Unmatched:['#FDF1DC','#8A5A00'],Reversed:['#EEF0F3','#4A5160'],Verified:['#E3F3E8','#1B7A3A']};
 const chip=s=>{ const c=STAT[s]||STAT.Draft; return {text:s,bg:c[0],fg:c[1]}; };
 const OPEN=['Draft','Pending approval','Approved','Sent','Partially received'];
 const APPROVAL_LIMIT=250;
@@ -23,7 +23,10 @@ const VENDOR_BY_CAT={Fashion:'V-01',Home:'V-03',Beauty:'V-01',Gadgets:'V-02'};
 const pl=(n,one,many)=>n+' '+(n===1?one:(many||one+'s'));
 const CATS=['Fashion','Home','Beauty','Gadgets'];
 const REASONS=['Damaged','Opened pack','Theft'];
-const ACCTS=[['1100','Cash on hand','Asset'],['1110','Bank — current account','Asset'],['1300','Inventory — Main Store','Asset'],['1310','Inventory — Online Warehouse','Asset'],['2100','Accounts payable','Liability'],['3000','Owner’s equity','Equity'],['4000','Sales — Main Store','Revenue'],['4010','Sales — Online','Revenue'],['5000','Cost of goods sold','Expense'],['5400','Shrinkage and write-offs','Expense']];
+const ACCTS=[['1100','Cash on hand','Asset'],['1110','Bank — current account','Asset'],['1120','K-Net settlement receivable','Asset'],['1130','Card settlement receivable','Asset'],['1300','Inventory — Main Store','Asset'],['1310','Inventory — Online Warehouse','Asset'],['1400','Prepaid expenses','Asset'],['1500','Store fixtures and equipment','Asset'],['1590','Accumulated depreciation','Asset'],['2100','Accounts payable','Liability'],['2200','Accrued expenses','Liability'],['3000','Owner’s equity','Equity'],['4000','Sales — Main Store','Revenue'],['4010','Sales — Online','Revenue'],['4050','Discounts and returns','Revenue'],['5000','Cost of goods sold','Expense'],['5400','Shrinkage and write-offs','Expense'],['6100','Rent','Expense'],['6200','Salaries and wages','Expense'],['6300','Utilities and telecom','Expense'],['6400','Payment processing fees','Expense'],['6500','Marketing','Expense'],['6600','Delivery and couriers','Expense'],['6700','Bank charges','Expense'],['6800','Depreciation','Expense'],['6900','Cash over and short','Expense'],['6950','General and admin','Expense']];
+const EXP_ACCTS=['6100','6200','6300','6400','6500','6600','6700','6800','6900','6950','1400'];
+const KN_FEE=0.0075, CARD_FEE=0.0225, FLOAT=100, STMT_DATE='2026-10-06', LEDGER_CUT='2026-10-05';
+const r3=v=>Math.round(v*1000)/1000;
 
 const EL=['0001101','0011001','0010011','0111101','0100011','0110001','0101111','0111011','0110111','0001011'];
 const PAR=['LLLLLL','LLGLGG','LLGGLG','LLGGGL','LGLLGG','LGGLLG','LGGGLL','LGLGLG','LGLGGL','LGGLGL'];
@@ -83,7 +86,7 @@ const poCalc=(po,db)=>{
 };
 const invStatus=v=>v.paid>=v.amount-0.0005?'Paid':v.paid>0?'Partially paid':v.due<TODAY?'Overdue':'Unpaid';
 const invRate=(db,v)=>v.rate!=null?v.rate:rate(db,v.ccy);
-const post=(db,date,ref,memo,lines)=>{ lines.forEach(([acct,dr,cr])=>db.ledger.push({id:db.ledger.length+1,date,ref,memo,acct,dr:Math.round(dr*1000)/1000,cr:Math.round(cr*1000)/1000})); };
+const post=(db,date,ref,memo,lines)=>{ lines.filter(l=>Math.abs(l[1])>0.0005||Math.abs(l[2])>0.0005).forEach(([acct,dr,cr])=>db.ledger.push({id:db.ledger.length+1,date,ref,memo,acct,dr:Math.round(dr*1000)/1000,cr:Math.round(cr*1000)/1000})); };
 const audit=(db,date,time,user,action,ref,detail)=>db.audit.push({id:db.audit.length+1,date,time,user,action,ref,detail});
 
 const USERS=[
@@ -122,7 +125,7 @@ function seed(){
   const U=[0.30652,0.30668,0.30661,0.30679,0.30690,0.30684,0.30702], C=[0.04281,0.04285,0.04279,0.04288,0.04292,0.04290,0.04296], A=[0.08346,0.08350,0.08348,0.08353,0.08356,0.08354,0.08359];
   const rates=U.map((u,i)=>({date:addDays('2026-09-30',i),USD:u,CNY:C[i],AED:A[i]}));
   while(rates[0].date>OPEN_DATE){ const f=rates[0]; const d=()=>1+(R()-.5)*0.0024; rates.unshift({date:addDays(f.date,-1),USD:+(f.USD*d()).toFixed(5),CNY:+(f.CNY*d()).toFixed(5),AED:+(f.AED*d()).toFixed(5)}); }
-  const db={items,stock,moves:[],vendors,rates,pos:[],grns:[],transfers:[],counts:[],writeoffs:[],invoices:[],ledger:[],sales:[],online:[],audit:[],seq:{PO:144,GRN:92,TRF:35,CNT:14,WO:47,INV:208,BT:55120}};
+  const db={items,stock,moves:[],vendors,rates,pos:[],grns:[],transfers:[],counts:[],writeoffs:[],invoices:[],ledger:[],sales:[],online:[],audit:[],seq:{PO:144,GRN:92,TRF:35,CNT:14,WO:47,INV:208,BT:55120,EXP:64,JV:13,CAP:12,BS:1}};
 
   const P=(no,vendor,ccy,date,eta,dest,status,freight,duty,lines,log,by)=>({no,vendor,ccy,date,eta,dest,status,freight,duty,rate:null,rateDate:null,lines,log,by});
   db.pos=[
@@ -238,20 +241,77 @@ function seed(){
   post(db,OPEN_DATE,'OPEN','Opening inventory — Main Store',[['1300',sv('store'),0],['3000',0,sv('store')]]);
   post(db,OPEN_DATE,'OPEN','Opening inventory — Online Warehouse',[['1310',sv('online'),0],['3000',0,sv('online')]]);
   post(db,OPEN_DATE,'OPEN','Opening bank and cash',[['1110',16500,0],['1100',350,0],['3000',0,16850]]);
+  post(db,OPEN_DATE,'OPEN','Opening fixtures and equipment',[['1500',4200,0],['3000',0,4200]]);
   const op=412*0.30612; post(db,OPEN_DATE,'OPEN','Opening payables',[['3000',op,0],['2100',0,op]]);
   db.grns.forEach(g=>post(db,g.date,g.no,'Goods received on '+g.po,[[INVACCT[g.loc],g.valK,0],['2100',0,g.valK]]));
   db.invoices.forEach(v=>v.payments.forEach(p=>post(db,p.date,v.no,'Payment '+p.ref+' to '+V[v.vendor].name,[['2100',p.k,0],['1110',0,p.k]])));
   db.counts.forEach(c=>{ const v=c.lines.reduce((a,l)=>a+(l.sys-l.counted)*l.cost,0); if(v) post(db,c.date,c.no,'Count variance — '+POOL[c.loc].name,[['5400',v,0],[INVACCT[c.loc],0,v]]); });
   db.writeoffs.forEach(w=>post(db,w.date,w.no,'Write-off · '+w.reason,[['5400',w.value,0],[INVACCT[w.loc],0,w.value]]));
   db.transfers.forEach(t=>{ if(t.status==='Draft') return; const v=t.lines.reduce((a,l)=>a+l.qty*IT[l.sku].cost,0); post(db,t.date,t.no,'Transfer '+POOL[t.from].label+' → '+POOL[t.to].label,[[INVACCT[t.to],v,0],[INVACCT[t.from],0,v]]); });
+  // POS daily close. Every closed shift prints a Z-report; the last closed day is still waiting for its Z-report to be captured.
+  const lastClosed=addDays(TODAY,-1); db.zreports=[];
   for(let d=0;d<days;d++){ const date=addDays(START,d); const mmdd=date.slice(5,7)+date.slice(8,10);
-    const ss=db.sales.filter(s=>s.date===date); const rev=ss.reduce((a,s)=>a+s.total,0); const cogs=ss.reduce((a,s)=>a+s.lines.reduce((b,l)=>b+l.qty*IT[l.sku].cost,0),0);
-    const cash=ss.filter(s=>s.pay==='Cash').reduce((a,s)=>a+s.total,0);
-    if(rev){ post(db,date,'Z-'+mmdd,'Store sales',[['1100',cash,0],['1110',rev-cash,0],['4000',0,rev]]); post(db,date,'Z-'+mmdd,'Cost of store sales',[['5000',cogs,0],['1300',0,cogs]]); }
+    const ss=db.sales.filter(s=>s.date===date);
+    if(ss.length&&date<TODAY){ const by=p=>r3(ss.filter(s=>s.pay===p).reduce((a,s)=>a+s.total,0)); const cash=by('Cash'), knet=by('K-Net'), card=by('Card'), net=r3(cash+knet+card);
+      const os=date===lastClosed?0:(R()<0.2?[-0.25,-0.5,0.1,-1,0.25][Math.floor(R()*5)]:0);
+      const z={no:'Z-'+mmdd,date,register:'POS-01',cashier:cashiers[d%3],receipts:ss.length,units:ss.reduce((a,s)=>a+s.lines.reduce((b,l)=>b+l.qty,0),0),gross:net,disc:0,ret:0,net,cash,knet,card,float:FLOAT,counted:r3(FLOAT+cash+os),os,status:'Posted',source:date>='2026-10-01'?'OCR capture':'Keyed in',postedBy:'Layla Karim',postedOn:addDays(date,1)};
+      if(date===lastClosed){ z.status='Awaiting Z-report'; z.source='—'; z.counted=null; z.os=null; z.postedBy=null; z.postedOn=null; }
+      db.zreports.push(z);
+      if(z.status==='Posted'){ const cogs=ss.reduce((a,s)=>a+s.lines.reduce((b,l)=>b+l.qty*IT[l.sku].cost,0),0);
+        post(db,date,z.no,'Store sales — daily close',[['1100',cash+os,0],['1120',knet,0],['1130',card,0],['6900',os<0?-os:0,os>0?os:0],['4000',0,net]]);
+        post(db,date,z.no,'Cost of store sales',[['5000',cogs,0],['1300',0,cogs]]);
+        [['KN',knet,KN_FEE,1,'1120','K-Net'],['CS',card,CARD_FEE,2,'1130','Card']].forEach(([px,g,f,lag,acct,lab])=>{ const sd=addDays(date,lag); if(!g) return; const fee=r3(g*f); const rec={ref:px+'-'+mmdd,date:sd,gross:g,fee,net:r3(g-fee),acct,lab,z:z.no};
+          (db.settlements=db.settlements||[]).push(rec); if(sd<=LEDGER_CUT) post(db,sd,rec.ref,lab+' settlement for '+z.no,[['1110',rec.net,0],['6400',fee,0],[acct,0,g]]); }); } }
     const os=db.online.filter(o=>o.date===date); const orev=os.reduce((a,o)=>a+o.qty*o.price,0), ocogs=os.reduce((a,o)=>a+o.qty*IT[o.sku].cost,0);
     if(orev){ post(db,date,'SO-'+mmdd,'Online sales',[['1110',orev,0],['4010',0,orev]]); post(db,date,'SO-'+mmdd,'Cost of online sales',[['5000',ocogs,0],['1310',0,ocogs]]); }
   }
+  // operating expenses
+  const X=(date,acct,payee,desc,amount,method,o)=>({date,acct,payee,desc,amount,method,...(o||{})});
+  const exps=[
+    X('2026-08-09','6100','Al-Salam Real Estate Co.','Shop rent, August 2026',650,'Bank'),
+    X('2026-08-09','1400','Gulf Insurance Group','Shop all-risk insurance, 12 months',240,'Bank'),
+    X('2026-08-10','6500','Meta Platforms Ireland','Instagram launch campaign',85,'Bank'),
+    X('2026-08-16','6300','Zain Kuwait','Fibre internet and POS data SIMs, August',24,'Bank'),
+    X('2026-08-18','6300','Ministry of Electricity and Water','Electricity and water, July',38.5,'Bank'),
+    X('2026-08-20','6950','Al-Mulla Office Supplies','Thermal rolls and stationery',18.75,'Cash'),
+    X('2026-08-23','6600','Armada Delivery','Online deliveries, weeks 33–34',46,'Bank'),
+    X('2026-08-31','6200','Payroll — WPS','August salaries, 9 staff',980,'Bank'),
+    X('2026-09-01','6100','Al-Salam Real Estate Co.','Shop rent, September 2026',650,'Bank'),
+    X('2026-09-06','6600','Armada Delivery','Online deliveries, weeks 35–36',52.5,'Bank'),
+    X('2026-09-08','6950','Kuwait Chamber of Commerce','Annual membership renewal',35,'Bank'),
+    X('2026-09-10','6500','Meta Platforms Ireland','Back-to-school campaign',120,'Bank'),
+    X('2026-09-12','6950','Al-Mulla Office Supplies','Cleaning supplies',7.5,'Cash'),
+    X('2026-09-15','6300','Ministry of Electricity and Water','Electricity and water, August',41.25,'Bank'),
+    X('2026-09-16','6300','Zain Kuwait','Fibre internet and POS data SIMs, September',24,'Bank'),
+    X('2026-09-20','6600','Armada Delivery','Online deliveries, weeks 37–38',49,'Bank'),
+    X('2026-09-27','6950','Sultan Center','Staff water and refreshments',9.25,'Cash'),
+    X('2026-09-30','6200','Payroll — WPS','September salaries, 9 staff',980,'Bank'),
+    X('2026-09-30','6300','Ministry of Electricity and Water','Electricity and water, September',43.9,'Unpaid',{due:'2026-10-20'}),
+    X('2026-10-01','6100','Al-Salam Real Estate Co.','Shop rent, October 2026',650,'Bank'),
+    X('2026-10-04','6600','Armada Delivery','Online deliveries, weeks 39–40',55.5,'Bank'),
+    X('2026-10-05','6500','Meta Platforms Ireland','Autumn collection campaign',95,'Unpaid',{due:'2026-10-12'}),
+    X('2026-10-06','6950','Al-Mulla Office Supplies','Price labels 50 × 25 mm',4.5,'Cash')];
+  db.expenses=exps.map((x,i)=>{ const no='EXP-2026-'+pad(40+i); const e={no,...x,amount:r3(x.amount),status:x.method==='Unpaid'?'Unpaid':'Paid',paidOn:x.method==='Unpaid'?null:x.date,by:x.method==='Cash'?'Yousef Hamdan':'Layla Karim',ocr:false};
+    post(db,x.date,no,x.payee+' · '+x.desc,[[x.acct,e.amount,0],[x.method==='Cash'?'1100':x.method==='Bank'?'1110':'2200',0,e.amount]]); return e; });
+  db.seq.EXP=40+exps.length;
+  // month-end journals (September not yet posted, see period close)
+  db.journals=[{no:'JV-2026-0012',date:'2026-08-31',memo:'Month-end: depreciation and insurance, August 2026',by:'Layla Karim',status:'Posted',lines:[{acct:'6800',dr:70,cr:0,memo:'Fixtures 4,200 over 60 months'},{acct:'1590',dr:0,cr:70,memo:''},{acct:'6950',dr:20,cr:0,memo:'Insurance 240 over 12 months'},{acct:'1400',dr:0,cr:20,memo:''}]}];
+  db.journals.forEach(j=>post(db,j.date,j.no,j.memo,j.lines.map(l=>[l.acct,l.dr,l.cr])));
+  post(db,'2026-08-31','BC-0831','Bank account maintenance fee, August',[['6700',2.5,0],['1110',0,2.5]]);
+  // cash deposits on Sundays and Wednesdays, keeping a KWD 100 float in the drawer
+  for(let d=1;d<days;d++){ const date=addDays(START,d); if(![0,3].includes(weekday(date))) continue; const bal=db.ledger.filter(e=>e.acct==='1100'&&e.date<date).reduce((a,e)=>a+e.dr-e.cr,0); const amt=Math.floor(bal-FLOAT);
+    if(amt>=20) post(db,date,'CD-'+date.slice(5,7)+date.slice(8,10),'Cash deposited to bank',[['1110',amt,0],['1100',0,amt]]); }
   db.ledger.sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id); db.ledger.forEach((e,i)=>e.id=i+1);
+  // bank statement imported up to 06 Oct; September is reconciled except the month-end fee
+  const DESC=e=>{ const r=e.ref; if(r.startsWith('SO-')) return 'MYFATOORAH SETTLEMENT '+r.slice(3); if(r.startsWith('KN-')) return 'KNET POS SETTLEMENT MID 400123 '+r.slice(3); if(r.startsWith('CS-')) return 'VISA/MC MERCHANT SETTLEMENT '+r.slice(3); if(r.startsWith('CD-')) return 'CASH DEPOSIT · SALMIYA BRANCH'; if(r.startsWith('INV')) return 'OUTWARD TRANSFER · '+e.memo.replace(/^Payment \S+ to /,'').toUpperCase(); if(r.startsWith('BC-')) return 'ACCOUNT MAINTENANCE FEE'; if(r.startsWith('EXP')) return (e.memo.split(' · ')[0]).toUpperCase(); return e.memo.toUpperCase(); };
+  db.bank=[]; const bl=(date,desc,amt,match)=>db.bank.push({id:'BS-'+pad(db.seq.BS++),date,desc,amt:r3(amt),match:match||null});
+  db.ledger.filter(e=>e.acct==='1110'&&e.ref!=='OPEN'&&e.date<=STMT_DATE).forEach(e=>bl(e.date,DESC(e),e.dr-e.cr,e.date<='2026-09-30'?e.id:null));
+  bl('2026-09-30','ACCOUNT MAINTENANCE FEE',-2.5,null);
+  db.settlements.filter(x=>x.date>LEDGER_CUT&&x.date<=STMT_DATE).forEach(x=>bl(x.date,(x.acct==='1120'?'KNET POS SETTLEMENT MID 400123 ':'VISA/MC MERCHANT SETTLEMENT ')+x.z.slice(2),x.net,null));
+  db.bank.sort((a,b)=>a.date.localeCompare(b.date)); db.bank.forEach((x,i)=>x.id='BS-'+pad(i+1)); db.seq.BS=db.bank.length+1; db.bankOpen=16500;
+  db.lockDate='2026-08-31'; db.close={period:'2026-09',accruals:false}; db.closed=[{period:'2026-08',by:'Layla Karim',on:'2026-09-03',lock:'2026-08-31'}];
+  db.captures=db.zreports.filter(z=>z.source==='OCR capture').map((z,i)=>({no:'CAP-2026-'+pad(i+7),date:z.postedOn,time:'09:'+String(12+i*7).padStart(2,'0'),type:'Z-report',file:'IMG_'+(2041+i*3)+'.jpg',conf:[96.4,93.1,97.2,91.8,95.5][i%5],status:'Posted',ref:z.no,by:'Layla Karim'}));
+  db.seq.CAP=7+db.captures.length;
 
   // audit log
   const tm=()=>String(8+Math.floor(R()*11)).padStart(2,'0')+':'+String(Math.floor(R()*60)).padStart(2,'0');
@@ -263,6 +323,10 @@ function seed(){
   db.invoices.forEach(v=>{ audit(db,v.date,tm(),'System','Invoice created',v.no,v.grn?'From '+v.grn+' on '+v.po:'Entered for '+v.po); v.payments.forEach(p=>audit(db,p.date,tm(),'Layla Karim','Payment recorded',v.no,mny(p.amount,v.ccy))); });
   rates.forEach(r=>{ if(r.date>='2026-09-20') audit(db,r.date,'07:00','System','Exchange rates updated','RATES','Sample rates USD, CNY, AED'); });
   for(let d=0;d<days-1;d++){ const date=addDays(START,d); audit(db,date,'22:15',cashiers[d%3],'Shift closed','Z-'+date.slice(5,7)+date.slice(8,10),'Z-report printed'); }
+  db.zreports.filter(z=>z.status==='Posted').forEach(z=>audit(db,z.postedOn,'09:'+String(10+Math.floor(R()*40)).padStart(2,'0'),'Layla Karim','Z-report posted',z.no,(z.source==='OCR capture'?'Captured by OCR · ':'')+'Net sales '+k3(z.net)+(z.os?' · cash '+(z.os>0?'over ':'short ')+nf(Math.abs(z.os),3):'')));
+  db.expenses.forEach(e=>audit(db,e.date,tm(),e.by,'Expense recorded',e.no,e.payee+' · '+k3(e.amount)+' · '+e.method));
+  db.journals.forEach(j=>audit(db,j.date,'18:30',j.by,'Journal posted',j.no,j.memo));
+  db.captures.forEach(c=>audit(db,c.date,c.time,c.by,'Document captured',c.no,c.type+' '+c.ref+' · OCR confidence '+c.conf+'%'));
   db.audit.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)); db.audit.forEach((e,i)=>e.id=i+1);
   db.devices=DEVICES.map(d=>({...d}));
   db.orders=[{no:'SO-2026-0412',cust:'Salmiya · Block 10',slot:'Today 16:00–18:00',lines:[{sku:'BE-LIP-ROS',qty:2},{sku:'FA-TOT-CRM',qty:1}]},{no:'SO-2026-0413',cust:'Jabriya · Block 8',slot:'Today 18:00–20:00',lines:[{sku:'GA-CBL-C1M',qty:3},{sku:'HO-CND-VAN',qty:1},{sku:'BE-MSK-5PK',qty:1}]},{no:'SO-2026-0415',cust:'Hawalli · Block 2',slot:'Tomorrow 10:00–12:00',lines:[{sku:'FA-HOD-GRY-M',qty:1},{sku:'GA-EAR-WHT',qty:1}]}].map(o=>({...o,status:'Picking',picked:{},short:{}}));
@@ -276,5 +340,5 @@ const eanFor=n=>eanCheck('6271234'+String(n).padStart(5,'0'));
 const NOTES_KEY='nv-erp-delivery-notes';
 const readNotes=()=>{ try{ return JSON.parse(localStorage.getItem(NOTES_KEY)||'{}'); }catch(e){ return {}; } };
 const addNote=(po,note)=>{ try{ const n=readNotes(); (n[po]=n[po]||[]).push(note); localStorage.setItem(NOTES_KEY,JSON.stringify(n)); }catch(e){} };
-window.ERP={LOGO,LOGO_WHITE,eanFor,readNotes,addNote,APPROVAL_LIMIT,VENDOR_BY_CAT,pl,TODAY,START,OPEN_DATE,fd,fds,nf,k3,mny,addDays,dayDiff,weekday,pad,POOL,INVACCT,chip,OPEN,CATS,REASONS,ACCTS,eanSvg,eanValid,symbology,rate,rateOn,poCalc,invStatus,invRate,post,audit,seed,USERS};
+window.ERP={EXP_ACCTS,KN_FEE,CARD_FEE,FLOAT,STMT_DATE,r3,LOGO,LOGO_WHITE,eanFor,readNotes,addNote,APPROVAL_LIMIT,VENDOR_BY_CAT,pl,TODAY,START,OPEN_DATE,fd,fds,nf,k3,mny,addDays,dayDiff,weekday,pad,POOL,INVACCT,chip,OPEN,CATS,REASONS,ACCTS,eanSvg,eanValid,symbology,rate,rateOn,poCalc,invStatus,invRate,post,audit,seed,USERS};
 })();
